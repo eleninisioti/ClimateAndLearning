@@ -187,7 +187,6 @@ class Life:
         num_generalists += 1
         gen_means.append(agent.mean)
         gen_stds.append(agent.SD)
-        print(idx)
       else:
         num_extinctions_spec += agent.is_extinct(self.env.mean)
         spec_means.append(agent.mean)
@@ -251,14 +250,22 @@ class Life:
     # Initialize population
     if self.config.env_type == "change":
       self.env = ChangeEnv(self.config.climate_mean_init, self.config.capacity)
+      self.log["env_profile"] = {"start_a": self.env.b1, "end_a": self.env.b2,
+                                 "start_b": self.env.b3, "end_b": self.env.b4}
     elif self.config.env_type == "sin":
       self.env = SinEnv(self.config.climate_period, self.config.capacity)
+      self.log["env_profile"] = {}
+
     elif self.config.env_type == "combined":
       self.env = CombEnv(self.config.capacity, self.config.scale_time, self.config.model)
+      self.log["env_profile"] = {"start_a": self.env.b1, "end_a": self.env.b2,
+                                 "start_b": self.env.b3, "end_b": self.env.b4}
+
     self.agents = []
 
+
+
     num_agents_init = int(np.min([self.config.num_agents, self.env.capacity]))
-    print(num_agents_init)
     for _ in range(num_agents_init):
       agent_mean = normal(self.env.mean, self.config.init_SD)
       agent_SD = np.abs(normal(0, self.config.init_SD))
@@ -266,6 +273,10 @@ class Life:
 
     self.evaluate_gen()
     self.process_agents(gen=0)
+
+
+    print(random.randint(1,10))
+    print(np.random.normal())
 
 
     # run generations
@@ -276,9 +287,6 @@ class Life:
       # find new generation
       if not self.new_gen(mutate=self.config.mutate):
         return self.log
-
-      if gen==800:
-        print("check number of generalists")
 
       # compute metrics for new generation
       self.evaluate_gen()

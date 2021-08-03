@@ -11,8 +11,7 @@ log = pickle.load(open(top_dir + current_project + '/log.pickle', 'rb'))
 
 
 plotter = Plotter(current_project)
-plotter.plot_project(log)
-plotter.plot_species(log)
+plotter.plot_trial(log, 0)
 
 
 

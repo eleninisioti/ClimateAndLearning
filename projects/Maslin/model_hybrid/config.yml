@@ -1,0 +1,12 @@
+!!python/object:argparse.Namespace
+capacity: 1000
+climate_mean_init: 1.0
+climate_period: 10
+env_type: combined
+init_SD: 0.1
+model: B
+mutate: 0.005
+num_agents: 1000
+num_gens: 5000
+project: Maslin/modelB_v2_repeat
+scale_time: 1

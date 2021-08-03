@@ -1,0 +1,12 @@
+!!python/object:argparse.Namespace
+capacity: 1000
+climate_mean_init: 1.0
+climate_period: 10
+env_type: sin
+init_SD: 0.1
+model: hybrid_nocapac
+mutate: 0.005
+num_agents: 1000
+num_gens: 2500
+project: Grove_2014/Fig4_extinct
+scale_time: 1

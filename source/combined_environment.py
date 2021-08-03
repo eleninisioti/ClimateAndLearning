@@ -31,6 +31,12 @@ class CombEnv(Env):
     self.orig_capacity = orig_capacity
     self.capacity = self.orig_capacity*self.low
     self.cycles = 1
+    self.b1_values = [self.b1]
+    self.b2_values = [self.b2]
+    self.b3_values = [self.b3]
+    self.b4_values = [self.b4]
+
+
 
 
   def climate_func(self, gen):
@@ -74,6 +80,11 @@ class CombEnv(Env):
       self.b4 = self.b3 + int(2000 / self.generation_duration)
       self.b5 = self.b4 + int(8000 / self.generation_duration)
       print(self.b1, self.b2, self.b3,self.b4, self.b5)
+      self.b1_values.append(self.b1)
+      self.b3_values.append(self.b2)
+      self.b3_values.append(self.b3)
+      self.b4_values.append(self.b4)
+
 
 
     # TODO: this is for debugging

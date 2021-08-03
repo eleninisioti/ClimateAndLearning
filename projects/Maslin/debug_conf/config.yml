@@ -7,7 +7,7 @@ init_SD: 0.1
 model: hybrid
 mutate: 0.005
 num_agents: 1000
-num_gens: 2500
-num_trials: 10
+num_gens: 6000
+num_trials: 2
 project: Maslin/debug_conf
 scale_time: 1

@@ -36,14 +36,15 @@ class Plotter:
 
     # highlight periods of variability
     if len(self.env_profile):
-      axs[0].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[0].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
-      axs[1].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[1].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
-      axs[2].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[2].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
-      axs[3].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[3].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
+      for cycle in range(len(self.env_profile["start_a"])):
+        axs[0].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        axs[0].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
+        axs[1].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        axs[1].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
+        axs[2].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        axs[2].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
+        axs[3].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle] , alpha=0.5, color='red')
+        axs[3].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
 
     plt.savefig("../projects/" + self.project + "/trials/trial_" + str(trial) + "/plots/evolution.png")
     plt.clf()
@@ -61,14 +62,15 @@ class Plotter:
     axs[3].set(ylabel="$\\bar{f}$")
     # highlight periods of variability
     if len(self.env_profile):
-      axs[0].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[0].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
-      axs[1].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[1].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
-      axs[2].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[2].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
-      axs[3].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[3].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
+      for cycle in range(len(self.env_profile["start_a"])):
+        axs[0].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        axs[0].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
+        axs[1].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        axs[1].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
+        axs[2].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        axs[2].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
+        axs[3].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        axs[3].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
 
     plt.savefig("../projects/" + self.project + "/plots/evolution.png")
     plt.clf()
@@ -117,14 +119,15 @@ class Plotter:
     axs[3].set(xlabel="Time (in generations)")
     # highlight periods of variability
     if len(self.env_profile):
-      axs[0].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[0].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
-      axs[1].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[1].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
-      axs[2].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[2].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
-      axs[3].axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      axs[3].axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
+      for cycle in range(len(self.env_profile["start_a"])):
+        axs[0].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        axs[0].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
+        axs[1].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        axs[1].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
+        axs[2].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        axs[2].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
+        axs[3].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle] , alpha=0.5, color='red')
+        axs[3].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
 
     plt.savefig("../projects/" + self.project + "/trials/trial_" + str(trial) + "/plots/species.png")
     plt.clf()
@@ -193,8 +196,10 @@ class Plotter:
 
     # highlight periods of variability
     if len(self.env_profile):
-      plt.axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      plt.axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
+      for cycle in range(len(self.env_profile["start_a"])):
+        plt.axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        plt.axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
+
 
     plt.savefig("../projects/" + self.project + "/trials/trial_" + str(trial) + "/plots/diversity.png")
     plt.clf()
@@ -210,8 +215,9 @@ class Plotter:
 
     # highlight periods of variability
     if len(self.env_profile):
-      plt.axvspan(self.env_profile["start_a"], self.env_profile["end_a"] , alpha=0.5, color='red')
-      plt.axvspan(self.env_profile["start_b"], self.env_profile["end_b"], alpha=0.5, color='blue')
+      for cycle in range(len(self.env_profile["start_a"])):
+        plt.axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5, color='red')
+        plt.axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5, color='blue')
 
     plt.savefig("../projects/" + self.project + "/plots/diversity.png")
     plt.clf()

@@ -63,8 +63,8 @@ def main(args):
       plotter = Plotter(args.project, env_profile)
       plotter.plot_trial(log, trial)
 
-    with open('../projects/' + args.project + '/log.pickle', 'wb') as pfile:
-      pickle.dump(log_df, pfile)
+    with open('../projects/' + args.project + '/log_total.pickle', 'wb') as pfile:
+      pickle.dump([log_df,env_profile], pfile)
     plotter.plot_with_conf(log_df)
 
   except KeyboardInterrupt:

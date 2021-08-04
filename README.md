@@ -14,7 +14,7 @@ Install required dependencies by running
 
 `conda env create -f environment.yml`
 
-File `simulate.py` is the main interface and accepts a variety of arguments. For example, a simulation on Maslin's climate model can be run as:
+File `simulate.py` is the main interface and accepts a variety of arguments. It needs to be called from the `source` directory. For example, a simulation on Maslin's climate model can be run as:
 
 `python simulate.py --project Maslin/my_project --env_type combined --model hybrid --num_gens 2500`
 

@@ -10,15 +10,13 @@ import yaml
 import pandas as pd
 import random
 import numpy as np
+from pathlib import Path
 
 def main(args):
   # create project sub-directories
   if not os.path.exists("../projects/" + args.project + "/plots"):
     os.makedirs("../projects/" + args.project + "/plots")
 
-  for trial in range(args.num_trials):
-    if not os.path.exists("../projects/" + args.project + "/trials/trial_" + str(trial) + "/plots"):
-      os.makedirs("../projects/" + args.project + "/trials/trial_" + str(trial) + "/plots")
 
   # save projecct configuration
   with open("../projects/" + args.project + '/config.yml', 'w') as outfile:
@@ -39,6 +37,9 @@ def main(args):
     else:
       trials_range = list(range(args.num_trials))
     for trial in trials_range:
+      if not os.path.exists("../projects/" + args.project + "/trials/trial_" + str(trial) + "/plots"):
+        Path("../projects/" + args.project + "/trials/trial_" + str(trial) + "/plots").mkdir(parents=True, exist_ok=True)
+
       print(trial)
       random.seed(trial)
       np.random.seed(trial)

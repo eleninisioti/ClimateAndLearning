@@ -81,7 +81,7 @@ class CombEnv(Env):
       self.b5 = self.b4 + int(8000 / self.generation_duration)
       print(self.b1, self.b2, self.b3,self.b4, self.b5)
       self.b1_values.append(self.b1)
-      self.b3_values.append(self.b2)
+      self.b2_values.append(self.b2)
       self.b3_values.append(self.b3)
       self.b4_values.append(self.b4)
 

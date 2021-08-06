@@ -10,7 +10,10 @@
 #SBATCH --mail-type=fail
 #SBATCH --mail-user=eleni.nisioti@inria.fr
 
-python simulate.py --project Maslin/presentation --env_type combined --model hybrid --num_gens 10000 --num_trials 10
+for i in {1..10}
+  do
+    python simulate.py --project Maslin/presentation --env_type combined --model hybrid --num_gens 10000 --trial $i
+  done
 
 
 

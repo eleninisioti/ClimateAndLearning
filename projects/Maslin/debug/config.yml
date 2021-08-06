@@ -4,9 +4,10 @@ climate_mean_init: 1.0
 climate_period: 10
 env_type: combined
 init_SD: 0.1
-model: hybrid
+model: A
 mutate: 0.005
-num_agents: 1000
-num_gens: 5
+num_agents: 1
+num_gens: 10000
+num_trials: 10
 project: Maslin/debug
 scale_time: 1

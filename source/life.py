@@ -251,8 +251,7 @@ class Life:
     if self.config.env_type == "change":
       self.env = ChangeEnv(self.config.climate_mean_init, self.config.capacity)
       self.log["env_profile"] = {"start_a": self.env.b1, "end_a": self.env.b2,
-                                 "start_b": self.env.b3, "end_b": self.env.b4,
-                                 "cycles": self.cycles}
+                                 "start_b": self.env.b3, "end_b": self.env.b4}
     elif self.config.env_type == "sin":
       self.env = SinEnv(self.config.climate_period, self.config.capacity)
       self.log["env_profile"] = {}
@@ -296,6 +295,18 @@ class Life:
         print("Generation: ", gen)
 
       self.log["climate_values"] = self.env.climate_values
+
+      # Initialize population
+      if self.config.env_type == "change":
+        self.log["env_profile"] = {"start_a": self.env.b1, "end_a": self.env.b2,
+                                   "start_b": self.env.b3, "end_b": self.env.b4,
+                                   "cycles": self.cycles}
+      elif self.config.env_type == "sin":
+        self.log["env_profile"] = {}
+
+      elif self.config.env_type == "combined":
+        self.log["env_profile"] = {"start_a": self.env.b1_values, "end_a": self.env.b2_values,
+                                   "start_b": self.env.b3_values, "end_b": self.env.b4_values}
 
     return self.log
 

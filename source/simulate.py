@@ -34,7 +34,11 @@ def main(args):
                                  "Generalists_Diversity_Mean","Generalists_Diversity_SD"],
                         dtype=np.float)
   try:
-    for trial in range(args.num_trials):
+    if args.trial:
+      trials_range = [args.trial]
+    else:
+      trials_range = list(range(args.num_trials))
+    for trial in trials_range:
       print(trial)
       random.seed(trial)
       np.random.seed(trial)
@@ -57,6 +61,10 @@ def main(args):
                      "Generalists_Diversity_Mean": [log["generalists"]["diversity_mean"][step]],
                      "Generalists_Diversity_SD": [log["generalists"]["diversity_std"][step]]}
         log_df = log_df.append(pd.DataFrame.from_dict(trial_log))
+
+        with open('../projects/' + args.project + '/log_total_part_' + str(trial) + '.pickle', 'wb') as pfile:
+          pickle.dump([log_df, env_profile], pfile)
+
       with open('../projects/' + args.project + '/trials/trial_' + str(trial) + '/log.pickle', 'wb') as pfile:
         pickle.dump(log, pfile)
 
@@ -104,6 +112,11 @@ if __name__== "__main__":
                       help='Name of generations',
                       type=int,
                       default=50)
+
+  parser.add_argument('--trial',
+                      help='Current trial',
+                      type=int,
+                      default=0)
 
   parser.add_argument('--climate_mean_init',
                       help="Mean of climate",

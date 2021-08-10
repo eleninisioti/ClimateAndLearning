@@ -8,7 +8,7 @@ logs_dir = "/gpfsscratch/rech/imi/utw61ti/logs"
 python_path = "python"
 code_dir = "/gpfswork/rech/imi/utw61ti/workspace/ClimateAndLearning/source"
 slurm_dir = "/gpfswork/rech/imi/utw61ti/workspace/ClimateAndLearning/jz/slurm"
-preparatory_commands = "module purge\n module load pytorch-gpu/py3/1.7.1\n"
+prep = "module purge\n module load pytorch-gpu/py3/1.7.1\n"
 
 
 def run_exp(

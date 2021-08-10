@@ -300,14 +300,14 @@ class Life:
       if self.config.env_type == "change":
         self.log["env_profile"] = {"start_a": self.env.b1, "end_a": self.env.b2,
                                    "start_b": self.env.b3, "end_b": self.env.b4,
-                                   "cycles": self.cycles}
+                                   "cycles": self.env.cycles}
       elif self.config.env_type == "sin":
         self.log["env_profile"] = {}
 
       elif self.config.env_type == "combined":
         self.log["env_profile"] = {"start_a": self.env.b1_values, "end_a": self.env.b2_values,
                                    "start_b": self.env.b3_values, "end_b": self.env.b4_values,
-                                   "ncycles": self.cycles, "cycle": self.b5}
+                                   "ncycles": self.env.cycles, "cycle": self.env.b5_values[0]}
 
     return self.log
 

@@ -1,3 +1,7 @@
+import sys
+
+sys.path.insert(0, "../jz")
+
 from jz.auto_sbatch import run_exp
 import itertools
 

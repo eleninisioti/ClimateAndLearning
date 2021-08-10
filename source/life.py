@@ -306,7 +306,8 @@ class Life:
 
       elif self.config.env_type == "combined":
         self.log["env_profile"] = {"start_a": self.env.b1_values, "end_a": self.env.b2_values,
-                                   "start_b": self.env.b3_values, "end_b": self.env.b4_values}
+                                   "start_b": self.env.b3_values, "end_b": self.env.b4_values,
+                                   "ncycles": self.cycles, "cycle": self.b5}
 
     return self.log
 

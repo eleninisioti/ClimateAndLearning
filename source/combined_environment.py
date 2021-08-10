@@ -35,6 +35,7 @@ class CombEnv(Env):
     self.b2_values = [self.b2]
     self.b3_values = [self.b3]
     self.b4_values = [self.b4]
+    self.b5_values = [self.b5]
 
 
 
@@ -84,6 +85,7 @@ class CombEnv(Env):
       self.b2_values.append(self.b2)
       self.b3_values.append(self.b3)
       self.b4_values.append(self.b4)
+      self.b5_values.append(self.b5)
 
 
 

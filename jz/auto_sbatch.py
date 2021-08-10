@@ -4,7 +4,7 @@ import os.path as op
 
 email = "enisioti@inria.fr"
 job_name = "Maslin_presentation"
-logs_dir = "/gpfsscratch/rech/imi/utw61ti/logs"
+logs_dir = "/gpfsscratch/rech/imi/utw61ti/logs/ClimateAndLearning"
 python_path = "python"
 code_dir = "/gpfswork/rech/imi/utw61ti/workspace/ClimateAndLearning/source"
 slurm_dir = "/gpfswork/rech/imi/utw61ti/workspace/ClimateAndLearning/jz/slurm"

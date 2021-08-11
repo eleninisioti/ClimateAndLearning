@@ -7,7 +7,7 @@ import numpy as np
 
 class CombEnv(Env):
 
-  def __init__(self, orig_capacity, scale_factor, model):
+  def __init__(self, orig_capacity, model, factor_time_abrupt=1, factor_time_variable=1, var_freq=5):
     self.low = 1.0
     self.high = 1.5
     # self.low = 1
@@ -17,11 +17,14 @@ class CombEnv(Env):
     self.generation_duration = 15 # how many years a generation is
 
     # define breakpoints
-    self.factor = scale_factor
+    self.factor_time_abrupt = factor_time_abrupt # scales abrupt transition in time
+    self.factor_time_variable = factor_time_variable # scales abrupt transition in time
+    self.var_freq = var_freq # scales abrupt transition in size
+
     self.b1 = int(8000/self.generation_duration)
-    self.b2 = self.b1 + int(300/self.generation_duration)*self.factor
+    self.b2 = self.b1 + int(300/self.generation_duration)*self.factor_time_abrupt
     self.b3 = self.b2 + int(8000/self.generation_duration)*2
-    self.b4 = self.b3 + int(2000/self.generation_duration)
+    self.b4 = self.b3 + int(2000/self.generation_duration)*self.factor_time_variable
     self.b5 = self.b4 + int(8000/self.generation_duration)
     self.SD = 0.2
     self.rate1 = (self.high-self.low)/(self.b2-self.b1)
@@ -60,7 +63,7 @@ class CombEnv(Env):
       capacity = climate*self.orig_capacity
       # add high variance
       self.climate_values_clean.append(climate)
-      if self.steps_var % 5:
+      if self.steps_var % self.var_freq:
         climate = climate + normal(0, self.SD)
       self.steps_var += 1
       climate = np.min([self.high, climate ])
@@ -76,9 +79,9 @@ class CombEnv(Env):
       capacity = climate*self.orig_capacity
       self.cycles += 1
       self.b1 = gen + int(8000 / self.generation_duration)
-      self.b2 = self.b1 + int(300 / self.generation_duration) * self.factor
+      self.b2 = self.b1 + int(300 / self.generation_duration) * self.factor_time_abrupt
       self.b3 = self.b2 + int(8000 / self.generation_duration) * 2
-      self.b4 = self.b3 + int(2000 / self.generation_duration)
+      self.b4 = self.b3 + int(2000 / self.generation_duration)*self.factor_time_variable
       self.b5 = self.b4 + int(8000 / self.generation_duration)
       print(self.b1, self.b2, self.b3,self.b4, self.b5)
       self.b1_values.append(self.b1)

@@ -153,10 +153,19 @@ if __name__== "__main__":
                       type=int,
                       default=1000)
 
-  parser.add_argument('--scale_time',
-                      help='Scaling factor for time.',
+  parser.add_argument('--factor_time_abrupt',
+                      help='Scaling factor for time for abrupt transition.',
                       type=int,
                       default=1)
+
+  parser.add_argument('--factor_time_variable',
+                      help='Scaling factor for time for variable period.',
+                      type=int,
+                      default=1)
+  parser.add_argument('--var_freq',
+                      help='Scaling factor for frequency for abrupt transition.',
+                      type=int,
+                      default=5)
 
   args = parser.parse_args()
   main(args)

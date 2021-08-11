@@ -57,9 +57,63 @@ def exp_presentation(gpu, project, env_type, model, num_gens, trial, long_run=Fa
         gpu=gpu,
     )
 
+def exp_slower_abrupt(gpu,  trial, long_run=False):
+    project = "Maslin/present_investigate/slower_abrupt"
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 10000
+    factor_time_abrupt = 10
+
+    experiments = [[project, env_type, model, num_gens, trial, factor_time_abrupt]]
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--factor_time_abrupt"]
+    run_batch(
+        experiments,
+        param_names,
+        long_run=long_run,
+        gpu=gpu,
+    )
+
+
+def exp_slower_variable(gpu, trial, long_run=False):
+    project = "Maslin/present_investigate/slower_variable"
+    env_type = "combined",
+    model = "hybrid"
+    num_gens = 10000
+    factor_time_variable = 10
+
+    experiments = [[project, env_type, model, num_gens, trial, factor_time_variable]]
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--factor_time_variable"]
+    run_batch(
+        experiments,
+        param_names,
+        long_run=long_run,
+        gpu=gpu,
+    )
+
+
+def exp_less_variable(gpu, trial, long_run=False):
+    project = "Maslin/present_investigate/less_variable"
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 10000
+    var_freq = 20
+
+    experiments = [[project, env_type, model, num_gens, trial, var_freq]]
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq"]
+    run_batch(
+        experiments,
+        param_names,
+        long_run=long_run,
+        gpu=gpu,
+    )
+
 if __name__ == "__main__":
     trials = 50
     for trial in range(trials):
-        exp_presentation(gpu=False, project="Maslin/present_conf", env_type="combined", model="hybrid",
-                         num_gens=10000, trial=trial)
+        # exp_presentation(gpu=False, project="Maslin/present_conf", env_type="combined", model="hybrid",
+        #                  num_gens=10000, trial=trial)
+        exp_slower_abrupt(gpu=False, trial=trial)
+        exp_slower_variable(gpu=False,  trial=trial)
+        exp_less_variable(gpu=False,  trial=trial)
     pass
+>>>>>>> 9507387a19c9d0f9cfbf9a2e37bb286249431a87

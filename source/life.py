@@ -250,16 +250,16 @@ class Life:
     # Initialize population
     if self.config.env_type == "change":
       self.env = ChangeEnv(self.config.climate_mean_init, self.config.capacity)
-      self.log["env_profile"] = {"start_a": self.env.b1, "end_a": self.env.b2,
-                                 "start_b": self.env.b3, "end_b": self.env.b4}
+
     elif self.config.env_type == "sin":
       self.env = SinEnv(self.config.climate_period, self.config.capacity)
-      self.log["env_profile"] = {}
 
     elif self.config.env_type == "combined":
-      self.env = CombEnv(self.config.capacity, self.config.scale_time, self.config.model)
-      self.log["env_profile"] = {"start_a": self.env.b1_values, "end_a": self.env.b2_values,
-                                 "start_b": self.env.b3_values, "end_b": self.env.b4_values}
+      self.env = CombEnv(orig_capacity=self.config.capacity, model=self.config.model,
+                         factor_time_abrupt=self.config.factor_time_abrupt,
+                         factor_time_variable=self.config.factor_time_variable,
+                         var_freq=self.config.var_freq)
+
 
     self.agents = []
 

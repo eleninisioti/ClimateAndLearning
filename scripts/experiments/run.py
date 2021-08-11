@@ -131,4 +131,4 @@ if __name__ == "__main__":
         #exp_slower_abrupt(gpu=False, trial=trial)
         #exp_slower_variable(gpu=False,  trial=trial)
         #exp_less_variable(gpu=False,  trial=trial)
-        exp_initialize(gpu=false, trial=trial)
+        exp_initialize(gpu=False, trial=trial)

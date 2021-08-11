@@ -115,5 +115,3 @@ if __name__ == "__main__":
         exp_slower_abrupt(gpu=False, trial=trial)
         exp_slower_variable(gpu=False,  trial=trial)
         exp_less_variable(gpu=False,  trial=trial)
-    pass
->>>>>>> 9507387a19c9d0f9cfbf9a2e37bb286249431a87

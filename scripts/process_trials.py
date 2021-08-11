@@ -8,7 +8,7 @@ import pandas as pd
 
 current_project = "Maslin/presentation"
 top_dir = "../projects/"
-trials = 2
+trials = 50
 
 
 # load data

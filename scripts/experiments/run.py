@@ -107,11 +107,28 @@ def exp_less_variable(gpu, trial, long_run=False):
         gpu=gpu,
     )
 
+def exp_initialize(gpu, trial, long_run=False):
+    project = "Maslin/present_investigate/initialize"
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 10000
+    num_agents = 10
+
+    experiments = [[project, env_type, model, num_gens, trial, num_agents]]
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--num_agents"]
+    run_batch(
+        experiments,
+        param_names,
+        long_run=long_run,
+        gpu=gpu,
+    )
+
 if __name__ == "__main__":
     trials = 50
     for trial in range(trials):
         # exp_presentation(gpu=False, project="Maslin/present_conf", env_type="combined", model="hybrid",
         #                  num_gens=10000, trial=trial)
-        exp_slower_abrupt(gpu=False, trial=trial)
-        exp_slower_variable(gpu=False,  trial=trial)
-        exp_less_variable(gpu=False,  trial=trial)
+        #exp_slower_abrupt(gpu=False, trial=trial)
+        #exp_slower_variable(gpu=False,  trial=trial)
+        #exp_less_variable(gpu=False,  trial=trial)
+        exp_initialize(gpu=false, trial=trial)

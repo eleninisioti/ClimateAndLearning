@@ -32,10 +32,12 @@ def run(project, trials):
   plotter = Plotter(project, env_profile)
   #plotter.plot_with_conf(log_df, [1,0,0,1], 2)
 
-  plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0], 2)
-  plotter.plot_species_with_conf(log_df, [1, 1, 0, 0], 2)
-  plotter.plot_species_with_conf(log_df, [1, 0, 1, 0], 2)
-  plotter.plot_species_with_conf(log_df, [1, 0, 0, 1], 2)
+  #plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0], 2)
+  plotter.plot_evolution_with_conf(log_df, [1, 1, 0, 0], 2)
+
+  #plotter.plot_species_with_conf(log_df, [1, 1, 0, 0], 2)
+  #plotter.plot_species_with_conf(log_df, [1, 0, 1, 0], 2)
+  #plotter.plot_species_with_conf(log_df, [1, 0, 0, 1], 2)
 
 if __name__ == "__main__":
   run()

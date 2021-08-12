@@ -76,7 +76,7 @@ def exp_slower_abrupt(gpu,  trial, long_run=False):
 
 def exp_slower_variable(gpu, trial, long_run=False):
     project = "Maslin/present_investigate/slower_variable"
-    env_type = "combined",
+    env_type = "combined"
     model = "hybrid"
     num_gens = 10000
     factor_time_variable = 10
@@ -149,4 +149,4 @@ if __name__ == "__main__":
         exp_slower_variable(gpu=False,  trial=trial)
         #exp_less_variable(gpu=False,  trial=trial)
         #exp_initialize(gpu=False, trial=trial)
-        exp_even_less_variable(gpu=False, trial=trial)
+        #exp_even_less_variable(gpu=False, trial=trial)

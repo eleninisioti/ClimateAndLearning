@@ -7,7 +7,7 @@ import numpy as np
 
 class CombEnv(Env):
 
-  def __init__(self, orig_capacity, model, factor_time_abrupt=1, factor_time_variable=1, var_freq=5):
+  def __init__(self, orig_capacity, model, factor_time_abrupt=1, factor_time_variable=1, var_freq=5, var_SD=0.2):
     self.low = 1.0
     self.high = 1.5
     # self.low = 1
@@ -26,7 +26,7 @@ class CombEnv(Env):
     self.b3 = self.b2 + int(8000/self.generation_duration)*2
     self.b4 = self.b3 + int(2000/self.generation_duration)*self.factor_time_variable
     self.b5 = self.b4 + int(8000/self.generation_duration)
-    self.SD = 0.2
+    self.SD = var_SD
     self.rate1 = (self.high-self.low)/(self.b2-self.b1)
     self.rate2 =  (self.high-self.low)/(self.b4-self.b3)
     self.climate_values = [self.low]

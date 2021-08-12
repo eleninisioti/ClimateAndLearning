@@ -9,7 +9,7 @@ import click
 
 @click.command()
 @click.option("--project", type=str, default="") # how many generations will training take?
-@click.option("--project", type=int, default=50)
+@click.option("--trials", type=int, default=50)
 def run(project, trials):
   top_dir = "../projects/"
   log_df = pd.DataFrame(columns=["Generation", "Trial", "Climate",
@@ -21,7 +21,10 @@ def run(project, trials):
                                  "Generalists_Diversity_Mean", "Generalists_Diversity_SD"],
                         dtype=np.float)
   for trial in range(0, trials):
-    if trial!=10 and trial!=25:
+
+    if os.path.isfile(top_dir + project + '/log_total_part_' + str(trial)
+                                        + '.pickle'):
+
       log, env_profile = pickle.load(open(top_dir + project + '/log_total_part_' + str(trial)
                                           + '.pickle', 'rb'))
       log_df = log_df.append(log)
@@ -29,8 +32,8 @@ def run(project, trials):
   plotter = Plotter(project, env_profile)
   #plotter.plot_with_conf(log_df, [1,0,0,1], 2)
 
-  # plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0], 2)
-  # plotter.plot_species_with_conf(log_df, [1, 1, 0, 0], 2)
+  plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0], 2)
+  plotter.plot_species_with_conf(log_df, [1, 1, 0, 0], 2)
   plotter.plot_species_with_conf(log_df, [1, 0, 1, 0], 2)
   plotter.plot_species_with_conf(log_df, [1, 0, 0, 1], 2)
 

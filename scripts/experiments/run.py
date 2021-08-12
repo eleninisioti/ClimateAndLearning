@@ -146,7 +146,7 @@ if __name__ == "__main__":
         # exp_presentation(gpu=False, project="Maslin/present_conf", env_type="combined", model="hybrid",
         #                  num_gens=10000, trial=trial)
         #exp_slower_abrupt(gpu=False, trial=trial)
-        #exp_slower_variable(gpu=False,  trial=trial)
+        exp_slower_variable(gpu=False,  trial=trial)
         #exp_less_variable(gpu=False,  trial=trial)
         #exp_initialize(gpu=False, trial=trial)
-        exp_even_less_variable(gpu=False, trial=trial)
+        #exp_even_less_variable(gpu=False, trial=trial)

@@ -72,8 +72,8 @@ class Plotter:
     log = log[log['Generation'] <= max_gen]
 
     if include[0]:
-      log_climate = log.loc[(log['Trial'] ==0)]
-      sns.lineplot(ax=axs[count], data=log_climate, x="Generation", y="Climate")
+      #log_climate = log.loc[(log['Trial'] ==0)]
+      sns.lineplot(ax=axs[count], data=log, x="Generation", y="Climate")
       axs[count].set(ylabel="$s$")
       axs[count].set(xlabel=None)
 
@@ -198,8 +198,8 @@ class Plotter:
     log = log[log['Generation'] <= max_gen]
 
     if include[0]:
-      log_climate = log.loc[(log['Trial'] ==0)]
-      sns.lineplot(ax=axs[count], data=log_climate, x="Generation", y="Climate")
+      #log_climate = log.loc[(log['Trial'] ==0)]
+      sns.lineplot(ax=axs[count], data=log, x="Generation", y="Climate")
       axs[count].set(ylabel="$s$")
       axs[count].set(xlabel=None)
 

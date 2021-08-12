@@ -170,7 +170,7 @@ if __name__== "__main__":
 
   parser.add_argument('--var_SD',
                       help='Scaling factor for SD of abrupt transition.',
-                      type=int,
+                      type=float,
                       default=0.2)
 
   args = parser.parse_args()

@@ -33,7 +33,7 @@ def run(project, trials):
   #plotter.plot_with_conf(log_df, [1,0,0,1], 2)
 
   #plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0], 2)
-  plotter.plot_evolution_with_conf(log_df, [1, 1, 0, 0], 2)
+  plotter.plot_evolution_with_conf(log_df, [1, 1, 0, 1], 2)
 
   #plotter.plot_species_with_conf(log_df, [1, 1, 0, 0], 2)
   #plotter.plot_species_with_conf(log_df, [1, 0, 1, 0], 2)

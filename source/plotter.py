@@ -92,7 +92,7 @@ class Plotter:
       count += 1
     if include[3]:
       sns.lineplot(ax=axs[count], data=log, x="Generation", y="Fitness")
-      axs[3].set(xlabel="Time (in generations)")
+      axs[count].set(xlabel="Time (in generations)")
       axs[count].set(ylabel="$\\bar{f}$")
       count +=1
     axs[count - 1].set(xlabel="Time (in generations)")

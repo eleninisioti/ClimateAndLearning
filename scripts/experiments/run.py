@@ -116,7 +116,7 @@ def exp_even_less_variable(gpu, trial, long_run=False):
     var_SD = 0.1
 
     experiments = [[project, env_type, model, num_gens, trial, var_freq, var_SD]]
-    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", --var_SD]
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", "--var_SD"]
     run_batch(
         experiments,
         param_names,
@@ -149,4 +149,4 @@ if __name__ == "__main__":
         exp_slower_variable(gpu=False,  trial=trial)
         #exp_less_variable(gpu=False,  trial=trial)
         #exp_initialize(gpu=False, trial=trial)
-        #exp_even_less_variable(gpu=False, trial=trial)
+        exp_even_less_variable(gpu=False, trial=trial)

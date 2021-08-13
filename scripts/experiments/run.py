@@ -180,7 +180,7 @@ def exp_tune_var2(gpu, trial, long_run=False):
         gpu=gpu,
     )
 
-def exp_tune_var2(gpu, trial, long_run=False):
+def exp_tune_var3(gpu, trial, long_run=False):
     project = "Maslin/present_investigate/batch_3/tune_var3"
     env_type = "combined"
     model = "hybrid"

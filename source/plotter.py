@@ -212,9 +212,6 @@ class Plotter:
     count = 0
     start_cycle = cycles - 2  # which cycles to plot?
     end_cycle = cycles
-    count = 0
-    start_cycle = 2  # which cycles to plot?
-    end_cycle = 4
     # max_gen = int(cycles * self.env_profile["cycle"])
     log = log[(start_cycle * self.env_profile["cycle"]) <= log['Generation'] ]
     log = log[log['Generation'] <= (end_cycle * self.env_profile["cycle"])]

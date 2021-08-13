@@ -180,6 +180,28 @@ def exp_tune_var2(gpu, trial, long_run=False):
         gpu=gpu,
     )
 
+def exp_tune_var2(gpu, trial, long_run=False):
+    project = "Maslin/present_investigate/batch_3/tune_var3"
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 10000
+    var_freq = 30
+    var_SD = 0.2
+    factor_time_variable = 10
+    factor_time_abrupt = 10
+
+
+    experiments = [[project, env_type, model, num_gens, trial, var_freq, var_SD, factor_time_variable,
+                    factor_time_abrupt]]
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", "--var_SD",
+                   "--factor_time_variable", "--factor_time_abrupt"]
+    run_batch(
+        experiments,
+        param_names,
+        long_run=long_run,
+        gpu=gpu,
+    )
+
 if __name__ == "__main__":
     trials = 50
     for trial in range(trials):
@@ -191,4 +213,5 @@ if __name__ == "__main__":
         #exp_initialize(gpu=False, trial=trial)
         #exp_even_less_variable(gpu=False, trial=trial)
         #exp_tune_var1(gpu=False, trial=trial)
-        exp_tune_var2(gpu=False, trial=trial)
+        #exp_tune_var2(gpu=False, trial=trial)
+        exp_tune_var3(gpu=False, trial=trial)

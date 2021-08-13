@@ -63,9 +63,10 @@ class CombEnv(Env):
       capacity = climate*self.orig_capacity
       # add high variance
       self.climate_values_clean.append(climate)
-      if self.steps_var % self.var_freq:
-        climate = climate + normal(0, self.SD)
       self.steps_var += 1
+      if self.steps_var == self.var_freq:
+        climate = climate + normal(0, self.SD)
+        self.steps_var = 0
       climate = np.min([self.high, climate ])
       climate = np.max([self.low, climate])
     elif gen >= self.b4 and gen < self.b5:

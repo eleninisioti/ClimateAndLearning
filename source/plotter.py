@@ -3,9 +3,14 @@ import seaborn as sns
 
 class Plotter:
 
-  def __init__(self, project, env_profile):
+  def __init__(self, project, env_profile, climate_noconf):
+    """
+    Args:
+      climate_noconf (bool): don't plot confidence intervals for climate
+      """
     self.project = project
     self.env_profile = env_profile
+    self.climate_noconf = climate_noconf
     plt.rcParams['font.size'] = '16'
     plt.rc('axes', labelsize='24')
     #plt.ioff()
@@ -65,15 +70,24 @@ class Plotter:
     plt.savefig("../projects/" + self.project + "/trials/trial_" + str(trial) + "/plots/evolution_" + str(include) + ".png")
     plt.clf()
 
-  def plot_evolution_with_conf(self, log, include, cycles):
+  def plot_evolution_with_conf(self, log, include, cycles=None):
     fig, axs = plt.subplots(sum(include), figsize=(20, 10))
+    if cycles is None:
+      cycles = len(self.env_profile["start_a"])
     count = 0
-    max_gen = int(cycles * self.env_profile["cycle"])
-    log = log[log['Generation'] <= max_gen]
+    start_cycle = cycles - 2 # which cycles to plot?
+    end_cycle = cycles
+    #max_gen = int(cycles * self.env_profile["cycle"])
+    log = log[(start_cycle * self.env_profile["cycle"]) <= log['Generation'] ]
+    log = log[log['Generation'] <= (end_cycle * self.env_profile["cycle"])]
 
     if include[0]:
-      #log_climate = log.loc[(log['Trial'] ==0)]
-      sns.lineplot(ax=axs[count], data=log, x="Generation", y="Climate")
+      if self.climate_noconf:
+
+        log_climate = log.loc[(log['Trial'] == 1)]
+      else:
+        log_climate = log
+      sns.lineplot(ax=axs[count], data=log_climate, x="Generation", y="Climate")
       axs[count].set(ylabel="$s$")
       axs[count].set(xlabel=None)
 
@@ -98,8 +112,7 @@ class Plotter:
     axs[count - 1].set(xlabel="Time (in generations)")
 
     # highlight periods of variability
-    if cycles is None:
-      cycles = len(self.env_profile["start_a"])
+
     if len(self.env_profile):
       plot_regions = True
     else:
@@ -107,12 +120,13 @@ class Plotter:
 
     if plot_regions:
       for subplot in range(count):
-        for cycle in range(cycles):
+        for cycle in range(start_cycle, end_cycle):
           axs[subplot].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.2,
                                color='gray')
           axs[subplot].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.2,
                                color='green')
-    plt.savefig("../projects/" + self.project + "/plots/evolution_" + str(include) + ".png")
+    plt.savefig("../projects/" + self.project + "/plots/evolution_" + str(include) + "_" + str(self.climate_noconf)
+                + ".png")
     plt.clf()
 
 
@@ -190,16 +204,28 @@ class Plotter:
       "../projects/" + self.project + "/trials/trial_" + str(trial) + "/plots/species_" + str(include) + ".png")
     plt.clf()
 
-  def plot_species_with_conf(self, log, include, cycles ):
+  def plot_species_with_conf(self, log, include, cycles=None):
 
     fig, axs = plt.subplots(sum(include), figsize=(20, 10))
+    if cycles is None:
+      cycles = len(self.env_profile["start_a"])
     count = 0
-    max_gen = int(cycles * self.env_profile["cycle"])
-    log = log[log['Generation'] <= max_gen]
+    start_cycle = cycles - 2  # which cycles to plot?
+    end_cycle = cycles
+    count = 0
+    start_cycle = 2  # which cycles to plot?
+    end_cycle = 4
+    # max_gen = int(cycles * self.env_profile["cycle"])
+    log = log[(start_cycle * self.env_profile["cycle"]) <= log['Generation'] ]
+    log = log[log['Generation'] <= (end_cycle * self.env_profile["cycle"])]
 
     if include[0]:
-      #log_climate = log.loc[(log['Trial'] ==0)]
-      sns.lineplot(ax=axs[count], data=log, x="Generation", y="Climate")
+      if self.climate_noconf:
+
+        log_climate = log.loc[(log['Trial'] == 1)]
+      else:
+        log_climate = log
+      sns.lineplot(ax=axs[count], data=log_climate, x="Generation", y="Climate")
       axs[count].set(ylabel="$s$")
       axs[count].set(xlabel=None)
 
@@ -238,12 +264,8 @@ class Plotter:
       axs[count].legend(loc="upper right", fontsize=14)
       axs[count].set(ylabel="Diversity")
       count += 1
-
+    print(count, len(axs))
     axs[count - 1].set(xlabel="Time (in generations)")
-
-    # highlight periods of variability
-    if cycles is None:
-      cycles = len(self.env_profile["start_a"])
 
     if len(self.env_profile):
       plot_regions = True
@@ -252,14 +274,14 @@ class Plotter:
 
     if plot_regions:
       for subplot in range(count):
-        for cycle in range(cycles):
+        for cycle in range(start_cycle, end_cycle):
           axs[subplot].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.2,
                                color='gray')
           axs[subplot].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.2,
                                color='green')
 
     plt.savefig(
-      "../projects/" + self.project + "/plots/species_" + str(include) + ".png")
+      "../projects/" + self.project + "/plots/species_" + str(include) + "_" + str(self.climate_noconf) + ".png")
     plt.clf()
 
 

@@ -10,7 +10,8 @@ import click
 @click.command()
 @click.option("--project", type=str, default="") # how many generations will training take?
 @click.option("--trials", type=int, default=50)
-def run(project, trials):
+@click.option("--climate_noconf", type=int, default=0)
+def run(project, trials, climate_noconf):
   top_dir = "../projects/"
   log_df = pd.DataFrame(columns=["Generation", "Trial", "Climate",
                                  "Fitness", "Mean", "SD", "Total_Diversity",
@@ -29,15 +30,14 @@ def run(project, trials):
                                           + '.pickle', 'rb'))
       log_df = log_df.append(log)
 
-  plotter = Plotter(project, env_profile)
+  plotter = Plotter(project, env_profile, climate_noconf=climate_noconf)
   #plotter.plot_with_conf(log_df, [1,0,0,1], 2)
 
-  #plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0], 2)
-  plotter.plot_evolution_with_conf(log_df, [1, 1, 0, 1], 2)
-
-  #plotter.plot_species_with_conf(log_df, [1, 1, 0, 0], 2)
-  #plotter.plot_species_with_conf(log_df, [1, 0, 1, 0], 2)
-  #plotter.plot_species_with_conf(log_df, [1, 0, 0, 1], 2)
+  plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0])
+  plotter.plot_evolution_with_conf(log_df, [1, 1, 0, 1])
+  plotter.plot_species_with_conf(log_df, [1, 1, 0, 0])
+  plotter.plot_species_with_conf(log_df, [1, 0, 1, 0])
+  plotter.plot_species_with_conf(log_df, [1, 0, 0, 1])
 
 if __name__ == "__main__":
   run()

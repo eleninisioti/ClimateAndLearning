@@ -159,7 +159,7 @@ def exp_tune_var1(gpu, trial, long_run=False):
     )
 
 def exp_tune_var2(gpu, trial, long_run=False):
-    project = "Maslin/present_investigate/tune_var2"
+    project = "Maslin/present_investigate/batch_3/tune_var2"
     env_type = "combined"
     model = "hybrid"
     num_gens = 10000
@@ -190,5 +190,5 @@ if __name__ == "__main__":
         #exp_less_variable(gpu=False,  trial=trial)
         #exp_initialize(gpu=False, trial=trial)
         #exp_even_less_variable(gpu=False, trial=trial)
-        exp_tune_var1(gpu=False, trial=trial)
+        #exp_tune_var1(gpu=False, trial=trial)
         exp_tune_var2(gpu=False, trial=trial)

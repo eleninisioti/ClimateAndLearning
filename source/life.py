@@ -271,8 +271,8 @@ class Life:
       agent_SD = np.abs(normal(0, self.config.init_SD))
       self.agents.append(Agent(agent_mean, agent_SD))
 
-    self.evaluate_gen()
-    self.process_agents(gen=0)
+    #self.evaluate_gen()
+    #self.process_agents(gen=0)
 
 
     print(random.randint(1,10))
@@ -284,16 +284,16 @@ class Life:
       # update environment
       self.env.step(gen)
 
-      # find new generation
-      if not self.new_gen(mutate=self.config.mutate):
-        return self.log
-
-      # compute metrics for new generation
-      self.evaluate_gen()
-
-      if gen%100==0:
-        print("Generation: ", gen)
-
+      # # find new generation
+      # if not self.new_gen(mutate=self.config.mutate):
+      #   return self.log
+      #
+      # # compute metrics for new generation
+      # self.evaluate_gen()
+      #
+      # if gen%100==0:
+      #   print("Generation: ", gen)
+      #
       self.log["climate_values"] = self.env.climate_values
 
       # Initialize population

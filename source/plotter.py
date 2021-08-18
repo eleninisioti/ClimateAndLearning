@@ -3,7 +3,7 @@ import seaborn as sns
 
 class Plotter:
 
-  def __init__(self, project, env_profile, climate_noconf):
+  def __init__(self, project, env_profile, climate_noconf=False):
     """
     Args:
       climate_noconf (bool): don't plot confidence intervals for climate

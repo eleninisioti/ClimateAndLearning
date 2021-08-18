@@ -46,35 +46,32 @@ def main(args):
       log = life_simul.run()
       env_profile = log["env_profile"]
       for step in range(args.num_gens+1):
-        trial_log = {'Generation': [step], 'Trial': [trial], "Climate": [log["climate_values"][step]],
-                     'Fitness': [log["running_fitness"][step]],
-                     "Mean": [log["running_mean"][step]],
-                     "SD": [log["running_SD"][step]],
-                     "Total_Diversity": [log["total_diversity"][step]],
-                     "Specialists_Extinct": [log["specialists"]["extinctions"][step]],
-                     "Specialists_Number": [log["specialists"]["number"][step]],
-                     "Specialists_Diversity": [log["specialists"]["diversity"][step]],
-                     "Specialists_Diversity_Mean": [log["specialists"]["diversity_mean"][step]],
-                     "Specialists_Diversity_SD": [log["specialists"]["diversity_std"][step]],
-                     "Generalists_Extinct": [log["generalists"]["extinctions"][step]],
-                     "Generalists_Number": [log["generalists"]["number"][step]],
-                     "Generalists_Diversity": [log["generalists"]["diversity"][step]],
-                     "Generalists_Diversity_Mean": [log["generalists"]["diversity_mean"][step]],
-                     "Generalists_Diversity_SD": [log["generalists"]["diversity_std"][step]]}
+        trial_log = {'Generation': [step], 'Trial': [trial], "Climate": [log["climate_values"][step]]}
+                     # 'Fitness': [log["running_fitness"][step]],
+                     # "Mean": [log["running_mean"][step]],
+                     # "SD": [log["running_SD"][step]],
+                     # "Total_Diversity": [log["total_diversity"][step]],
+                     # "Specialists_Extinct": [log["specialists"]["extinctions"][step]],
+                     # "Specialists_Number": [log["specialists"]["number"][step]],
+                     # "Specialists_Diversity": [log["specialists"]["diversity"][step]],
+                     # "Specialists_Diversity_Mean": [log["specialists"]["diversity_mean"][step]],
+                     # "Specialists_Diversity_SD": [log["specialists"]["diversity_std"][step]],
+                     # "Generalists_Extinct": [log["generalists"]["extinctions"][step]],
+                     # "Generalists_Number": [log["generalists"]["number"][step]],
+                     # "Generalists_Diversity": [log["generalists"]["diversity"][step]],
+                     # "Generalists_Diversity_Mean": [log["generalists"]["diversity_mean"][step]],
+                     # "Generalists_Diversity_SD": [log["generalists"]["diversity_std"][step]]}
         log_df = log_df.append(pd.DataFrame.from_dict(trial_log))
 
-        with open('../projects/' + args.project + '/log_total_part_' + str(trial) + '.pickle', 'wb') as pfile:
-          pickle.dump([log_df, env_profile], pfile)
+        # with open('../projects/' + args.project + '/log_total_part_' + str(trial) + '.pickle', 'wb') as pfile:
+        #   pickle.dump([log_df, env_profile], pfile)
 
       with open('../projects/' + args.project + '/trials/trial_' + str(trial) + '/log.pickle', 'wb') as pfile:
-        pickle.dump(log, pfile)
+        pickle.dump(log_df, pfile)
 
-      plotter = Plotter(args.project, env_profile)
-      plotter.plot_trial(log, trial)
 
     with open('../projects/' + args.project + '/log_total.pickle', 'wb') as pfile:
-      pickle.dump([log_df,env_profile], pfile)
-    plotter.plot_with_conf(log_df)
+      pickle.dump([log_df, env_profile], pfile)
 
   except KeyboardInterrupt:
     print("Running aborted. Saving intermediate results.")

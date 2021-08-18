@@ -4,6 +4,9 @@
 from environment import Env
 from numpy.random import normal
 import numpy as np
+from scipy.interpolate import interp1d
+
+
 
 class CombEnv(Env):
 
@@ -29,6 +32,7 @@ class CombEnv(Env):
     self.SD = var_SD
     self.rate1 = (self.high-self.low)/(self.b2-self.b1)
     self.rate2 =  (self.high-self.low)/(self.b4-self.b3)
+    #self.rate2 = 0.1
     self.climate_values = [self.low]
     self.climate_values_clean = [self.high]
     self.orig_capacity = orig_capacity
@@ -39,6 +43,7 @@ class CombEnv(Env):
     self.b3_values = [self.b3]
     self.b4_values = [self.b4]
     self.b5_values = [self.b5]
+
 
 
 
@@ -58,23 +63,43 @@ class CombEnv(Env):
       capacity = climate*self.orig_capacity
       self.steps_var = 0
 
-    elif gen >= self.b3 and gen < self.b4:
-      climate = self.climate_values_clean[-1] - self.rate2
+    elif gen == self.b3:
+      x_points = list(range(self.b3, self.b4,  self.var_freq))
+      x_points.append(self.b4)
+
+      y_points = []
+
+      for el in x_points:
+        offset = normal(0, self.SD)
+        while np.abs(offset) < 0.05:
+          offset = normal(0, self.SD)
+
+        y_points.append(self.high -self.rate2*(el-self.b3)  + offset)
+
+      y_points = [max([self.low, min([el, self.high])]) for el in y_points]
+      self.interp = interp1d(x_points, y_points)
+      climate= self.high
       capacity = climate*self.orig_capacity
-      # add high variance
-      self.climate_values_clean.append(climate)
-      self.steps_var += 1
-      if self.steps_var == self.var_freq:
-        climate = climate + normal(0, self.SD)
-        self.steps_var = 0
+
+
+    elif gen >= self.b3 and gen < self.b4:
+      climate = float(self.interp(gen))
       climate = np.min([self.high, climate ])
       climate = np.max([self.low, climate])
+      #climate = self.climate_values[-1] - self.rate2
+      capacity = climate*self.orig_capacity
+      # add high variance
+      #self.steps_var += 1
+      # if self.steps_var == self.var_freq:
+      #   climate = climate + np.abs(normal(0, self.SD))
+      #   self.steps_var = 0
+
     elif gen >= self.b4 and gen < self.b5:
       climate = self.low
       capacity = climate*self.orig_capacity
 
     elif gen == self.b5:
-      self.climate_values_clean.append(self.high)
+      #self.climate_values.append(self.high)
 
       climate = self.low
       capacity = climate*self.orig_capacity

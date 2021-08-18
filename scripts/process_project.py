@@ -21,23 +21,26 @@ def run(project, trials, climate_noconf):
                                  "Generalists_Number", "Generalists_Diversity",
                                  "Generalists_Diversity_Mean", "Generalists_Diversity_SD"],
                         dtype=np.float)
+
+  _, env_profile = pickle.load(open(top_dir + project + '/log_total.pickle', 'rb'))
   for trial in range(0, trials):
 
-    if os.path.isfile(top_dir + project + '/log_total_part_' + str(trial)
-                                        + '.pickle'):
+    if os.path.isfile(top_dir + project + '/trials/trial_' + str(trial)
+                                          + '/log.pickle'):
 
-      log, env_profile = pickle.load(open(top_dir + project + '/log_total_part_' + str(trial)
-                                          + '.pickle', 'rb'))
+      log = pickle.load(open(top_dir + project + '/trials/trial_' + str(trial)
+                                          + '/log.pickle', 'rb'))
       log_df = log_df.append(log)
 
   plotter = Plotter(project, env_profile, climate_noconf=climate_noconf)
   #plotter.plot_with_conf(log_df, [1,0,0,1], 2)
+  plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0], cycles=1)
 
-  plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0])
-  plotter.plot_evolution_with_conf(log_df, [1, 1, 0, 1])
-  plotter.plot_species_with_conf(log_df, [1, 1, 0, 0])
-  plotter.plot_species_with_conf(log_df, [1, 0, 1, 0])
-  plotter.plot_species_with_conf(log_df, [1, 0, 0, 1])
+  #plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0])
+  # plotter.plot_evolution_with_conf(log_df, [1, 1, 0, 1])
+  # plotter.plot_species_with_conf(log_df, [1, 1, 0, 0])
+  # plotter.plot_species_with_conf(log_df, [1, 0, 1, 0])
+  # plotter.plot_species_with_conf(log_df, [1, 0, 0, 1])
 
 if __name__ == "__main__":
   run()

@@ -43,7 +43,7 @@ def main(args):
       print(trial)
       random.seed(trial)
       np.random.seed(trial)
-      log = life_simul.run()
+      log = life_simul.run()/gpfswork/rech/imi/utw61ti/workspace/ClimateAndLearning/projects/Maslin/present_investigate/batch_3
       env_profile = log["env_profile"]
       for step in range(args.num_gens+1):
         trial_log = {'Generation': [step], 'Trial': [trial], "Climate": [log["climate_values"][step]],

@@ -24,11 +24,11 @@ class CombEnv(Env):
     self.factor_time_variable = factor_time_variable # scales abrupt transition in time
     self.var_freq = var_freq # scales abrupt transition in size
 
-    self.b1 = int(8000/self.generation_duration)*self.factor_time_abrupt
+    self.b1 = int(8000/self.generation_duration)
     self.b2 = self.b1 + int(300/self.generation_duration)*self.factor_time_abrupt
-    self.b3 = self.b2 + int(8000/self.generation_duration)*2*self.factor_time_abrupt
+    self.b3 = self.b2 + int(8000/self.generation_duration)*2
     self.b4 = self.b3 + int(2000/self.generation_duration)*self.factor_time_variable
-    self.b5 = self.b4 + int(8000/self.generation_duration)*self.factor_time_abrupt
+    self.b5 = self.b4 + int(8000/self.generation_duration)
     self.SD = var_SD
     self.rate1 = (self.high-self.low)/(self.b2-self.b1)
     self.rate2 =  (self.high-self.low)/(self.b4-self.b3)
@@ -104,11 +104,11 @@ class CombEnv(Env):
       climate = self.low
       capacity = climate*self.orig_capacity
       self.cycles += 1
-      self.b1 = gen + int(8000 / self.generation_duration)*self.factor_time_abrupt
+      self.b1 = gen + int(8000 / self.generation_duration)
       self.b2 = self.b1 + int(300 / self.generation_duration) * self.factor_time_abrupt
-      self.b3 = self.b2 + int(8000 / self.generation_duration) * 2*self.factor_time_abrupt
+      self.b3 = self.b2 + int(8000 / self.generation_duration) * 2
       self.b4 = self.b3 + int(2000 / self.generation_duration)*self.factor_time_variable
-      self.b5 = self.b4 + int(8000 / self.generation_duration)*self.factor_time_abrupt
+      self.b5 = self.b4 + int(8000 / self.generation_duration)
       print(self.b1, self.b2, self.b3,self.b4, self.b5)
       self.b1_values.append(self.b1)
       self.b2_values.append(self.b2)

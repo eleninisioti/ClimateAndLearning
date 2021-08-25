@@ -43,10 +43,7 @@ class CombEnv(Env):
     self.b3_values = [self.b3]
     self.b4_values = [self.b4]
     self.b5_values = [self.b5]
-
-
-
-
+    print(self.b1, self.b2, self.b3, self.b4, self.b5)
 
   def climate_func(self, gen):
 
@@ -64,15 +61,36 @@ class CombEnv(Env):
       self.steps_var = 0
 
     elif gen == self.b3:
-      x_points = list(range(self.b3, self.b4,  self.var_freq))
+      x_points = [self.b3]
+      while x_points[-1] < self.b4:
+        x_points.append(int(x_points[-1] + self.var_freq + normal(0,20)))
       x_points.append(self.b4)
 
       y_points = []
-
+      previous_offset = 1
+      pos_offset = 1
+      neg_offset = -1
       for el in x_points:
         offset = normal(0, self.SD)
-        while np.abs(offset) < 0.05:
+        if previous_offset>0:
+          small_enough = (np.abs(offset) < np.abs(neg_offset))
+        else:
+          small_enough = (np.abs(offset) < np.abs(pos_offset))
+        while (np.abs(offset) < 0.05) or (offset*previous_offset >0) or (not small_enough):
           offset = normal(0, self.SD)
+          if previous_offset > 0:
+            small_enough = (np.abs(offset) < np.abs(neg_offset))
+          else:
+            small_enough = (np.abs(offset) < np.abs(pos_offset))
+
+        print(offset)
+        if previous_offset > 0:
+          neg_offset = offset
+        else:
+          pos_offset = offset
+
+        previous_offset = offset
+
 
         y_points.append(self.high -self.rate2*(el-self.b3)  + offset)
 

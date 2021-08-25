@@ -293,9 +293,9 @@ class Life:
 
       if gen%100==0:
         print("Generation: ", gen)
-      #
+      # #
       self.log["climate_values"] = self.env.climate_values
-
+      #
       # Initialize population
       if self.config.env_type == "change":
         self.log["env_profile"] = {"start_a": self.env.b1, "end_a": self.env.b2,

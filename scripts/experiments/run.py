@@ -230,7 +230,7 @@ def exp_tune_var6(gpu, trial, long_run=False):
     model = "hybrid"
     num_gens = 30000
     var_freq = 85
-    var_SD = 0.5
+    var_SD = 0.2
     factor_time_variable = 10
     factor_time_abrupt = 10
 

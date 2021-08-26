@@ -83,7 +83,6 @@ class CombEnv(Env):
           else:
             small_enough = (np.abs(offset) < np.abs(pos_offset))
 
-        print(offset)
         if previous_offset > 0:
           neg_offset = offset
         else:

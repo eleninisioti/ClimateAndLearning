@@ -286,6 +286,7 @@ class Life:
 
       # find new generation
       if not self.new_gen(mutate=self.config.mutate):
+
         return self.log
 
       # compute metrics for new generation

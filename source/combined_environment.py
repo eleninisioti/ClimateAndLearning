@@ -44,6 +44,7 @@ class CombEnv(Env):
     self.b4_values = [self.b4]
     self.b5_values = [self.b5]
     print(self.b1, self.b2, self.b3, self.b4, self.b5)
+    self.irregular = True
 
   def climate_func(self, gen):
 
@@ -67,28 +68,32 @@ class CombEnv(Env):
       x_points.append(self.b4)
 
       y_points = []
-      previous_offset = 1
-      pos_offset = 1
-      neg_offset = -1
-      for el in x_points:
+
+      if self.irregular:
         offset = normal(0, self.SD)
-        if previous_offset>0:
-          small_enough = (np.abs(offset) < np.abs(neg_offset))
-        else:
-          small_enough = (np.abs(offset) < np.abs(pos_offset))
-        while (np.abs(offset) < 0.05) or (offset*previous_offset >0) or (not small_enough):
+      else:
+        previous_offset = 1
+        pos_offset = 1
+        neg_offset = -1
+        for el in x_points:
           offset = normal(0, self.SD)
-          if previous_offset > 0:
+          if previous_offset>0:
             small_enough = (np.abs(offset) < np.abs(neg_offset))
           else:
             small_enough = (np.abs(offset) < np.abs(pos_offset))
+          while (np.abs(offset) < 0.05) or (offset*previous_offset >0) or (not small_enough):
+            offset = normal(0, self.SD)
+            if previous_offset > 0:
+              small_enough = (np.abs(offset) < np.abs(neg_offset))
+            else:
+              small_enough = (np.abs(offset) < np.abs(pos_offset))
 
-        if previous_offset > 0:
-          neg_offset = offset
-        else:
-          pos_offset = offset
+          if previous_offset > 0:
+            neg_offset = offset
+          else:
+            pos_offset = offset
 
-        previous_offset = offset
+          previous_offset = offset
 
 
         y_points.append(self.high -self.rate2*(el-self.b3)  + offset)

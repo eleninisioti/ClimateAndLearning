@@ -75,8 +75,8 @@ class Plotter:
     if cycles is None:
       cycles = len(self.env_profile["start_a"])
     count = 0
-    start_cycle = cycles - 2 # which cycles to plot?
-    end_cycle = cycles
+    start_cycle = cycles - 3 # which cycles to plot?
+    end_cycle = cycles -1
     #max_gen = int(cycles * self.env_profile["cycle"])
     log = log[(start_cycle * self.env_profile["cycle"]) <= log['Generation'] ]
     log = log[log['Generation'] <= (end_cycle * self.env_profile["cycle"])]

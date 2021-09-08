@@ -1,10 +1,11 @@
 import sys
+import os
 
 sys.path.insert(0, "../jz")
 
 from auto_sbatch import run_exp
 import itertools
-
+import numpy as np
 
 def run_batch(
     experiments,
@@ -246,6 +247,9 @@ def exp_tune_var6(gpu, trial, long_run=False):
         gpu=gpu,
     )
 
+#def exp_tune_var6_irreg(gpu, trial,  mode, long_run=False):
+
+
 def exp_total_scale(gpu, trial, long_run=False):
     project = "Maslin/present_investigate/batch_3/total_scale"
     env_type = "combined"
@@ -261,15 +265,47 @@ def exp_total_scale(gpu, trial, long_run=False):
                     factor_time_abrupt]]
     param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", "--var_SD",
                    "--factor_time_variable", "--factor_time_abrupt"]
-    run_batch(
-        experiments,
-        param_names,
-        long_run=long_run,
-        gpu=gpu,
-    )
+
+
+def exp_parametric(gpu, trial,  mode, long_run=False):
+    var_SD_values = np.arange(0.05, 0.35, 0.05 )
+    factor_time_abrupt_values =  np.arange(1, 10, 1)
+    top_dir = "Maslin/parametric"
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", "--var_SD",
+                   "--factor_time_variable", "--factor_time_abrupt"]
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 30000
+    var_freq = 85
+    factor_time_variable = 10
+
+    for var_SD in var_SD_values:
+        for factor_time_abrupt in factor_time_abrupt_values:
+            project = top_dir + "SD_" + str(var_SD) + "_time_" + str(factor_time_abrupt)
+            new_exp = [project, env_type, model, num_gens, trial, var_freq, var_SD, factor_time_variable,
+                    factor_time_abrupt]
+            experiments.append(new_exp)
+            if mode == "local":
+                command = "python simulate.py "
+                for idx, el in enumerate(param_names):
+                    command += el + " " + str(experiments[idx]) + " "
+                print(command)
+                os.system("bash -c '{}'".format(command))
+
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
 
 if __name__ == "__main__":
-    trials = 30
+    trials = int(sys.argv[1])
+    mode = sys.argv[2] # server for jz experiments and local otherwise
     for trial in range(trials):
         # exp_presentation(gpu=False, project="Maslin/present_conf", env_type="combined", model="hybrid",
         #                  num_gens=10000, trial=trial)
@@ -281,5 +317,5 @@ if __name__ == "__main__":
         #exp_tune_var1(gpu=False, trial=trial)
         #exp_tune_var2(gpu=False, trial=trial)
         #exp_tune_var5(gpu=False, trial=trial)
-        exp_tune_var6(gpu=False, trial=trial)
-        #exp_total_scale(gpu=False, trial=trial)
+        #exp_tune_var6_irreg(gpu=False, trial=trial, mode=mode)
+        exp_parametric(gpu=False, trial=trial, mode=mode)

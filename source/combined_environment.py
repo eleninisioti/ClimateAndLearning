@@ -96,7 +96,7 @@ class CombEnv(Env):
           previous_offset = offset
 
 
-        y_points.append(self.high -self.rate2*(el-self.b3)  + offset)
+      y_points.append(self.high -self.rate2*(el-self.b3)  + offset)
 
       y_points = [max([self.low, min([el, self.high])]) for el in y_points]
       self.interp = interp1d(x_points, y_points)

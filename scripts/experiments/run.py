@@ -270,7 +270,7 @@ def exp_total_scale(gpu, trial, long_run=False):
 def exp_parametric(gpu, trial,  mode, long_run=False):
     var_SD_values = np.arange(0.05, 0.35, 0.05 )
     factor_time_abrupt_values =  np.arange(1, 10, 1)
-    top_dir = "Maslin/parametric"
+    top_dir = "Maslin/parametric/"
     experiments = []
     param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", "--var_SD",
                    "--factor_time_variable", "--factor_time_abrupt"]
@@ -289,7 +289,7 @@ def exp_parametric(gpu, trial,  mode, long_run=False):
             if mode == "local":
                 command = "python simulate.py "
                 for idx, el in enumerate(param_names):
-                    command += el + " " + str(experiments[idx]) + " "
+                    command += el + " " + str(new_exp[idx]) + " "
                 print(command)
                 os.system("bash -c '{}'".format(command))
 

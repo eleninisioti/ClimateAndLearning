@@ -45,7 +45,7 @@ def main(args):
       np.random.seed(trial)
       log = life_simul.run()
       env_profile = log["env_profile"]
-      for step in range(len(log["running_fitness"])):
+      for step in range(len(log["climate_values"])):
         trial_log = {'Generation': [step], 'Trial': [trial], "Climate": [log["climate_values"][step]],
                      'Fitness': [log["running_fitness"][step]],
                      "Mean": [log["running_mean"][step]],

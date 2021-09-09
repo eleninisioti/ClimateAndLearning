@@ -26,7 +26,7 @@ class CombEnv(Env):
 
     self.b1 = int(8000/self.generation_duration)
     self.b2 = self.b1 + int(300/self.generation_duration)*self.factor_time_abrupt
-    self.b3 = self.b2 + int(8000/self.generation_duration)*2
+    self.b3 = self.b2 + int(8000/self.generation_duration)
     self.b4 = self.b3 + int(2000/self.generation_duration)*self.factor_time_variable
     self.b5 = self.b4 + int(8000/self.generation_duration)
     self.SD = var_SD
@@ -69,14 +69,15 @@ class CombEnv(Env):
 
       y_points = []
 
-      if self.irregular:
+
+
+      previous_offset = 1
+      pos_offset = 1
+      neg_offset = -1
+      for el in x_points:
         offset = normal(0, self.SD)
-      else:
-        previous_offset = 1
-        pos_offset = 1
-        neg_offset = -1
-        for el in x_points:
-          offset = normal(0, self.SD)
+
+        if not self.irregular:
           if previous_offset>0:
             small_enough = (np.abs(offset) < np.abs(neg_offset))
           else:
@@ -96,25 +97,26 @@ class CombEnv(Env):
           previous_offset = offset
 
 
-      y_points.append(self.high -self.rate2*(el-self.b3)  + offset)
+        y_points.append(self.high -self.rate2*(el-self.b3)  + offset)
 
       y_points = [max([self.low, min([el, self.high])]) for el in y_points]
+
       self.interp = interp1d(x_points, y_points)
       climate= self.high
       capacity = climate*self.orig_capacity
 
 
     elif gen >= self.b3 and gen < self.b4:
+
       climate = float(self.interp(gen))
+
+      print(climate, self.rate2)
       climate = np.min([self.high, climate ])
       climate = np.max([self.low, climate])
       #climate = self.climate_values[-1] - self.rate2
       capacity = climate*self.orig_capacity
-      # add high variance
-      #self.steps_var += 1
-      # if self.steps_var == self.var_freq:
-      #   climate = climate + np.abs(normal(0, self.SD))
-      #   self.steps_var = 0
+      #self.climate_values.append(climate)
+
 
     elif gen >= self.b4 and gen < self.b5:
       climate = self.low
@@ -128,7 +130,7 @@ class CombEnv(Env):
       self.cycles += 1
       self.b1 = gen + int(8000 / self.generation_duration)
       self.b2 = self.b1 + int(300 / self.generation_duration) * self.factor_time_abrupt
-      self.b3 = self.b2 + int(8000 / self.generation_duration) * 2
+      self.b3 = self.b2 + int(8000 / self.generation_duration)
       self.b4 = self.b3 + int(2000 / self.generation_duration)*self.factor_time_variable
       self.b5 = self.b4 + int(8000 / self.generation_duration)
       print(self.b1, self.b2, self.b3,self.b4, self.b5)

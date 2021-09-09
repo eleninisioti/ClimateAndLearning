@@ -268,7 +268,7 @@ def exp_total_scale(gpu, trial, long_run=False):
 
 
 def exp_parametric(gpu, trial,  mode, long_run=False):
-    var_SD_values = np.arange(0.05, 0.35, 0.05 )
+    var_freq_values = np.arange(10, 150, 20)
     factor_time_abrupt_values =  np.arange(1, 10, 1)
     top_dir = "Maslin/parametric/"
     experiments = []
@@ -279,19 +279,24 @@ def exp_parametric(gpu, trial,  mode, long_run=False):
     num_gens = 30000
     var_freq = 85
     factor_time_variable = 10
+    var_SD = 0.2
 
-    for var_SD in var_SD_values:
-        for factor_time_abrupt in factor_time_abrupt_values:
-            project = top_dir + "SD_" + str(var_SD) + "_time_" + str(factor_time_abrupt)
-            new_exp = [project, env_type, model, num_gens, trial, var_freq, var_SD, factor_time_variable,
-                    factor_time_abrupt]
-            experiments.append(new_exp)
-            if mode == "local":
-                command = "python simulate.py "
-                for idx, el in enumerate(param_names):
-                    command += el + " " + str(new_exp[idx]) + " "
-                print(command)
-                os.system("bash -c '{}'".format(command))
+    irregular = [True, False]
+
+    for irreg in irregular:
+
+        for var_freq in var_freq_values:
+            for factor_time_abrupt in factor_time_abrupt_values:
+                project = top_dir + "SD_" + str(var_SD) + "_time_" + str(factor_time_abrupt)
+                new_exp = [project, env_type, model, num_gens, trial, var_freq, var_SD, factor_time_variable,
+                        factor_time_abrupt]
+                experiments.append(new_exp)
+                if mode == "local":
+                    command = "python simulate.py "
+                    for idx, el in enumerate(param_names):
+                        command += el + " " + str(new_exp[idx]) + " "
+                    print(command)
+                    os.system("bash -c '{}'".format(command))
 
 
     if mode == "server":

@@ -170,5 +170,10 @@ if __name__== "__main__":
                       type=float,
                       default=0.2)
 
+  parser.add_argument('--irregular',
+                      help='Scaling factor for SD of abrupt transition.',
+                      type=float,
+                      default=0)
+
   args = parser.parse_args()
   main(args)

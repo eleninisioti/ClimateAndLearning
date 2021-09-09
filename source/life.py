@@ -258,7 +258,7 @@ class Life:
       self.env = CombEnv(orig_capacity=self.config.capacity, model=self.config.model,
                          factor_time_abrupt=self.config.factor_time_abrupt,
                          factor_time_variable=self.config.factor_time_variable,
-                         var_freq=self.config.var_freq, var_SD=self.config.var_SD)
+                         var_freq=self.config.var_freq, var_SD=self.config.var_SD, irregular=self.config.irregular)
 
 
     self.agents = []

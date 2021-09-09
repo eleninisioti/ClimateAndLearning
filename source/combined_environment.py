@@ -10,7 +10,7 @@ from scipy.interpolate import interp1d
 
 class CombEnv(Env):
 
-  def __init__(self, orig_capacity, model, factor_time_abrupt=1, factor_time_variable=1, var_freq=5, var_SD=0.2):
+  def __init__(self, orig_capacity, model, irregular, factor_time_abrupt=1, factor_time_variable=1, var_freq=5, var_SD=0.2):
     self.low = 1.0
     self.high = 1.5
     # self.low = 1
@@ -44,7 +44,7 @@ class CombEnv(Env):
     self.b4_values = [self.b4]
     self.b5_values = [self.b5]
     print(self.b1, self.b2, self.b3, self.b4, self.b5)
-    self.irregular = True
+    self.irregular = irregular
 
   def climate_func(self, gen):
 

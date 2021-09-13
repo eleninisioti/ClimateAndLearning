@@ -273,11 +273,10 @@ def exp_parametric(gpu, trial,  mode, long_run=False):
     top_dir = "Maslin/parametric/"
     experiments = []
     param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", "--var_SD",
-                   "--factor_time_variable", "--factor_time_abrupt"]
+                   "--factor_time_variable", "--factor_time_abrupt", "--iregular"]
     env_type = "combined"
     model = "hybrid"
     num_gens = 30000
-    var_freq = 85
     factor_time_variable = 10
     var_SD = 0.2
 
@@ -287,9 +286,9 @@ def exp_parametric(gpu, trial,  mode, long_run=False):
 
         for var_freq in var_freq_values:
             for factor_time_abrupt in factor_time_abrupt_values:
-                project = top_dir + "SD_" + str(var_SD) + "_time_" + str(factor_time_abrupt)
+                project = top_dir + "SD_" + str(var_SD) + "_time_" + str(factor_time_abrupt) + "_irreg_" + str(irreg)
                 new_exp = [project, env_type, model, num_gens, trial, var_freq, var_SD, factor_time_variable,
-                        factor_time_abrupt]
+                        factor_time_abrupt, irreg]
                 experiments.append(new_exp)
                 if mode == "local":
                     command = "python simulate.py "

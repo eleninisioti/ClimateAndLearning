@@ -273,14 +273,14 @@ def exp_parametric(gpu, trial,  mode, long_run=False):
     top_dir = "Maslin/parametric/"
     experiments = []
     param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", "--var_SD",
-                   "--factor_time_variable", "--factor_time_abrupt", "--iregular"]
+                   "--factor_time_variable", "--factor_time_abrupt", "--irregular"]
     env_type = "combined"
     model = "hybrid"
     num_gens = 30000
     factor_time_variable = 10
     var_SD = 0.2
 
-    irregular = [True, False]
+    irregular = [1, 0]
 
     for irreg in irregular:
 

@@ -67,6 +67,7 @@ class CombEnv(Env):
       x_points.append(self.b4)
 
       y_points = []
+      print("entered")
 
 
 

@@ -292,6 +292,8 @@ class Life:
       # compute metrics for new generation
       self.evaluate_gen()
 
+      print("Generation: ", gen)
+
       if gen%100==0:
         print("Generation: ", gen)
       #

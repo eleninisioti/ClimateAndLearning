@@ -270,13 +270,13 @@ def exp_total_scale(gpu, trial, long_run=False):
 def exp_parametric(gpu, trial,  mode, long_run=False):
     var_freq_values = np.arange(10, 150, 20)
     factor_time_abrupt_values =  np.arange(1, 10, 1)
-    top_dir = "Maslin/parametric_debug/"
+    top_dir = "Maslin/parametric_v1/"
     experiments = []
     param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", "--var_SD",
                    "--factor_time_variable", "--factor_time_abrupt", "--irregular"]
     env_type = "combined"
     model = "hybrid"
-    num_gens = 300
+    num_gens = 15000
     factor_time_variable = 10
     var_SD = 0.2
 

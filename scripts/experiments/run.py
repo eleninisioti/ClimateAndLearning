@@ -276,11 +276,11 @@ def exp_parametric(gpu, trial,  mode, long_run=False):
                    "--factor_time_variable", "--factor_time_abrupt", "--irregular"]
     env_type = "combined"
     model = "hybrid"
-    num_gens = 30000
+    num_gens = 15000
     factor_time_variable = 10
     var_SD = 0.2
 
-    irregular = [1, 0]
+    irregular = [1]
 
     for irreg in irregular:
 

@@ -43,7 +43,6 @@ class CombEnv(Env):
     self.b3_values = [self.b3]
     self.b4_values = [self.b4]
     self.b5_values = [self.b5]
-    print(self.b1, self.b2, self.b3, self.b4, self.b5)
     self.irregular = irregular
 
   def climate_func(self, gen):
@@ -110,7 +109,6 @@ class CombEnv(Env):
 
       climate = float(self.interp(gen))
 
-      print(climate, self.rate2)
       climate = np.min([self.high, climate ])
       climate = np.max([self.low, climate])
       #climate = self.climate_values[-1] - self.rate2
@@ -133,7 +131,6 @@ class CombEnv(Env):
       self.b3 = self.b2 + int(8000 / self.generation_duration)
       self.b4 = self.b3 + int(2000 / self.generation_duration)*self.factor_time_variable
       self.b5 = self.b4 + int(8000 / self.generation_duration)
-      print(self.b1, self.b2, self.b3,self.b4, self.b5)
       self.b1_values.append(self.b1)
       self.b2_values.append(self.b2)
       self.b3_values.append(self.b3)

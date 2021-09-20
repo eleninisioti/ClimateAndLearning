@@ -7,10 +7,7 @@ import numpy as np
 import pandas as pd
 import click
 
-@click.command()
-@click.option("--project", type=str, default="") # how many generations will training take?
-@click.option("--trials", type=int, default=50)
-@click.option("--climate_noconf", type=int, default=0)
+
 def run(project, trials, climate_noconf):
   top_dir = "../projects/"
   log_df = pd.DataFrame(columns=["Generation", "Trial", "Climate",
@@ -36,14 +33,26 @@ def run(project, trials, climate_noconf):
   #plotter.plot_with_conf(log_df, [1,0,0,1], 2)
   #plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0], cycles=1)
 
-  plotter.plot_evolution_with_conf(log_df, [1, 0, 0, 0])
-  # plotter.plot_evolution_with_conf(log_df, [1, 1, 0, 1])
-  # plotter.plot_species_with_conf(log_df, [1, 1, 0, 0])
-  # plotter.plot_species_with_conf(log_df, [1, 0, 1, 0])
-  # plotter.plot_species_with_conf(log_df, [1, 0, 0, 1])
+  plotter.plot_evolution_with_conf(log_df, [1, 1, 0, 0])
+  plotter.plot_evolution_with_conf(log_df, [1, 1, 0, 1])
+  plotter.plot_species_with_conf(log_df, [1, 1, 0, 0])
+  plotter.plot_species_with_conf(log_df, [1, 0, 1, 0])
+  plotter.plot_species_with_conf(log_df, [1, 0, 0, 1])
+
+
+def heatmap(x_values, y_values, results):
+
 
 if __name__ == "__main__":
-  run()
+  top_dir = "../projects/Maslin/parametric/"
+  projects = [os.path.join(top_dir, o) for o in os.listdir(top_dir) if os.path.isdir(os.path.join(top_dir, o))]
+  for p in projects:
+    run(project=p, trials=10, climate_noconf=0)
+
+  x_values = []
+
+
+
 
 
 

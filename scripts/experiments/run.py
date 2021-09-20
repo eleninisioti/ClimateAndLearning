@@ -279,14 +279,13 @@ def exp_parametric(gpu, trial,  mode, long_run=False):
     num_gens = 15000
     factor_time_variable = 10
     var_SD = 0.2
-
     irregular = [1]
 
     for irreg in irregular:
 
         for var_freq in var_freq_values:
             for factor_time_abrupt in factor_time_abrupt_values:
-                project = top_dir + "SD_" + str(var_SD) + "_time_" + str(factor_time_abrupt) + "_irreg_" + str(irreg)
+                project = top_dir + "freq_" + str(var_freq) + "_time_" + str(factor_time_abrupt) + "_irreg_" + str(irreg)
                 new_exp = [project, env_type, model, num_gens, trial, var_freq, var_SD, factor_time_variable,
                         factor_time_abrupt, irreg]
                 experiments.append(new_exp)

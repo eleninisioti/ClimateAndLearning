@@ -1,13 +1,13 @@
 import pickle
 import sys
-sys.path.insert(0, "../source")
+sys.path.insert(0, "../../source")
 from plotter import Plotter
 import os
 import numpy as np
 import pandas as pd
 
 current_project = "Maslin/presentation"
-top_dir = "../projects/"
+top_dir = "../../projects/"
 trials = 50
 
 

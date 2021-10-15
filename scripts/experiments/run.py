@@ -268,33 +268,32 @@ def exp_total_scale(gpu, trial, long_run=False):
 
 
 def exp_parametric(gpu, trial,  mode, long_run=False):
-    var_freq_values = np.arange(10, 150, 20)
+    var_freq_values = np.arange(10, 150, 5)
     factor_time_abrupt_values =  np.arange(1, 10, 1)
-    top_dir = "Maslin/parametric_v1/"
+    top_dir = "Maslin/parametric/"
     experiments = []
     param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", "--var_SD",
-                   "--factor_time_variable", "--factor_time_abrupt", "--irregular"]
+                   "--factor_time_variable", "--factor_time_abrupt", "--only_climate"]
     env_type = "combined"
     model = "hybrid"
     num_gens = 15000
     factor_time_variable = 10
     var_SD = 0.2
-    irregular = [1]
 
-    for irreg in irregular:
 
-        for var_freq in var_freq_values:
-            for factor_time_abrupt in factor_time_abrupt_values:
-                project = top_dir + "freq_" + str(var_freq) + "_time_" + str(factor_time_abrupt) + "_irreg_" + str(irreg)
-                new_exp = [project, env_type, model, num_gens, trial, var_freq, var_SD, factor_time_variable,
-                        factor_time_abrupt, irreg]
-                experiments.append(new_exp)
-                if mode == "local":
-                    command = "python simulate.py "
-                    for idx, el in enumerate(param_names):
-                        command += el + " " + str(new_exp[idx]) + " "
-                    print(command)
-                    os.system("bash -c '{}'".format(command))
+
+    for var_freq in var_freq_values:
+        for factor_time_abrupt in factor_time_abrupt_values:
+            project = top_dir + "freq_" + str(var_freq) + "_time_" + str(factor_time_abrupt)
+            new_exp = [project, env_type, model, num_gens, trial, var_freq, var_SD, factor_time_variable,
+                    factor_time_abrupt, ""]
+            experiments.append(new_exp)
+            if mode == "local":
+                command = "python simulate.py "
+                for idx, el in enumerate(param_names):
+                    command += el + " " + str(new_exp[idx]) + " "
+                print(command)
+                os.system("bash -c '{}'".format(command))
 
 
     if mode == "server":
@@ -304,6 +303,33 @@ def exp_parametric(gpu, trial,  mode, long_run=False):
             long_run=long_run,
             gpu=gpu,
         )
+
+def debug(gpu, trial,  mode, long_run=False):
+    project = "Maslin/present_investigate/batch_3/total_scale"
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 10000
+    var_freq = 30
+    var_SD = 0.2
+    factor_time_variable = 10
+    factor_time_abrupt = 10
+    irregular = [1]
+
+
+    experiments = [[project, env_type, model, num_gens, trial, var_freq, var_SD, factor_time_variable,
+                    factor_time_abrupt]]
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", "--var_SD",
+                   "--factor_time_variable", "--factor_time_abrupt"]
+
+    if mode == "local":
+        command = "python simulate.py "
+        new_exp = [project, env_type, model, num_gens, trial, var_freq, var_SD, factor_time_variable,
+                   factor_time_abrupt, irregular]
+        for idx, el in enumerate(param_names):
+            command += el + " " + str(new_exp[idx]) + " "
+        print(command)
+        os.system("bash -c '{}'".format(command))
+
 
 
 if __name__ == "__main__":
@@ -321,4 +347,5 @@ if __name__ == "__main__":
         #exp_tune_var2(gpu=False, trial=trial)
         #exp_tune_var5(gpu=False, trial=trial)
         #exp_tune_var6_irreg(gpu=False, trial=trial, mode=mode)
+        #debug(gpu=False, trial=trial, mode=mode)\
         exp_parametric(gpu=False, trial=trial, mode=mode)

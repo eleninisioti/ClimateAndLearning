@@ -45,8 +45,7 @@ class CombEnv(Env):
     self.b3_values = [self.b3]
     self.b4_values = [self.b4]
     self.b5_values = [self.b5]
-    self.climate_values = [self.low]
-    self.climate_values_clean = [self.high]
+    self.climate_values = []
 
   def climate_func(self, gen):
 

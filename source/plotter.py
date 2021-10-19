@@ -30,8 +30,8 @@ class Plotter:
         self.plot_evolution_with_conf(log)
         # self.plot_diversity_with_conf(log)
 
-    def plot_evolution(self, log, trial, include=[1, 1, 1, 1], cycles=None):
-        fig, axs = plt.subplots(sum(include), figsize=(20, 10))
+    def plot_evolution(self, log, trial, include=[1, 1, 1, 1,1], cycles=None):
+        fig, axs = plt.subplots(sum(include), figsize=(5*sum(include), 10))
         count = 0
         max_gen = int(self.env_profile["ncycles"] * self.env_profile["cycle"])
 
@@ -79,10 +79,10 @@ class Plotter:
         if cycles is None:
             cycles = len(self.env_profile["start_a"])
         count = 0
-        start_cycle = cycles - 3  # which cycles to plot?
-        end_cycle = cycles - 1
+        #start_cycle = cycles - 3  # which cycles to plot?
+        #end_cycle = cycles - 1
         start_cycle = 0
-        end_cycles = cycles - 1
+        end_cycle = cycles
         # max_gen = int(cycles * self.env_profile["cycle"])
         log = log[(start_cycle * self.env_profile["cycle"]) <= log['Generation']]
         log = log[log['Generation'] <= (end_cycle * self.env_profile["cycle"])]
@@ -110,7 +110,14 @@ class Plotter:
             axs[count].set(xlabel=None)
 
             count += 1
+
         if include[3]:
+            sns.lineplot(ax=axs[count], data=log, x="Generation", y="R")
+            axs[count].set(ylabel="$\\bar{R}$")
+            axs[count].set(xlabel=None)
+
+            count += 1
+        if include[4]:
             sns.lineplot(ax=axs[count], data=log, x="Generation", y="Fitness")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$\\bar{f}$")

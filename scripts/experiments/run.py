@@ -41,10 +41,15 @@ def run_batch(
 
         script = "simulate.py"
 
+        if long_run:
+            time = "80:00:00"
+        else:
+            time = "15:00:00"
         run_exp(
             script=script,
             parameters=parameters,
             gpu=gpu,
+            time=time,
             long_run=long_run,
         )
 
@@ -268,16 +273,16 @@ def exp_total_scale(gpu, trial, long_run=False):
 
 
 def exp_parametric(gpu, trial,  mode, long_run=False):
-    var_freq_values = np.arange(10, 150, 5)
-    factor_time_abrupt_values =  np.arange(1, 10, 1)
+    var_freq_values = np.arange(10, 100, 20)
+    factor_time_abrupt_values =  np.arange(5, 15, 3)
     top_dir = "Maslin/parametric/"
     experiments = []
     param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--var_freq", "--var_SD",
-                   "--factor_time_variable", "--factor_time_abrupt", "--only_climate"]
+                   "--factor_time_variable", "--factor_time_abrupt"]
     env_type = "combined"
     model = "hybrid"
-    num_gens = 15000
-    factor_time_variable = 10
+    num_gens = 10000
+    factor_time_variable = 5
     var_SD = 0.2
 
 
@@ -286,7 +291,7 @@ def exp_parametric(gpu, trial,  mode, long_run=False):
         for factor_time_abrupt in factor_time_abrupt_values:
             project = top_dir + "freq_" + str(var_freq) + "_time_" + str(factor_time_abrupt)
             new_exp = [project, env_type, model, num_gens, trial, var_freq, var_SD, factor_time_variable,
-                    factor_time_abrupt, ""]
+                    factor_time_abrupt]
             experiments.append(new_exp)
             if mode == "local":
                 command = "python simulate.py "
@@ -348,4 +353,4 @@ if __name__ == "__main__":
         #exp_tune_var5(gpu=False, trial=trial)
         #exp_tune_var6_irreg(gpu=False, trial=trial, mode=mode)
         #debug(gpu=False, trial=trial, mode=mode)\
-        exp_parametric(gpu=False, trial=trial, mode=mode)
+        exp_parametric(gpu=True, trial=trial, mode=mode)

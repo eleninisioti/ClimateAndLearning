@@ -121,7 +121,7 @@ def init_parser():
     parser.add_argument('--mutate_rate',
                         help='Mutation rate of mutation rate',
                         type=float,
-                        default=0.0001)
+                        default=0.0005)
 
     parser.add_argument('--env_type',
                         help='Type of environment. Choose between change, sin and combined',
@@ -132,6 +132,7 @@ def init_parser():
                         help='Model for evolution. Choose between A and B',
                         type=str,
                         default="A")
+
     parser.add_argument('--capacity',
                         help='Capacity of a niche',
                         type=int,

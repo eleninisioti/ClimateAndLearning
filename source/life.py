@@ -60,6 +60,11 @@ class Life:
                 # compute fitness of population
                 self.population.survive(self.env)
 
+                if self.population.has_mass_extinction():
+                    # compute metrics for new generation
+                    self.logger.log_gen(self.population)
+                    break
+
                 self.population.reproduce(self.env)
 
                 # compute metrics for new generation
@@ -67,7 +72,6 @@ class Life:
 
             if gen % 100 == 0:
                 print("Generation: ", gen)
-            print("Generation: ", gen)
 
         self.logger.final_log(self.env)
 

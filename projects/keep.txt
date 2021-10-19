@@ -1,1 +1,0 @@
- python simulate.py --project Maslin/model_MC --env_type combined --model MC --num_gens 2500 --scale_time 1

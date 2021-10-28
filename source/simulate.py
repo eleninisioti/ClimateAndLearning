@@ -145,7 +145,12 @@ def init_parser():
 
     parser.add_argument('--factor_time_variable',
                         help='Scaling factor for time for variable period.',
-                        type=int,
+                        type=float,
+                        default=1)
+
+    parser.add_argument('--factor_time_steady',
+                        help='Scaling factor for time for steady periods.',
+                        type=float,
                         default=1)
 
     parser.add_argument('--var_freq',

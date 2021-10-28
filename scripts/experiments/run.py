@@ -336,6 +336,39 @@ def debug(gpu, trial,  mode, long_run=False):
         os.system("bash -c '{}'".format(command))
 
 
+def parametric_abrupt(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    top_dir = "Maslin/1D_mutate/parametric_abrupt/"
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--factor_time_abrupt",
+                   "--mutate_rate"]
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 1000
+    factor_time_abrupt_values =  np.arange(2, 15, 3)
+    mutation_values = [0.0001, 0.0005, 0.001, 0.005, 0.01]
+
+
+    for mutation in mutation_values:
+        for factor_time_abrupt in factor_time_abrupt_values:
+            project = top_dir + "mut_" + str(mutation) + "_time_" + str(factor_time_abrupt)
+            new_exp = [project, env_type, model, num_gens, trial,   factor_time_abrupt, mutate_rate]
+            experiments.append(new_exp)
+            if mode == "local":
+                command = "python simulate.py "
+                for idx, el in enumerate(param_names):
+                    command += el + " " + str(new_exp[idx]) + " "
+                print(command)
+                os.system("bash -c '{}'".format(command))
+
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
 
 if __name__ == "__main__":
     trials = int(sys.argv[1])
@@ -353,4 +386,5 @@ if __name__ == "__main__":
         #exp_tune_var5(gpu=False, trial=trial)
         #exp_tune_var6_irreg(gpu=False, trial=trial, mode=mode)
         #debug(gpu=False, trial=trial, mode=mode)\
-        exp_parametric(gpu=True, trial=trial, mode=mode)
+        #exp_parametric(gpu=True, trial=trial, mode=mode)
+        parametric_abrupt(gpu=True, trial=trial, mode=mode)

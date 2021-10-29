@@ -66,7 +66,7 @@ class CombEnv(Env):
       # generations at which there is variability using desired frequency
       x_points = [self.b3]
       while x_points[-1] < self.b4:
-        x_points.append(int(x_points[-1] + self.var_freq + normal(0,20)))
+        x_points.append(int(x_points[-1] + self.var_freq))
       x_points.append(self.b4)
 
       y_points = []

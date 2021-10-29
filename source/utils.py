@@ -1,22 +1,43 @@
 import numpy as np
 
-def consol_trials(project):
-  top_dir = "../projects/"
-  log_df = pd.DataFrame(columns=["Generation", "Trial", "Climate",
-                                 "Fitness", "Mean", "SD", "Total_Diversity",
-                                 "Specialists_Extinct", "Specialists_Number",
-                                 "Specialists_Diversity", "Specialists_Diversity_Mean",
-                                 "Specialists_Diversity_SD", "Generalists_Extinct",
-                                 "Generalists_Number", "Generalists_Diversity",
-                                 "Generalists_Diversity_Mean", "Generalists_Diversity_SD"],
-                        dtype=np.float)
 
-  _, env_profile = pickle.load(open(top_dir + project + '/log_total.pickle', 'rb'))
-  for trial in range(0, trials):
+def compute_selection_strength( log):
+    climate = log["Climate"].to_list()
+    pop_mean = log["Mean"].to_list()
+    strength = [np.abs(el - pop_mean[idx]) for idx, el in climate]
+    log["Selection"] = strength
+    return log
 
-    if os.path.isfile(top_dir + project + '/trials/trial_' + str(trial)
-                                          + '/log.pickle'):
+def compute_survival(log):
 
-      log = pickle.load(open(top_dir + project + '/trials/trial_' + str(trial)
-                                          + '/log.pickle', 'rb'))
-      log_df = log_df.append(log)
+    num_latitudes = 20
+    window = 5
+    all_DI = []
+    for lat in range(-int(num_latitudes/2), int(num_latitudes/2) ):
+        climate = log["Climate"].to_list()
+        num_gens = len(climate)
+        survivals = []
+
+        for gen in range(num_gens):
+            lat_climate = climate[gen] = lat
+
+            current_mean = log["Mean"]["Generation"==gen]
+            current_sigma = log["Sigma"]["Generation" == gen]
+
+            if (current_mean-2*current_sigma) < lat_climate  and lat_climate >  (current_mean-2*current_sigma):
+                survived = 1
+            else:
+                survived = 0
+            survivals.append(survived)
+
+        all_DI.append(np.convolve(survivals, np.ones(window, dtype=int), 'valid'))
+
+    dispersal = []
+    for el in range(all_DI[0]):
+        sum_disp = 0
+        for lat_DI in all_DI:
+            sum_disp += lat_DI[el]
+
+    log["Dispersal"] = dispersal
+    log["Generation_dispersal"] = list(range(0, num_gens, window))
+    return log

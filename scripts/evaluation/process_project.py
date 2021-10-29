@@ -31,8 +31,8 @@ def run(project, trials, climate_noconf):
     # plotter.plot_with_conf(log_df, [1,0,0,1], 2)
     # plotter.plot_evolution_with_conf(log_df, [1, 0, 1, 0], cycles=1)
 
-    plotter.plot_evolution_with_conf(log_df, [1, 0, 0, 0, 0])
-    plotter.plot_evolution_with_conf(log_df, [1, 1, 1, 1, 1])
+    plotter.plot_evolution_with_conf(log_df, [1, 0, 0, 0, 0, 0, 0])
+    plotter.plot_evolution_with_conf(log_df, [1, 1, 1, 1, 1, 0, 0])
     #plotter.plot_species_with_conf(log_df, [1, 1, 0, 0])
     #plotter.plot_species_with_conf(log_df, [1, 0, 1, 0])
     #plotter.plot_species_with_conf(log_df, [1, 0, 0, 1])
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         p = sys.argv[1]
         run(project="../projects/" + p, trials=1, climate_noconf=0)
     else:
-        top_dir = "Maslin/1D_mutate/parametric_abrupt"
+        top_dir = "Maslin/1D_mutate/parametric_variable"
         projects = [os.path.join(top_dir, o) for o in os.listdir("../projects/" + top_dir)]
         for p in projects:
             if "plots" not in p:

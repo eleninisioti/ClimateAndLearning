@@ -4,6 +4,7 @@ import numpy as np
 import os
 import pickle
 import yaml
+from utils import compute_selection_strength, compute_survival
 
 class Plotter:
 
@@ -18,6 +19,9 @@ class Plotter:
         plt.rcParams['font.size'] = '16'
         plt.rc('axes', labelsize='24')
         # plt.ioff()
+
+
+
 
     def plot_trial(self, log, trial):
         # plot evolution
@@ -87,6 +91,7 @@ class Plotter:
         log = log[(start_cycle * self.env_profile["cycle"]) <= log['Generation']]
         log = log[log['Generation'] <= (end_cycle * self.env_profile["cycle"])]
 
+
         if include[0]:
             if self.climate_noconf:
 
@@ -122,6 +127,23 @@ class Plotter:
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$\\bar{f}$")
             count += 1
+
+        if include[5]:
+            log = compute_selection_strength(log)
+
+            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Selection")
+            axs[count].set(xlabel="Time (in generations)")
+            axs[count].set(ylabel="$S$")
+            count += 1
+
+        if include[6]:
+            log = compute_survival(log)
+
+            sns.lineplot(ax=axs[count], data=log, x="Generation_dispersal", y="Dispersal")
+            axs[count].set(xlabel="Time (in generations)")
+            axs[count].set(ylabel="$D$")
+            count += 1
+
         axs[count - 1].set(xlabel="Time (in generations)")
 
         # highlight periods of variability

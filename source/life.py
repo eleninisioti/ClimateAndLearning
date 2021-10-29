@@ -51,7 +51,7 @@ class Life:
         self.setup()
 
         # ----- run generations ------
-        for gen in range(self.config.num_gens):
+        for gen in range(self.config.first_gen, self.config.num_gens):
 
             # update environment
             self.env.step(gen)

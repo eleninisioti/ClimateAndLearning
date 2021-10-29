@@ -349,9 +349,9 @@ def parametric_abrupt(gpu, trial,  mode, long_run=False):
     mutation_values = [0.0001, 0.0005, 0.001, 0.005, 0.01]
 
 
-    for mutation in mutation_values:
+    for mutate_rate in mutation_values:
         for factor_time_abrupt in factor_time_abrupt_values:
-            project = top_dir + "mut_" + str(mutation) + "_time_" + str(factor_time_abrupt)
+            project = top_dir + "mut_" + str(mutate_rate) + "_time_" + str(factor_time_abrupt)
             new_exp = [project, env_type, model, num_gens, trial,   factor_time_abrupt, mutate_rate]
             experiments.append(new_exp)
             if mode == "local":

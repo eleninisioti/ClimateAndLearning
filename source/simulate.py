@@ -126,7 +126,7 @@ def init_parser():
     parser.add_argument('--env_type',
                         help='Type of environment. Choose between change, sin and combined',
                         type=str,
-                        default="change")
+                        default="combined")
 
     parser.add_argument('--model',
                         help='Model for evolution. Choose between A and B',
@@ -181,8 +181,14 @@ def init_parser():
 
     parser.add_argument('--only_climate',
                         help='If use, no population is created.',
-                        action="store_true",
-)
+                        action="store_true")
+
+    parser.add_argument('--first_gen',
+                        help='First timestep to start simulating life',
+                        type=int,
+                        default=0)
+
+
     args = parser.parse_args()
     return args
 

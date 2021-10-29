@@ -390,7 +390,7 @@ def parametric_variable(gpu, trial,  mode, long_run=False):
         for var_freq in var_freq_values:
             project = top_dir + "SD_" + str(var_SD) + "_var_" + str(var_freq)
             new_exp = [project, env_type, model, num_gens, trial,  factor_time_abrupt, factor_time_variable,
-                       mutate_rate, var_SD, var_freq, factor_time_steady]
+                       mutate_rate, var_freq, var_SD, factor_time_steady]
             experiments.append(new_exp)
             if mode == "local":
                 command = "python simulate.py "

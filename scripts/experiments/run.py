@@ -370,6 +370,43 @@ def parametric_abrupt(gpu, trial,  mode, long_run=False):
             gpu=gpu,
         )
 
+def parametric_variable(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    top_dir = "Maslin/1D_mutate/parametric_variable/"
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--factor_time_abrupt",
+                   "--factor_time_variable", "--mutate_rate", "--var_freq", "--var_SD"]
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 1000
+    factor_time_abrupt = 2
+    mutate_rate = 0.001
+    var_freq_values = np.arange(1, 100, 20)
+    var_SD_values = [0.05, 0.1, 0.2, 0.4]
+    factor_time_variable = 1
+
+    for var_SD in var_SD_values:
+        for var_freq in var_freq_values:
+            project = top_dir + "SD_" + str(var_SD) + "_var_" + str(var_freq)
+            new_exp = [project, env_type, model, num_gens, trial,  factor_time_abrupt, factor_time_variable,
+                       mutate_rate, var_SD, var_freq]
+            experiments.append(new_exp)
+            if mode == "local":
+                command = "python simulate.py "
+                for idx, el in enumerate(param_names):
+                    command += el + " " + str(new_exp[idx]) + " "
+                print(command)
+                os.system("bash -c '{}'".format(command))
+
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
 if __name__ == "__main__":
     trials = int(sys.argv[1])
     mode = sys.argv[2] # server for jz experiments and local otherwise

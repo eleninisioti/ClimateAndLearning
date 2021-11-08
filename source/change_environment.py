@@ -18,13 +18,16 @@ class ChangeEnv(Env):
     self.b4 = 900
     self.v1 = self.mean
     self.rate = 0.01
-    self.climate_values = [self.mean]
+    self.climate_values = []
     self.orig_capacity = orig_capacity
     self.capacity = self.orig_capacity
+    self.type = "change"
 
 
   def climate_func(self, gen):
-    if gen > self.b1 and gen < self.b2:
+    if not gen:
+      climate = self.mean
+    elif gen > self.b1 and gen < self.b2:
       climate = self.climate_values[-1] + self.rate
     elif gen > self.b3 and gen < self.b4:
       climate = self.climate_values[-1] - self.rate

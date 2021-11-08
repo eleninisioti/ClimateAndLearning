@@ -34,6 +34,20 @@ class Plotter:
         self.plot_evolution_with_conf(log)
         # self.plot_diversity_with_conf(log)
 
+    def plot_selection_pressure(self, log):
+        fig, axs = plt.subplots(1, figsize=(20, 10))
+
+        log = compute_selection_strength(log)
+
+        sns.lineplot(data=log, x="Generation", y="Selection", label="Selection")
+        sns.lineplot(data=log, x="Generation", y="SD", label="$\sigma$")
+        sns.lineplot(data=log, x="Generation", y="R", label="$R$")
+        axs.set(xlabel="Time (in generations)")
+        plt.savefig("../projects/" + self.project + "/plots/selection.png")
+        plt.clf()
+
+
+
     def plot_evolution(self, log, trial, include=[1, 1, 1, 1,1], cycles=None):
         fig, axs = plt.subplots(sum(include), figsize=(5*sum(include), 10))
         count = 0
@@ -79,7 +93,7 @@ class Plotter:
         plt.clf()
 
     def plot_evolution_with_conf(self, log, include, cycles=None):
-        fig, axs = plt.subplots(sum(include) + 1, figsize=(20, 10))
+        fig, axs = plt.subplots(sum(include) + 1, figsize=(10, 5*sum(include)))
         if cycles is None:
             cycles = len(self.env_profile["start_a"])
         count = 0
@@ -88,8 +102,8 @@ class Plotter:
         start_cycle = 0
         end_cycle = cycles
         # max_gen = int(cycles * self.env_profile["cycle"])
-        log = log[(start_cycle * self.env_profile["cycle"]) <= log['Generation']]
-        log = log[log['Generation'] <= (end_cycle * self.env_profile["cycle"])]
+        #log = log[(start_cycle * self.env_profile["cycle"]) <= log['Generation']]
+        #log = log[log['Generation'] <= (end_cycle * self.env_profile["cycle"])]
 
 
         if include[0]:
@@ -139,7 +153,7 @@ class Plotter:
         if include[6]:
             log = compute_survival(log)
 
-            sns.lineplot(ax=axs[count], data=log, x="Generation_dispersal", y="Dispersal")
+            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Dispersal")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$D$")
             count += 1
@@ -153,7 +167,7 @@ class Plotter:
         else:
             plot_regions = False
 
-        if plot_regions:
+        if plot_regions and end_cycle:
             for subplot in range(count):
                 for cycle in range(start_cycle, end_cycle):
                     axs[subplot].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle],

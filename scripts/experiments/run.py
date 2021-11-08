@@ -338,7 +338,7 @@ def debug(gpu, trial,  mode, long_run=False):
 
 def parametric_abrupt(gpu, trial,  mode, long_run=False):
     #var_freq_values = np.arange(10, 100, 20)
-    top_dir = "Maslin/1D_mutate/parametric_abrupt/"
+    top_dir = "Maslin/1D_mutate/parametric_abrupt_mutatev2/"
     experiments = []
     param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--factor_time_abrupt",
                    "--mutate_rate"]
@@ -346,7 +346,7 @@ def parametric_abrupt(gpu, trial,  mode, long_run=False):
     model = "hybrid"
     num_gens = 1000
     factor_time_abrupt_values =  np.arange(2, 15, 3)
-    mutation_values = [0.0001, 0.0005, 0.001, 0.005, 0.01]
+    mutation_values = [0]
 
 
     for mutate_rate in mutation_values:
@@ -425,4 +425,5 @@ if __name__ == "__main__":
         #exp_tune_var6_irreg(gpu=False, trial=trial, mode=mode)
         #debug(gpu=False, trial=trial, mode=mode)\
         #exp_parametric(gpu=True, trial=trial, mode=mode)
-        parametric_variable(gpu=True, trial=trial, mode=mode)
+        #parametric_variable(gpu=True, trial=trial, mode=mode)
+        parametric_abrupt(gpu=True, trial=trial, mode=mode)

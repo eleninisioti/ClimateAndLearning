@@ -31,7 +31,7 @@ class Genome:
         elif self.type == "1D_mutate":
             self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
             self.genes["sigma"] = np.abs(self.genes["sigma"] + normal(0, self.genes["r"]))
-            self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.mutate_rate))
+            self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.genes["r"]))
 
     def cross(self, genomes):
         for key in self.genes.keys():

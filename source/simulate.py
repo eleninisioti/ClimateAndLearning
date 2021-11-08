@@ -38,7 +38,7 @@ def simulate(args):
             random.seed(trial)
             np.random.seed(trial)
             log = life_simul.run()
-            for step in range(len(log["climate_values"])):
+            for step in range(len(log["Climate"])):
                 trial_log = {'Generation': [step], 'Trial': [trial]}
                 for key in log.keys():
                     if len(log[key]) and key!= "env_profile":
@@ -49,8 +49,6 @@ def simulate(args):
                 else:
                     log_df = pd.DataFrame.from_dict(trial_log)
 
-            # with open('../projects/' + args.project + '/log_total_part_' + str(trial) + '.pickle', 'wb') as pfile:
-            #   pickle.dump([log_df, env_profile], pfile)
 
             with open('../projects/' + args.project + '/trials/trial_' + str(trial) + '/log.pickle', 'wb') as pfile:
                 pickle.dump(log_df, pfile)

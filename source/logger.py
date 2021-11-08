@@ -45,7 +45,6 @@ class Logger:
                      "Mean": self.log["running_mean"],
                      "SD": self.log["running_SD"],
                      "R": self.log["running_mutate"],
-                     "climate_values" : self.log["climate_values"],
                      "Total_Diversity": self.log["total_diversity"],
                      "Specialists_Extinct": self.log["specialists"]["extinctions"],
                      "Specialists_Number": self.log["specialists"]["number"],
@@ -59,9 +58,9 @@ class Logger:
                      "Generalists_Diversity_SD": self.log["generalists"]["diversity_std"]}
 
         if env.type == "change":
-            self.log["env_profile"] = {"start_a": env.b1, "end_a": env.b2,
-                                       "start_b": env.b3, "end_b": env.b4,
-                                       "cycles": env.cycles}
+            self.log["env_profile"] = {"start_a": [0], "end_a": [0],
+                                       "start_b": [0], "end_b": [0],
+                                       "ncycles": 1, "cycle": 0}
         elif env.type == "sin":
             self.log["env_profile"] = {}
 

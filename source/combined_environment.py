@@ -10,11 +10,13 @@ from scipy.interpolate import interp1d
 
 class CombEnv(Env):
 
-  def __init__(self, orig_capacity, model, irregular, factor_time_abrupt=1, factor_time_variable=1, 
+  def __init__(self, orig_capacity, model, irregular, num_niches, low_value, factor_time_abrupt=1, \
+                                                                                               factor_time_variable=1,
                factor_time_steady=1, var_freq=5, var_SD=0.2):
     self.type = "combined"
-    self.low = 1.0 # mean of environment  during low-resources periods
-    self.high = 1.5 # mean of environment  during high-resources periods
+    self.num_niches = num_niches
+    self.low = low_value # mean of environment  during low-resources periods
+    self.high = low_value + 0.5 # mean of environment  during high-resources periods
     self.mean = self.low
     self.model = model
     self.generation_duration = 15 # how many years a generation is
@@ -23,13 +25,14 @@ class CombEnv(Env):
     self.factor_time_steady = factor_time_steady # scales abrupt transition in time
     self.var_freq = var_freq # scales abrupt transition in size
     self.irregular = irregular
-    self.orig_capacity = orig_capacity
-    self.capacity = self.orig_capacity*self.low
+    self.orig_capacity = int(orig_capacity/(num_niches))
+    print("capacity", self.orig_capacity*num_niches)
+    self.capacity = orig_capacity
     self.cycles = 1
 
 
     # breakpoints for determining the different phases
-    self.b1 = int(8000/self.generation_duration)
+    self.b1 = int(8000/self.generation_duration*self.factor_time_steady)
     self.b2 = int(self.b1 + int(300/self.generation_duration)*self.factor_time_abrupt)
     self.b3 = int(self.b2 + int(8000/self.generation_duration)*self.factor_time_steady)
     self.b4 = int(self.b3 + int(2000/self.generation_duration)*self.factor_time_variable)
@@ -37,9 +40,6 @@ class CombEnv(Env):
     self.SD = var_SD
     self.rate1 = (self.high-self.low)/(self.b2-self.b1)
     self.rate2 =  (self.high-self.low)/(self.b4-self.b3)
-
-
-
 
     # logging
     self.b1_values = [self.b1]
@@ -92,11 +92,11 @@ class CombEnv(Env):
 
       climate = self.low
       self.cycles += 1
-      self.b1 = int(gen + int(8000 / self.generation_duration))
+      self.b1 = int(gen + int(8000 / self.generation_duration)*self.factor_time_steady)
       self.b2 = int(self.b1 + int(300 / self.generation_duration) * self.factor_time_abrupt)
-      self.b3 = int(self.b2 + int(8000 / self.generation_duration))
+      self.b3 = int(self.b2 + int(8000 / self.generation_duration)*self.factor_time_steady)
       self.b4 = int(self.b3 + int(2000 / self.generation_duration)*self.factor_time_variable)
-      self.b5 = int(self.b4 + int(8000 / self.generation_duration))
+      self.b5 = int(self.b4 + int(8000 / self.generation_duration)*self.factor_time_steady)
       self.b1_values.append(self.b1)
       self.b2_values.append(self.b2)
       self.b3_values.append(self.b3)

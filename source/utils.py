@@ -2,18 +2,20 @@ import numpy as np
 
 
 def compute_selection_strength( log):
-    climate = log["Climate"].to_list()
+    climate = log["Climate_avg"].to_list()
     pop_mean = log["Mean"].to_list()
     strength = [np.abs(el - pop_mean[idx]) for idx, el in enumerate(climate)]
     log["Selection"] = strength
     return log
 
-def compute_survival(log):
 
-    num_latitudes = 40
+
+def compute_survival(log, num_niches):
+
+    num_latitudes = num_niches
     window = 11
     all_DI = []
-    for lat in range(-int(num_latitudes/2), int(num_latitudes/2) ):
+    for lat in range(num_latitudes):
         climate = log["Climate"].to_list()
         num_gens = len(climate)
         survivals = []
@@ -23,8 +25,6 @@ def compute_survival(log):
 
             current_mean = log["Mean"].to_list()[gen]
             current_sigma = log["SD"].to_list()[gen]
-            x= current_mean-2*current_sigma
-            y = current_mean+2*current_sigma
             if ((current_mean-2*current_sigma) < lat_climate) and (lat_climate < (current_mean+2*current_sigma)):
                 survived = 1
             else:
@@ -43,6 +43,9 @@ def compute_survival(log):
     while len(dispersal) < num_gens:
         dispersal = [0] + dispersal
 
+    if len(dispersal) > num_gens:
+        dispersal = dispersal[:num_gens]
+
     log["Dispersal"] = dispersal
     #log["Generation_dispersal"] = list(range(0, num_gens-window+2))
-    return log
+    return log, np.sum(survivals)

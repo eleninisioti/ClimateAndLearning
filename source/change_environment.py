@@ -8,20 +8,25 @@ from environment import Env
 
 class ChangeEnv(Env):
 
-  def __init__(self, mean, orig_capacity):
+  def __init__(self, mean, orig_capacity, num_niches, factor_time_abrupt, factor_time_steady):
     self.mean = mean
+    self.low = mean
+    self.high = mean + 0.5
+    self.num_niches = num_niches
 
     # define breakpoints
     self.b1 = 200
-    self.b2 = 250
-    self.b3 = 850
-    self.b4 = 900
+    self.b2 = self.b1 + 50*factor_time_abrupt
+    self.b3 = self.b2 + 50*factor_time_steady
+    self.b4 = self.b3 + 50*factor_time_abrupt
     self.v1 = self.mean
-    self.rate = 0.01
     self.climate_values = []
-    self.orig_capacity = orig_capacity
-    self.capacity = self.orig_capacity
+    self.orig_capacity = int(orig_capacity/(num_niches))
+    self.keep_capacity = orig_capacity
+    self.capacity = self.keep_capacity
     self.type = "change"
+    print(self.b1, self.b2, self.b3, self.b4)
+    self.rate = (self.high-self.low)/(self.b2-self.b1)
 
 
   def climate_func(self, gen):
@@ -33,7 +38,7 @@ class ChangeEnv(Env):
       climate = self.climate_values[-1] - self.rate
     else:
       climate = self.climate_values[-1]
-    self.capacity = climate*self.orig_capacity
+    self.capacity = climate*self.keep_capacity
     self.climate_values.append(climate)
     return climate
 

@@ -51,16 +51,16 @@ def simulate(args):
 
 
             with open('../projects/' + args.project + '/trials/trial_' + str(trial) + '/log.pickle', 'wb') as pfile:
-                pickle.dump(log_df, pfile)
+                pickle.dump(log_df, pfile, protocol=pickle.HIGHEST_PROTOCOL)
 
         with open('../projects/' + args.project + '/log_total.pickle', 'wb') as pfile:
-            pickle.dump([log_df, log["env_profile"]], pfile)
+            pickle.dump([log_df, log["env_profile"]], pfile, protocol=pickle.HIGHEST_PROTOCOL)
 
     except KeyboardInterrupt:
         print("Running aborted. Saving intermediate results.")
         log = life_simul.log
         with open('../projects/' + args.project + '/log.pickle', 'wb') as pfile:
-            pickle.dump(log, pfile)
+            pickle.dump(log, pfile, protocol=pickle.HIGHEST_PROTOCOL)
 
         plotter = Plotter(args.project)
         plotter.plot_project(log)
@@ -79,7 +79,7 @@ def init_parser():
     parser.add_argument('--num_agents',
                         help="Number of agents",
                         type=int,
-                        default=1000)
+                        default=500)
 
     parser.add_argument('--num_gens',
                         help='Name of generations',
@@ -99,7 +99,7 @@ def init_parser():
     parser.add_argument('--climate_mean_init',
                         help="Mean of climate",
                         type=float,
-                        default=1.0)
+                        default=2.0)
 
     parser.add_argument('--climate_period',
                         help="Mean of climate",
@@ -167,10 +167,9 @@ def init_parser():
                         default=1)
 
     parser.add_argument('--survival_type',
-                        help='Type of fitness used. Choose between "MC" for Minimum Criterion and "FP" for fitness '
-                             'proportionate.',
+                        help='Type of fitness used. Choose between "no-presure", "FP-global"',
                         type=str,
-                        default="FP")
+                        default="no-pressure")
 
     parser.add_argument('--genome_type',
                         help='Type of genome used. Choose between 1D and 1D_mutate',
@@ -179,12 +178,33 @@ def init_parser():
 
     parser.add_argument('--only_climate',
                         help='If use, no population is created.',
-                        action="store_true")
+                        type=int,
+                        default=0)
+
+    parser.add_argument('--scale_weights',
+                        help='If use, we compute the exponential of fitnesses for weighting selection.',
+                        type=int,
+                        default=0)
 
     parser.add_argument('--first_gen',
                         help='First timestep to start simulating life',
                         type=int,
                         default=0)
+
+    parser.add_argument('--low_value',
+                        help='Low value for climate',
+                        type=float,
+                        default=1)
+
+    parser.add_argument('--num_niches',
+                        help='Number of niches (latitudes)',
+                        type=int,
+                        default=1)
+
+    parser.add_argument('--extinctions',
+                        help='If True, extinct individuals disappear from the population',
+                        type=int,
+                        default=1)
 
 
     args = parser.parse_args()

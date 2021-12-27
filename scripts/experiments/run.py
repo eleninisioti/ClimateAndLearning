@@ -6,6 +6,7 @@ sys.path.insert(0, "../jz")
 from auto_sbatch import run_exp
 import itertools
 import numpy as np
+import datetime
 
 def run_batch(
     experiments,
@@ -338,21 +339,23 @@ def debug(gpu, trial,  mode, long_run=False):
 
 def parametric_abrupt(gpu, trial,  mode, long_run=False):
     #var_freq_values = np.arange(10, 100, 20)
-    top_dir = "Maslin/1D_mutate/parametric_abrupt_mutatev2/"
+    top_dir = "Maslin/1D_mutate/parametric_abrupt/"
     experiments = []
     param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--factor_time_abrupt",
-                   "--mutate_rate"]
+                   "--mutate_rate", "--factor_time_steady"]
     env_type = "combined"
     model = "hybrid"
     num_gens = 1000
-    factor_time_abrupt_values =  np.arange(2, 15, 3)
-    mutation_values = [0]
+    factor_time_abrupt_values =  np.arange(15, 50, 5)
+    factor_time_abrupt_values = factor_time_abrupt_values[::-1]
+    mutation_values = [0.001]
+    factor_time_steady = 0.5
 
 
     for mutate_rate in mutation_values:
         for factor_time_abrupt in factor_time_abrupt_values:
             project = top_dir + "mut_" + str(mutate_rate) + "_time_" + str(factor_time_abrupt)
-            new_exp = [project, env_type, model, num_gens, trial,   factor_time_abrupt, mutate_rate]
+            new_exp = [project, env_type, model, num_gens, trial,   factor_time_abrupt, mutate_rate, factor_time_steady]
             experiments.append(new_exp)
             if mode == "local":
                 command = "python simulate.py "
@@ -372,19 +375,19 @@ def parametric_abrupt(gpu, trial,  mode, long_run=False):
 
 def parametric_variable(gpu, trial,  mode, long_run=False):
     #var_freq_values = np.arange(10, 100, 20)
-    top_dir = "Maslin/1D_mutate/parametric_variable/"
+    top_dir = "Maslin/1D_mutate/parametric_variable_highermutate/"
     experiments = []
     param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--factor_time_abrupt",
                    "--factor_time_variable", "--mutate_rate", "--var_freq", "--var_SD", "--factor_time_steady"]
     env_type = "combined"
     model = "hybrid"
-    num_gens = 2000
+    num_gens = 1500
     factor_time_abrupt = 2
-    mutate_rate = 0.001
-    var_freq_values = np.arange(1, 100, 20)
-    var_SD_values = [0.05, 0.1, 0.2, 0.4]
+    mutate_rate = 0.01
+    var_freq_values = np.arange(5, 30, 10)
+    var_SD_values = [0.1, 0.4]
     factor_time_variable = 1
-    factor_time_steady = 0.2
+    factor_time_steady = 0.5
 
     for var_SD in var_SD_values:
         for var_freq in var_freq_values:
@@ -408,22 +411,630 @@ def parametric_variable(gpu, trial,  mode, long_run=False):
             gpu=gpu,
         )
 
+def test_low(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    top_dir = "Maslin/1D_mutate/test_low/"
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--factor_time_abrupt",
+                   "--factor_time_steady"]
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 1000
+    factor_time_abrupt_values = [1,2,3,4]
+    factor_time_steady = 1
+
+
+    for factor_time_abrupt in factor_time_abrupt_values:
+        project = top_dir + "_time_" + str(factor_time_abrupt)
+        new_exp = [project, env_type, model, num_gens, trial,   factor_time_abrupt, factor_time_steady]
+        experiments.append(new_exp)
+        if mode == "local":
+            command = "python simulate.py "
+            for idx, el in enumerate(param_names):
+                command += el + " " + str(new_exp[idx]) + " "
+            print(command)
+            os.system("bash -c '{}'".format(command))
+
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
+def parametric_low(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    top_dir = "Maslin/1D_mutate/debug/" + project + "/"
+
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--factor_time_abrupt",
+                   "--factor_time_steady", "--low_value", "--num_niches","--var_freq", "--var_SD", "--survival_type",
+                   "--mutate_rate", "--genome_type"]
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 1500
+    factor_time_abrupt_values = [4]
+    factor_time_steady = 1
+    low_values = [1]
+    niches_number_values = [1]
+    var_freq = 10
+    var_SD = 0.1
+    survival_types = ["FP-Grove", "mixed"]
+    mutate_rate = 0.001
+    genome_types = ["1D_mutate_fixed", "1D_mutate"]
+
+    for genome_type in genome_types:
+        for survival_type in survival_types:
+
+            for factor_time_abrupt in factor_time_abrupt_values:
+                for low_value in low_values:
+                    for niches_number in niches_number_values:
+                        project = top_dir + "survival_" + survival_type +"_low_" + str(low_value) + "_niches_" + str(
+                            niches_number)
+                        new_exp = [project, env_type, model, num_gens, trial,   factor_time_abrupt, factor_time_steady,
+                                   low_value, niches_number, var_freq, var_SD, survival_type, mutate_rate, genome_type]
+                        experiments.append(new_exp)
+                        if mode == "local":
+                            command = "python simulate.py "
+                            for idx, el in enumerate(param_names):
+                                command += el + " " + str(new_exp[idx]) + " "
+                            print(command)
+                            os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
+def targeted_low(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    top_dir = "Maslin/1D_mutate/parametric_low/"
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--factor_time_abrupt",
+                   "--factor_time_steady", "--low_value", "--num_niches","--var_freq", "--var_SD", "--survival_type"]
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 1500
+    factor_time_abrupt_values = [3]
+    factor_time_steady = 1
+    low_values = [1]
+    niches_number_values = [400]
+    var_freq = 10
+    var_SD = 0.2
+    survival_types = ["FP-global", "no-pressure", "no-oressure-random", "no-presure-fifo"]
+    survival_types = ["mixed"]
+
+    for survival_type in survival_types:
+
+        for factor_time_abrupt in factor_time_abrupt_values:
+            for low_value in low_values:
+                for niches_number in niches_number_values:
+                    project = top_dir + "survival_" + survival_type +"_low_" + str(low_value) + "_niches_" + str(
+                        niches_number)
+                    new_exp = [project, env_type, model, num_gens, trial,   factor_time_abrupt, factor_time_steady,
+                               low_value, niches_number, var_freq, var_SD, survival_type]
+                    experiments.append(new_exp)
+                    if mode == "local":
+                        command = "python simulate.py "
+                        for idx, el in enumerate(param_names):
+                            command += el + " " + str(new_exp[idx]) + " "
+                        print(command)
+                        os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu)
+
+def parametric_Grove(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    top_dir = "Maslin/debug/parametric/" + project + "/"
+
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--trial", "--survival_type",
+                   "--mutate_rate", "--genome_type", "--extinctions", "--factor_time_abrupt",
+                   "--factor_time_steady", "--num_niches",
+                   "--only_climate"]
+    factor_time_abrupt_values = [7, 10]
+    factor_time_steady_values = [5]
+    env_type = "change"
+    model = "hybrid"
+    num_gens = 1200
+    survival_types = ["capacity-fitness", "limited-capacity", "FP-Grove"]
+    #survival_types = ["FP-Grove"]
+    mutate_rate = 0.001
+    genome_types = ["1D_mutate_fixed", "1D_mutate", "1D"]
+    genome_types = ["1D_mutate"]
+    extinctions = [0, 1]
+    num_niches_values = [1, 100, 500, 1000]
+    climate_only = 0
+
+    for num_niches in num_niches_values:
+        for factor_time_abrupt in factor_time_abrupt_values:
+            for factor_time_steady in factor_time_steady_values:
+                for genome_type in genome_types:
+                    for survival_type in survival_types:
+                        for extinction in extinctions:
+
+                            project = top_dir + "survival_" + survival_type + "genome_" + genome_type + "extinctions_" + \
+                                      str(extinction) + "_scale_abrupt_" + str(factor_time_abrupt) + "_scale_steady_"\
+                                      + str(factor_time_steady )+ "_num_niches_" + \
+                                      str(num_niches)
+                            new_exp = [project, env_type, model, num_gens, trial, survival_type, mutate_rate, genome_type,
+                                       extinction, factor_time_abrupt, factor_time_steady,num_niches, climate_only]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                print(command)
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
+def parametric_rest(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    top_dir = "Maslin/debug/parametric/" + project + "/"
+
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--num_trials", "--survival_type",
+                   "--mutate_rate", "--genome_type", "--extinctions", "--factor_time_abrupt",
+                   "--factor_time_steady", "--num_niches",
+                   "--only_climate"]
+    factor_time_abrupt_values = [7]
+    factor_time_steady_values = [5]
+    env_type = "change"
+    model = "hybrid"
+    num_gens = 1300
+    survival_types = ["capacity-fitness", "limited-capacity", "FP-Grove"]
+    #survival_types = ["FP-Grove"]
+    mutate_rate = 0.001
+    genome_types = ["1D_mutate_fixed", "1D", "1D_mutate"]
+    extinctions = [1]
+    num_niches_values = [1, 10, 100]
+    climate_only = 0
+
+    for num_niches in num_niches_values:
+        for factor_time_abrupt in factor_time_abrupt_values:
+            for factor_time_steady in factor_time_steady_values:
+                for genome_type in genome_types:
+                    for survival_type in survival_types:
+                        for extinction in extinctions:
+
+                            project = top_dir + "survival_" + survival_type + "genome_" + genome_type + "extinctions_" + \
+                                      str(extinction) + "_scale_abrupt_" + str(factor_time_abrupt) + "_scale_steady_"\
+                                      + str(factor_time_steady )+ "_num_niches_" + \
+                                      str(num_niches)
+                            new_exp = [project, env_type, model, num_gens, trial, survival_type, mutate_rate, genome_type,
+                                       extinction, factor_time_abrupt, factor_time_steady,num_niches, climate_only]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                print(command)
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
+def parametric_1D(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    top_dir = "Maslin/debug/parametric/" + project + "_fixed/"
+
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--num_trials", "--survival_type",
+                   "--mutate_rate", "--genome_type", "--extinctions", "--factor_time_abrupt",
+                   "--factor_time_steady", "--num_niches", "--only_climate"]
+    factor_time_abrupt_values = [3]
+    factor_time_steady_values = [5]
+    env_type = "change"
+    model = "hybrid"
+    num_gens = 1300
+    survival_types = ["capacity-fitness"]
+    survival_types = ["capacity-fitness", "limited-capacity", "FP-Grove"]
+
+    #survival_types = ["FP-Grove"]
+    mutate_rate = 0.001
+    genome_types = ["1D_mutate", "1D_mutate_fixed"]
+    extinctions = [1]
+    num_niches_values = [1, 10, 100]
+    climate_only = 0
+
+    for num_niches in num_niches_values:
+        for factor_time_abrupt in factor_time_abrupt_values:
+            for factor_time_steady in factor_time_steady_values:
+                for genome_type in genome_types:
+                    for survival_type in survival_types:
+                        for extinction in extinctions:
+
+                            project = top_dir + "survival_" + survival_type + "genome_" + genome_type + "extinctions_" + \
+                                      str(extinction) + "_scale_abrupt_" + str(factor_time_abrupt) + "_scale_steady_"\
+                                      + str(factor_time_steady )+ "_num_niches_" + \
+                                      str(num_niches)
+                            new_exp = [project, env_type, model, num_gens, trial, survival_type, mutate_rate, genome_type,
+                                       extinction, factor_time_abrupt, factor_time_steady,num_niches, climate_only]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                print(command)
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
+def parametric(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    top_dir = "Maslin/debug/parametric/" + project + "_fixed/"
+
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--num_trials", "--survival_type",
+                   "--mutate_rate", "--genome_type", "--extinctions", "--factor_time_abrupt",
+                   "--factor_time_steady", "--num_niches", "--only_climate"]
+    factor_time_abrupt_values = [7]
+    factor_time_steady_values = [5]
+    env_type = "change"
+    model = "hybrid"
+    num_gens = 1300
+    survival_types = ["capacity-fitness", "FP-Grove", "limited-capacity"]
+    #survival_types = ["capacity-fitness"]
+    mutate_rate = 0.001
+    genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
+    extinctions = [1]
+    num_niches_values = [1, 10, 100]
+    climate_only = 0
+
+    for num_niches in num_niches_values:
+        for factor_time_abrupt in factor_time_abrupt_values:
+            for factor_time_steady in factor_time_steady_values:
+                for genome_type in genome_types:
+                    for survival_type in survival_types:
+                        for extinction in extinctions:
+
+                            project = top_dir + "survival_" + survival_type + "genome_" + genome_type + "extinctions_" + \
+                                      str(extinction) + "_scale_abrupt_" + str(factor_time_abrupt) + "_scale_steady_"\
+                                      + str(factor_time_steady )+ "_num_niches_" + \
+                                      str(num_niches)
+                            new_exp = [project, env_type, model, num_gens, trial, survival_type, mutate_rate, genome_type,
+                                       extinction, factor_time_abrupt, factor_time_steady,num_niches, climate_only]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                print(command)
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
+def parametric_1D_abrupt(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    top_dir = "Maslin/debug/parametric/" + project + "_fixed/"
+
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--num_trials", "--survival_type",
+                   "--mutate_rate", "--genome_type", "--extinctions", "--factor_time_abrupt",
+                   "--factor_time_steady", "--num_niches", "--only_climate"]
+    factor_time_abrupt_values = [1]
+    factor_time_steady_values = [5]
+    env_type = "change"
+    model = "hybrid"
+    num_gens = 1300
+    survival_types = ["capacity-fitness"]
+    survival_types = ["capacity-fitness", "limited-capacity", "FP-Grove"]
+
+    #survival_types = ["FP-Grove"]
+    mutate_rate = 0.001
+    genome_types = ["1D"]
+    extinctions = [0]
+    num_niches_values = [1, 10, 100]
+    climate_only = 0
+
+    for num_niches in num_niches_values:
+        for factor_time_abrupt in factor_time_abrupt_values:
+            for factor_time_steady in factor_time_steady_values:
+                for genome_type in genome_types:
+                    for survival_type in survival_types:
+                        for extinction in extinctions:
+
+                            project = top_dir + "survival_" + survival_type + "genome_" + genome_type + "extinctions_" + \
+                                      str(extinction) + "_scale_abrupt_" + str(factor_time_abrupt) + "_scale_steady_"\
+                                      + str(factor_time_steady )+ "_num_niches_" + \
+                                      str(num_niches)
+                            new_exp = [project, env_type, model, num_gens, trial, survival_type, mutate_rate, genome_type,
+                                       extinction, factor_time_abrupt, factor_time_steady,num_niches, climate_only]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                print(command)
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
+
+def debug_1D_LC(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    top_dir = "Maslin/debug/parametric/" + project + "_debug1DLC/"
+
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--num_trials", "--survival_type",
+                   "--mutate_rate", "--genome_type", "--extinctions", "--factor_time_abrupt",
+                   "--factor_time_steady", "--num_niches", "--only_climate"]
+    factor_time_abrupt_values = [1,3, 5]
+    factor_time_steady_values = [5]
+    env_type = "change"
+    model = "hybrid"
+    num_gens = 1300
+    survival_types = ["limited-capacity"]
+
+    #survival_types = ["FP-Grove"]
+    mutate_rate = 0.001
+    genome_types = ["1D"]
+    extinctions = [1]
+    num_niches_values = [10]
+    climate_only = 0
+
+    for num_niches in num_niches_values:
+        for factor_time_abrupt in factor_time_abrupt_values:
+            for factor_time_steady in factor_time_steady_values:
+                for genome_type in genome_types:
+                    for survival_type in survival_types:
+                        for extinction in extinctions:
+
+                            project = top_dir + "survival_" + survival_type + "genome_" + genome_type + "extinctions_" + \
+                                      str(extinction) + "_scale_abrupt_" + str(factor_time_abrupt) + "_scale_steady_"\
+                                      + str(factor_time_steady )+ "_num_niches_" + \
+                                      str(num_niches)
+                            new_exp = [project, env_type, model, num_gens, trial, survival_type, mutate_rate, genome_type,
+                                       extinction, factor_time_abrupt, factor_time_steady,num_niches, climate_only]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                print(command)
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
+def debug_1D(gpu, trial,  mode, long_run=False):
+    #var_freqvalues = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    top_dir = "Maslin/debug/parametric/" + project + "_debug1D/"
+
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--num_trials", "--survival_type",
+                   "--mutate_rate", "--genome_type", "--extinctions", "--factor_time_abrupt",
+                   "--factor_time_steady", "--num_niches", "--only_climate", "--scale_weights"]
+    factor_time_abrupt_values = [7]
+    factor_time_steady_values = [5]
+    env_type = "change"
+    model = "hybrid"
+    num_gens = 1300
+    survival_types = ["limited-capacity"]
+
+    survival_types = ["FP-Grove", "capacity-fitness"]
+    mutate_rate = 0.001
+    genome_types = ["1D"]
+    extinctions = [1]
+    num_niches_values = [1]
+    climate_only = 0
+    scale_weights = 1
+
+    for num_niches in num_niches_values:
+        for factor_time_abrupt in factor_time_abrupt_values:
+            for factor_time_steady in factor_time_steady_values:
+                for genome_type in genome_types:
+                    for survival_type in survival_types:
+                        for extinction in extinctions:
+
+                            project = top_dir + "survival_" + survival_type + "genome_" + genome_type + "extinctions_" + \
+                                      str(extinction) + "_scale_abrupt_" + str(factor_time_abrupt) + "_scale_steady_"\
+                                      + str(factor_time_steady )+ "_num_niches_" + \
+                                      str(num_niches)
+                            new_exp = [project, env_type, model, num_gens, trial, survival_type, mutate_rate, genome_type,
+                                       extinction, factor_time_abrupt, factor_time_steady,num_niches, climate_only,
+                                       scale_weights]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                print(command)
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
+
+def parametric_sin(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    top_dir = "Maslin/debug/parametric/" + project + "_fixed/"
+
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--num_trials", "--survival_type",
+                   "--mutate_rate", "--genome_type", "--extinctions", "--factor_time_abrupt",
+                   "--factor_time_steady", "--num_niches", "--only_climate"]
+    factor_time_abrupt_values = [7]
+    factor_time_steady_values = [5]
+    env_type = "sin"
+    model = "hybrid"
+    num_gens = 1300
+    survival_types = ["capacity-fitness", "limited-capacity", "FP-Grove"]
+    mutate_rate = 0.001
+    genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
+    extinctions = [1]
+    num_niches_values = [1, 10, 100]
+    climate_only = 0
+
+    for num_niches in num_niches_values:
+        for factor_time_abrupt in factor_time_abrupt_values:
+            for factor_time_steady in factor_time_steady_values:
+                for genome_type in genome_types:
+                    for survival_type in survival_types:
+                        for extinction in extinctions:
+
+                            project = top_dir + "survival_" + survival_type + "genome_" + genome_type + "extinctions_" + \
+                                      str(extinction) + "_scale_abrupt_" + str(factor_time_abrupt) + "_scale_steady_"\
+                                      + str(factor_time_steady )+ "_num_niches_" + \
+                                      str(num_niches)
+                            new_exp = [project, env_type, model, num_gens, trial, survival_type, mutate_rate, genome_type,
+                                       extinction, factor_time_abrupt, factor_time_steady,num_niches, climate_only]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                print(command)
+                                os.system("bash -c '{}'".format(command))
+                                #quit()
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
+def parametric_Maslin(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    top_dir = "Maslin/debug/parametric/" + project + "_fixed/"
+
+    experiments = []
+    param_names = ["--project", "--env_type", "--model", "--num_gens", "--num_trials", "--survival_type",
+                   "--mutate_rate", "--genome_type", "--extinctions", "--factor_time_abrupt",
+                   "--factor_time_steady", "--num_niches", "--only_climate", "--factor_time_variable",
+                   "--var_SD"]
+    factor_time_abrupt_values = [3]
+    factor_time_steady_values = [1]
+    factor_time_variable_values = [1]
+    var_freq_values = np.arange(10, 100, 20)
+    var_SD = 0.2
+    env_type = "combined"
+    model = "hybrid"
+    num_gens = 1500
+    survival_types = ["capacity-fitness", "limited-capacity", "FP-Grove"]
+    mutate_rate = 0.001
+    genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
+    extinctions = [1]
+    num_niches_values = [1, 10, 100]
+    climate_only = 0
+
+    for var_freq in var_freq_values:
+
+        for factor_time_variable in factor_time_variable_values:
+
+            for num_niches in num_niches_values:
+                for factor_time_abrupt in factor_time_abrupt_values:
+                    for factor_time_steady in factor_time_steady_values:
+                        for genome_type in genome_types:
+                            for survival_type in survival_types:
+                                for extinction in extinctions:
+
+                                    project = top_dir + "survival_" + survival_type + "genome_" + genome_type + "extinctions_" + \
+                                              str(extinction) + "_scale_abrupt_" + str(factor_time_abrupt) + "_scale_steady_"\
+                                              + str(factor_time_steady )+ "_num_niches_" + \
+                                              str(num_niches) + "_scale_variable_"+ str(factor_time_variable) + \
+                                              "_var_freq_"+ str(var_freq )
+                                    new_exp = [project, env_type, model, num_gens, trial, survival_type, mutate_rate, genome_type,
+                                               extinction, factor_time_abrupt, factor_time_steady,num_niches,
+                                               climate_only, factor_time_variable, var_freq]
+                                    experiments.append(new_exp)
+                                    if mode == "local":
+                                        command = "python simulate.py "
+                                        for idx, el in enumerate(param_names):
+                                            command += el + " " + str(new_exp[idx]) + " "
+                                        print(command)
+                                        os.system("bash -c '{}'".format(command))
+                                        #quit()
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
+
 if __name__ == "__main__":
     trials = int(sys.argv[1])
     mode = sys.argv[2] # server for jz experiments and local otherwise
-    for trial in range(1,trials+1):
-        # exp_presentation(gpu=False, project="Maslin/present_conf", env_type="combined", model="hybrid",
-        #                  num_gens=10000, trial=trial)
-        #exp_slower_abrupt(gpu=False, trial=trial)
-        #exp_slower_variable(gpu=False,  trial=trial)
-        #exp_less_variable(gpu=False,  trial=trial)
-        #exp_initialize(gpu=False, trial=trial)
-        #exp_even_less_variable(gpu=False, trial=trial)
-        #exp_tune_var1(gpu=False, trial=trial)
-        #exp_tune_var2(gpu=False, trial=trial)
-        #exp_tune_var5(gpu=False, trial=trial)
-        #exp_tune_var6_irreg(gpu=False, trial=trial, mode=mode)
-        #debug(gpu=False, trial=trial, mode=mode)\
-        #exp_parametric(gpu=True, trial=trial, mode=mode)
-        #parametric_variable(gpu=True, trial=trial, mode=mode)
-        parametric_abrupt(gpu=True, trial=trial, mode=mode)
+    for trial in range(1, trials+1):
+        parametric(gpu=True, trial=trial, mode=mode)
+        #parametric_sin(gpu=True, trial=trial, mode=mode)
+        #parametric_Maslin(gpu=True, trial=trial, mode=mode)
+        #parametric_rest(gpu=True, trial=trial, mode=mode)
+        #debug_1D_LC(gpu=True, trial=trial, mode=mode)
+        #debug_1D(gpu=True, trial=trial, mode=mode)
+

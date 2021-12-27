@@ -8,18 +8,20 @@ import math
 
 class SinEnv(Env):
 
-  def __init__(self, period, orig_capacity):
+  def __init__(self, period, orig_capacity, num_niches):
     self.omega = 2*math.pi/period
 
     # determine breakpoints and amplitudes based on the paper
     self.b1 = 500
     self.b2 = 1000
     self.v1 = 0.2 # low amplitude
-    self.v2 = 1  # high amplitude
-    self.mean = self.v1*np.sin(0*self.omega)
+    self.v2 = self.v1 + 1  # high amplitude
+    self.mean = self.v1*np.sin(0*self.omega) +1
     self.climate_values = [self.mean]
-    self.orig_capacity = orig_capacity
-    self.capacity = self.orig_capacity
+    self.orig_capacity = int(orig_capacity / (num_niches))
+    self.capacity = orig_capacity
+    self.type = "sin"
+    self.num_niches = num_niches
 
 
 
@@ -31,10 +33,8 @@ class SinEnv(Env):
       A = self.v1
 
     # A is the amplitude and omega is the frequency in rad
-    climate = A*np.sin(gen*self.omega)
+    climate = A*np.sin(gen*self.omega) + 1
     self.capacity = climate*self.orig_capacity
-
-
     self.climate_values.append(climate)
     return climate
 

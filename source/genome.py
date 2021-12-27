@@ -15,7 +15,7 @@ class Genome:
         """
         self.type = type
 
-        if self.type == "1D" or self.type == "1D_mutate":
+        if self.type == "1D" or self.type == "1D_mutate" or self.type == "1D_mutate_fixed":
             mu = normal(env_mean, init_SD)
             sigma = np.abs(normal(0, init_SD))
             r = init_mutate
@@ -28,10 +28,15 @@ class Genome:
         if self.type == "1D":
             self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
             self.genes["sigma"] = np.abs(self.genes["sigma"] + normal(0, self.genes["r"]))
+        elif self.type == "1D_mutate_fixed":
+            self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
+            self.genes["sigma"] = np.abs(self.genes["sigma"] + normal(0, self.genes["r"]))
+            self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.mutate_rate))
         elif self.type == "1D_mutate":
             self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
             self.genes["sigma"] = np.abs(self.genes["sigma"] + normal(0, self.genes["r"]))
             self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.genes["r"]))
+            #self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.mutate_rate))
 
     def cross(self, genomes):
         for key in self.genes.keys():

@@ -1,7 +1,7 @@
 from scipy import stats
 import numpy as np
 import math
-
+from utils import compute_survival
 
 class Agent:
 
@@ -13,6 +13,7 @@ class Agent:
         self.genome.mutate()
 
     def compute_fitness(self, env_mean):
+        #self.is_extinct(env)
         self.fitness = stats.norm(self.genome.genes["mean"], self.genome.genes["sigma"]).pdf(env_mean)
         return self.fitness
 
@@ -23,12 +24,43 @@ class Agent:
             self.generalist = False
         return self.generalist
 
-    def is_extinct(self, env_mean):
-        if ((self.genome.genes["mean"] - 2 * self.genome.genes["sigma"]) > env_mean)\
+    def is_extinct_old(self, env_mean):
+        if ((self.genome.genes["mean"] - 2 * self.genome.genes["sigma"]) > env_mean) \
                 or (self.genome.genes["mean"] + 2 * self.genome.genes["sigma"]) < env_mean:
             return True
         else:
             return False
+
+    def is_extinct(self, env):
+        num_latitudes = env.num_niches
+        survival = 0
+        self.niches = []
+        self.capacities = []
+        total_capacity = 0
+        self.fitness_values = []
+        for lat in range(-int(num_latitudes/2), int(num_latitudes/2) + 1):
+            lat_climate = env.mean + 0.01 * lat
+
+            if ((self.genome.genes["mean"] - 2 * self.genome.genes["sigma"]) < lat_climate) \
+                    and (lat_climate < self.genome.genes["mean"] + 2 * self.genome.genes["sigma"]):
+                survival += 1
+                self.niches.append(lat_climate)
+                self.capacities.append(np.floor(lat_climate*env.orig_capacity))
+                self.fitness_values.append(self.compute_fitness(lat_climate))
+
+            total_capacity += lat_climate*env.orig_capacity
+        if survival and len(self.niches)==0:
+            print("check")
+
+        if len(self.fitness_values):
+            self.fitness = np.mean(self.fitness_values)
+        else:
+            self.fitness = 0
+        #print(survival)
+        #if not survival:
+            #print("agent dieed with ", self.genome.genes["mean"], self.genome.genes["sigma"], lat_climate)
+        return (not survival), self
+
 
     def has_speciated(self, agents):
         thres_mean = 0.05

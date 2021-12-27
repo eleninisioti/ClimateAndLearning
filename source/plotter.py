@@ -34,15 +34,20 @@ class Plotter:
         self.plot_evolution_with_conf(log)
         # self.plot_diversity_with_conf(log)
 
-    def plot_selection_pressure(self, log):
+    def plot_selection_pressure(self, log, num_niches):
         fig, axs = plt.subplots(1, figsize=(20, 10))
-
+        climate_avg = []
+        for el in list(log["Climate"]):
+            niches_states = [el + 0.01 * idx for idx in range(-int(num_niches / 2), int(num_niches / 2) + 1)]
+            climate_avg.append(np.mean(niches_states))
+        log["Climate_avg"] = climate_avg
         log = compute_selection_strength(log)
 
-        sns.lineplot(data=log, x="Generation", y="Selection", label="Selection")
+        sns.lineplot(data=log, x="Generation", y="Selection", label="SoS")
         sns.lineplot(data=log, x="Generation", y="SD", label="$\sigma$")
-        sns.lineplot(data=log, x="Generation", y="R", label="$R$")
+        sns.lineplot(data=log, x="Generation", y="R", label="$r$")
         axs.set(xlabel="Time (in generations)")
+        axs.set_yscale('log')
         plt.savefig("../projects/" + self.project + "/plots/selection.png")
         plt.clf()
 
@@ -55,7 +60,7 @@ class Plotter:
 
         if include[0]:
             axs[count].plot(list(range(len(log["climate_values"][:max_gen]))), log["climate_values"][:max_gen])
-            axs[count].set(ylabel="$s$")
+            axs[count].set(ylabel="$e_0$")
 
             count += 1
         if include[1]:
@@ -92,10 +97,10 @@ class Plotter:
             "../projects/" + self.project + "/trials/trial_" + str(trial) + "/plots/evolution_" + str(include) + ".png")
         plt.clf()
 
-    def plot_evolution_with_conf(self, log, include, cycles=None):
-        fig, axs = plt.subplots(sum(include) + 1, figsize=(10, 5*sum(include)))
-        if cycles is None:
-            cycles = len(self.env_profile["start_a"])
+    def plot_evolution_with_conf(self, log, include, num_niches, cycles=None):
+        fig, axs = plt.subplots(sum(include), figsize=(12, 3*sum(include)))
+        #if cycles is None:
+            #cycles = len(self.env_profile["start_a"])
         count = 0
         #start_cycle = cycles - 3  # which cycles to plot?
         #end_cycle = cycles - 1
@@ -112,8 +117,15 @@ class Plotter:
                 log_climate = log.loc[(log['Trial'] == 1)]
             else:
                 log_climate = log
-            sns.lineplot(ax=axs[count], data=log_climate, x="Generation", y="Climate")
-            axs[count].set(ylabel="$s$")
+
+            # find mean across niches:
+            climate_avg = []
+            for el in list(log_climate["Climate"]):
+                niches_states = [el + 0.01*idx for idx in range(-int(num_niches/2), int(num_niches/2) + 1)]
+                climate_avg.append(np.mean(niches_states))
+            log["Climate_avg"] = climate_avg
+            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Climate_avg")
+            axs[count].set(ylabel="$\\bar{e}$")
             axs[count].set(xlabel=None)
 
             count += 1
@@ -127,13 +139,15 @@ class Plotter:
             sns.lineplot(ax=axs[count], data=log, x="Generation", y="SD")
             axs[count].set(ylabel="$\\bar{\sigma}$")
             axs[count].set(xlabel=None)
+            axs[count].set_yscale('log')
 
             count += 1
 
         if include[3]:
             sns.lineplot(ax=axs[count], data=log, x="Generation", y="R")
-            axs[count].set(ylabel="$\\bar{R}$")
+            axs[count].set(ylabel="$\\bar{r}$")
             axs[count].set(xlabel=None)
+            axs[count].set_yscale('log')
 
             count += 1
         if include[4]:
@@ -151,11 +165,25 @@ class Plotter:
             count += 1
 
         if include[6]:
-            log = compute_survival(log)
+            log, _ = compute_survival(log, num_niches)
 
             sns.lineplot(ax=axs[count], data=log, x="Generation", y="Dispersal")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$D$")
+            count += 1
+
+        if include[7]:
+
+            sns.lineplot(ax=axs[count], data=log, x="Generation", y="extinctions")
+            axs[count].set(xlabel="Time (in generations)")
+            axs[count].set(ylabel="Extinctions")
+            count += 1
+
+        if include[8]:
+
+            sns.lineplot(ax=axs[count], data=log, x="Generation", y="num_agents")
+            axs[count].set(xlabel="Time (in generations)")
+            axs[count].set(ylabel="$N$")
             count += 1
 
         axs[count - 1].set(xlabel="Time (in generations)")

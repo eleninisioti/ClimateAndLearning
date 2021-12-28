@@ -26,7 +26,6 @@ class CombEnv(Env):
     self.var_freq = var_freq # scales abrupt transition in size
     self.irregular = irregular
     self.orig_capacity = int(orig_capacity/(num_niches))
-    print("capacity", self.orig_capacity*num_niches)
     self.capacity = orig_capacity
     self.cycles = 1
 

@@ -47,7 +47,7 @@ def run(project, trials, climate_noconf):
     if config["only_climate"]:
         plotter.plot_evolution_with_conf(log_df, [1,0,0,0,0,0,0, 0, 0], config["num_niches"])
     else:
-        plotter.plot_evolution_with_conf(log, [1, 1, 1, 1, 1, 0, 0, 0, 1], config["num_niches"])
+        plotter.plot_evolution_with_conf(log, [1, 1, 1, 1, 1, 0, 0, 1, 1], config["num_niches"])
         plotter.plot_selection_pressure(log_df, config["num_niches"])
 
     #plotter.plot_evolution_with_conf(log_df, [1,0,0,0,0,0,0, 0, 0], config["num_niches"])
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         p = sys.argv[1]
         run(project= p, trials=1, climate_noconf=0)
     else:
-        top_dir = "Maslin/debug/parametric/27_12_2021_anal"
+        top_dir = "Maslin/debug/parametric/28_12_2021_debug"
         #top_dir = "report/final/1D_mutate"
         projects = [os.path.join(top_dir, o) for o in os.listdir("../projects/" + top_dir)]
         for idx, p in enumerate(projects):

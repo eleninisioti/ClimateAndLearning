@@ -84,7 +84,8 @@ class Life:
 
                 if gen % 10 == 0:
                     print("Generation: ", gen, len(self.population.agents), " agents with R:", self.logger.log[
-                        "running_mutate"][-1], " extinctions ", self.logger.log[
+                        "running_mutate"][-1],  " agents with sigma:", self.logger.log[
+                        "running_SD"][-1], " extinctions ", self.logger.log[
                         "extinctions"][-1])
 
         self.logger.final_log(self.env)

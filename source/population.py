@@ -54,13 +54,13 @@ class Population:
                 agent_genome.cross([agent.genome, partners_a[idx].genome])
                 new_agent = Agent(genome=agent_genome)
                 new_agent.mutate()
-                new_agent.is_extinct()
+                #new_agent.is_extinct()
                 #new_agent.compute_fitness(env.mean)
                 new_agents.append(new_agent)
 
                 if len(self.agents) < env.capacity:
                     # if extinctions are on, fill till maximum population
-                    self.agents.append(agent)
+                    self.agents.append(new_agent)
                 else:
                     # replace the worst agents
                     self.agents[idx + int(len(self.agents) / 2)] = new_agent
@@ -87,7 +87,7 @@ class Population:
                 agent_genome.cross([agent.genome, partners_a[idx].genome])
                 new_agent = Agent(genome=agent_genome)
                 new_agent.mutate()
-                new_agent.is_extinct()
+                #new_agent.is_extinct()
                 #new_agent.compute_fitness(env)
                 #new_agents.append(new_agent)
                 if len(self.agents) < (env.capacity):
@@ -103,12 +103,13 @@ class Population:
                     self.agents.append(new_agent)
 
         elif self.survival_type == "capacity-fitness":
+            self.agents = self.order_agents(self.agents)
+
             for agent in self.agents:
-                agent.assigned= False
+                agent.assigned = False
             new_agents = []
             keep_agents = copy.copy(self.agents)
             self.agents = []
-            keep_reproduced = []
 
 
             # the capacity determines how many will reproduce (in a niche)
@@ -119,8 +120,59 @@ class Population:
                     if lat_climate in agent.niches:
                         if not agent.assigned:
                             current_agents.append(agent)
-                    else:
-                        print("check")
+
+                lat_capacity = int(lat_climate * env.orig_capacity)
+                if lat_capacity > 1 and len(current_agents) > 2:
+                    current_agents = self.order_agents(current_agents)
+                    self.agents_reproduce = current_agents[:int(lat_capacity/2)]
+                    #self.agents_reproduce = self.agents_reproduce[:int(len(self.agents_reproduce )/2)]
+                    #self.compute_fitness(self.agents_reproduce, lat_climate)
+
+                    weights = [agent.fitness for agent in self.agents_reproduce]
+
+                    self.agents_reproduce = choices(self.agents_reproduce, weights=weights,
+                                                    k=len(self.agents_reproduce))
+
+                    for agent in self.agents_reproduce:
+                        agent.assigned = True
+
+                    # match pairs
+                    weights = [agent.fitness for agent in self.agents_reproduce]
+                    partners_a = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
+                    partners_b = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
+
+                    for idx, agent in enumerate(self.agents_reproduce):
+                        agent_genome = Genome(type=self.genome_type, env_mean=self.env_mean, init_SD=self.init_SD,
+                                              init_mutate=self.init_mutate, mutate_rate=self.mutate_rate)
+
+                        # first child
+                        agent_genome.cross([agent.genome, partners_a[idx].genome])
+                        new_agent = Agent(genome=agent_genome)
+                        new_agent.mutate()
+                        new_agents.append(new_agent)
+                        agent.reproduced = True
+
+                        # second child
+                        agent_genome.cross([agent.genome, partners_b[idx].genome])
+                        new_agent.mutate()
+                        new_agents.append(new_agent)
+                        agent.reproduced = True
+
+                        if len(new_agents)> lat_capacity:
+                            print("error")
+                            quit()
+            self.agents = new_agents
+
+        elif self.survival_type == "capacity-fitness-v2":
+            self.agents = self.order_agents(self.agents)
+
+            # the capacity determines how many will reproduce (in a niche)
+            for lat in range(-int(env.num_niches / 2), int(env.num_niches / 2) + 1):
+                lat_climate = env.mean + 0.01 * lat
+                current_agents = []
+                for agent in self.agents:
+                    if lat_climate in agent.niches:
+                        current_agents.append(agent)
 
 
                 lat_capacity = int(lat_climate * env.orig_capacity)
@@ -129,7 +181,7 @@ class Population:
                     current_agents = self.order_agents(current_agents)
 
                     self.agents_reproduce = current_agents[:lat_capacity]
-                    #self.compute_fitness(self.agents_reproduce, lat_climate)
+                    self.agents_reproduce = self.agents_reproduce[:int(len(self.agents_reproduce)/2)]
 
                     weights = [agent.fitness for agent in self.agents_reproduce]
                     if self.scale_weights:
@@ -138,46 +190,90 @@ class Population:
                                                     k=len(self.agents_reproduce))
 
 
-
-                    #self.agents_reproduce = [el for el in self.agents_reproduce if el not in keep_reproduced]
-                    keep_reproduced.extend(self.agents_reproduce)
-                    if len(self.agents_reproduce)>2:
-
-                        for agent in self.agents_reproduce:
-                            agent.assigned = True
-
+                    if len(self.agents_reproduce) > 2:
 
                         # match pairs
                         weights = [agent.fitness for agent in self.agents_reproduce]
                         if self.scale_weights:
                             weights = [math.exp(w) for w in weights]
                         partners_a = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
-                        partners_b = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
 
                         for idx, agent in enumerate(self.agents_reproduce):
-                            agent_genome = Genome(type=self.genome_type, env_mean=self.env_mean, init_SD=self.init_SD,
+                            agent_genome = Genome(type=self.genome_type, env_mean=lat_climate, init_SD=self.init_SD,
                                                   init_mutate=self.init_mutate, mutate_rate=self.mutate_rate)
 
                             # first child
-                            if True :
-                                agent_genome.cross([agent.genome, partners_a[idx].genome])
-                                new_agent = Agent(genome=agent_genome)
-                                new_agent.mutate()
-                                #new_agent.compute_fitness(lat_climate)
-                                new_agents.append(new_agent)
-                                agent.reproduced = True
 
-                            # second child
-                            if True:
-                                agent_genome.cross([agent.genome, partners_b[idx].genome])
-                                new_agent.mutate()
-                                #new_agent.compute_fitness(lat_climate)
-                                new_agents.append(new_agent)
-                                agent.reproduced = True
+                            agent_genome.cross([agent.genome, partners_a[idx].genome])
+                            new_agent = Agent(genome=agent_genome)
+                            new_agent.mutate()
+                            # new_agent.compute_fitness(lat_climate)
+                            if len(self.agents) < lat_capacity:
+                                # if extinctions are on, fill till maximum population
+                                self.agents.append(new_agent)
+                            else:
+                                # replace the worst agents
+                                self.agents[idx + int(len(self.agents) / 2)] = new_agent
+
+        elif self.survival_type == "capacity-fitness-v3":
+            self.agents = self.order_agents(self.agents)
+
+            for agent in self.agents:
+                agent.assigned = False
+            new_agents = []
+            keep_agents = copy.copy(self.agents)
+            #self.agents = []
 
 
+            # the capacity determines how many will reproduce (in a niche)
+            for lat in range(-int(env.num_niches/2) , int(env.num_niches/2) + 1):
+                lat_climate = env.mean + 0.01 * lat
+                current_agents = []
+                for agent in keep_agents:
+                    if lat_climate in agent.niches:
+                        if not agent.assigned:
+                            current_agents.append(agent)
 
-            self.agents = new_agents
+                lat_capacity = int(lat_climate * env.orig_capacity)
+                if lat_capacity > 1 and len(current_agents) > 2:
+                    current_agents = self.order_agents(current_agents)
+                    self.agents_reproduce = current_agents[:int(lat_capacity/2)]
+                    #self.agents_reproduce = self.agents_reproduce[:int(len(self.agents_reproduce )/2)]
+                    #self.compute_fitness(self.agents_reproduce, lat_climate)
+
+                    weights = [agent.fitness for agent in self.agents_reproduce]
+
+                    self.agents_reproduce = choices(self.agents_reproduce, weights=weights,
+                                                    k=len(self.agents_reproduce))
+
+                    for agent in self.agents_reproduce:
+                        agent.assigned = True
+
+                    # match pairs
+                    weights = [agent.fitness for agent in self.agents_reproduce]
+                    partners_a = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
+                    partners_b = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
+
+                    for idx, agent in enumerate(self.agents_reproduce):
+                        agent_genome = Genome(type=self.genome_type, env_mean=self.env_mean, init_SD=self.init_SD,
+                                              init_mutate=self.init_mutate, mutate_rate=self.mutate_rate)
+
+                        # first child
+                        agent_genome.cross([agent.genome, partners_a[idx].genome])
+                        new_agent = Agent(genome=agent_genome)
+                        new_agent.mutate()
+                        #new_agents.append(new_agent)
+                        if len(self.agents) < lat_capacity:
+                            # if extinctions are on, fill till maximum population
+                            self.agents.append(new_agent)
+                        else:
+                            # replace the worst agents
+                            self.agents[idx + int(len(self.agents) / 2)] = new_agent
+                        agent.reproduced = True
+
+
+            #self.agents = new_agents
+
 
 
 
@@ -388,7 +484,7 @@ class Population:
             #agent.compute_fitness(env)
             extinct, agent = agent.is_extinct(env)
             if extinct and self.extinctions:
-                self.agents.remove(agent)
+                #self.agents.remove(agent)
                 self.num_extinctions += 1
             else:
                 new_agents.append(agent)

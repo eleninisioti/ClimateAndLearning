@@ -703,16 +703,15 @@ def parametric(gpu, trial,  mode, long_run=False):
     top_dir = "Maslin/debug/parametric/" + project + "/"
 
     experiments = []
-    param_names = ["--project", "--env_type", "--model", "--num_gens", "--num_trials", "--survival_type",
-                   "--mutate_rate", "--genome_type", "--extinctions", "--factor_time_abrupt",
+    param_names = ["--project", "--env_type", "--num_gens", "--num_trials", "--survival_type",
+                   "--mutate_mutate_rate", "--genome_type", "--extinctions", "--factor_time_abrupt",
                    "--factor_time_steady", "--num_niches", "--only_climate"]
     factor_time_abrupt_values = [1, 7]
     factor_time_steady_values = [5]
     env_type = "change"
-    model = "hybrid"
     num_gens = 1300
     survival_types = ["capacity-fitness", "FP-Grove", "limited-capacity"]
-    mutate_rate = 0.001
+    mutate_mutate_rate = 0.001
     genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
     extinctions = [1]
     num_niches_values = [1, 10, 100]
@@ -729,7 +728,8 @@ def parametric(gpu, trial,  mode, long_run=False):
                                       str(extinction) + "_scale_abrupt_" + str(factor_time_abrupt) + "_scale_steady_"\
                                       + str(factor_time_steady )+ "_num_niches_" + \
                                       str(num_niches)
-                            new_exp = [project, env_type, model, num_gens, trial, survival_type, mutate_rate, genome_type,
+                            new_exp = [project, env_type, num_gens, trial, survival_type, mutate_mutate_rate,
+                                       genome_type,
                                        extinction, factor_time_abrupt, factor_time_steady,num_niches, climate_only]
                             experiments.append(new_exp)
                             if mode == "local":

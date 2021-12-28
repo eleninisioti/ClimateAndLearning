@@ -1,9 +1,12 @@
-
+""" This script is used to log information during the simulation.
+"""
 import numpy as np
+import pandas as pd
 
 class Logger:
 
-    def __init__(self):
+    def __init__(self, trial):
+        self.trial = trial
         self.log = {"running_fitness": [],
                     "running_mean": [],
                     "running_SD": [],
@@ -18,6 +21,11 @@ class Logger:
 
     def log_gen(self, population):
         """ Compute metrics characterizing the generation.
+
+        Parameters
+        ----------
+        population: Population
+            the population
         """
         # compute generation averages
         fitness_values = []
@@ -44,7 +52,7 @@ class Logger:
     def final_log(self, env):
         self.log["climate_values"] = env.climate_values
 
-        # convert log for plotting
+        # ----- adapt for  plotting -----
         self.log = { "Climate": self.log["climate_values"],
                      'Fitness': self.log["running_fitness"],
                      "Mean": self.log["running_mean"],
@@ -77,6 +85,18 @@ class Logger:
             self.log["env_profile"] = {"start_a": env.b1_values, "end_a": env.b2_values,
                                        "start_b": env.b3_values, "end_b": env.b4_values,
                                        "ncycles": env.cycles, "cycle": env.b5_values[0]}
+
+        # convert to dataframe and save trial data
+        for step in range(len(self.log["Climate"])):
+            trial_log = {'Generation': [step], 'Trial': [self.trial]}
+            for key in self.log.keys():
+                if len(self.log[key]) and key != "env_profile":
+                    trial_log[key] = self.log[key][step]
+
+            if step:
+                log_df = log_df.append(pd.DataFrame.from_dict(trial_log))
+            else:
+                log_df = pd.DataFrame.from_dict(trial_log)
 
 
 

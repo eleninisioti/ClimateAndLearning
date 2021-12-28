@@ -1,4 +1,4 @@
-""" Main interface to project
+""" This script is the main interface to the simulation.
 """
 
 import argparse
@@ -7,7 +7,6 @@ from life import Life
 from plotter import Plotter
 import pickle
 import yaml
-import pandas as pd
 import random
 import numpy as np
 from pathlib import Path
@@ -18,57 +17,46 @@ def simulate(args):
     if not os.path.exists("../projects/" + args.project + "/plots"):
         os.makedirs("../projects/" + args.project + "/plots")
 
-    # save projecct configuration
+    # save project configuration
     with open("../projects/" + args.project + '/config.yml', 'w') as outfile:
         yaml.dump(args, outfile)
 
-    life_simul = Life(args)
 
-    try:
         if args.trial:
+            # run a single trial with desired trial index
             trials_range = [args.trial]
         else:
+            # run multiple trials
             trials_range = list(range(args.num_trials))
         for trial in trials_range:
-            if not os.path.exists("../projects/" + args.project + "/trials/trial_" + str(trial) + "/plots"):
-                Path("../projects/" + args.project + "/trials/trial_" + str(trial) + "/plots").mkdir(parents=True,
-                                                                                                     exist_ok=True)
+            trial_dir = "../projects/" + args.project + "/trials/trial_" + str(trial)
+            if not os.path.exists(trial_dir + "/plots"):
+                Path(trial_dir + "/plots").mkdir(parents=True, exist_ok=True)
 
-            print(trial)
+            # seed simulation with trial index
             random.seed(trial)
             np.random.seed(trial)
-            log = life_simul.run()
-            for step in range(len(log["Climate"])):
-                trial_log = {'Generation': [step], 'Trial': [trial]}
-                for key in log.keys():
-                    if len(log[key]) and key!= "env_profile":
-                        trial_log[key] = log[key][step]
 
-                if step:
-                    log_df = log_df.append(pd.DataFrame.from_dict(trial_log))
-                else:
-                    log_df = pd.DataFrame.from_dict(trial_log)
+            args.trial = trial
+            life_simul = Life(args)
 
+            try:
+                log = life_simul.run()
 
-            with open('../projects/' + args.project + '/trials/trial_' + str(trial) + '/log.pickle', 'wb') as pfile:
-                pickle.dump(log_df, pfile, protocol=pickle.HIGHEST_PROTOCOL)
+                with open(trial_dir + '/log.pickle', 'wb') as pfile:
+                    pickle.dump(log, pfile, protocol=pickle.HIGHEST_PROTOCOL)
 
-        with open('../projects/' + args.project + '/log_total.pickle', 'wb') as pfile:
-            pickle.dump([log_df, log["env_profile"]], pfile, protocol=pickle.HIGHEST_PROTOCOL)
+            except KeyboardInterrupt:
+                print("Running aborted. Saving intermediate results.")
+                log = life_simul.log
+                with open(trial_dir + '/log.pickle', 'wb') as pfile:
+                    pickle.dump(log, pfile, protocol=pickle.HIGHEST_PROTOCOL)
 
-    except KeyboardInterrupt:
-        print("Running aborted. Saving intermediate results.")
-        log = life_simul.log
-        with open('../projects/' + args.project + '/log.pickle', 'wb') as pfile:
-            pickle.dump(log, pfile, protocol=pickle.HIGHEST_PROTOCOL)
-
-        plotter = Plotter(args.project)
-        plotter.plot_project(log)
-        plotter.plot_species(log)
-        plotter.plot_diversity(log)
 
 
 def init_parser():
+    """ Define flags for configuring simulation.
+    """
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--project',
@@ -82,12 +70,12 @@ def init_parser():
                         default=500)
 
     parser.add_argument('--num_gens',
-                        help='Name of generations',
+                        help='Number of generations',
                         type=int,
                         default=1500)
 
     parser.add_argument('--num_trials',
-                        help='Name of generations',
+                        help='Number of independent trials',
                         type=int,
                         default=1)
 
@@ -102,7 +90,7 @@ def init_parser():
                         default=2.0)
 
     parser.add_argument('--climate_period',
-                        help="Mean of climate",
+                        help="Period of climate (only used in sin_environment)",
                         type=float,
                         default=10)
 
@@ -116,20 +104,15 @@ def init_parser():
                         type=float,
                         default=0.005)
 
-    parser.add_argument('--mutate_rate',
+    parser.add_argument('--mutate_mutate_rate',
                         help='Mutation rate of mutation rate',
                         type=float,
                         default=0.0005)
 
     parser.add_argument('--env_type',
-                        help='Type of environment. Choose between change, sin and combined',
+                        help='Type of environment. Choose between change, sin and Maslin.',
                         type=str,
                         default="combined")
-
-    parser.add_argument('--model',
-                        help='Model for evolution. Choose between A and B',
-                        type=str,
-                        default="A")
 
     parser.add_argument('--capacity',
                         help='Capacity of a niche',
@@ -157,55 +140,46 @@ def init_parser():
                         default=5)
 
     parser.add_argument('--var_SD',
-                        help='Scaling factor for SD of abrupt transition.',
+                        help='SD of variable transition.',
                         type=float,
                         default=0.2)
 
     parser.add_argument('--irregular',
-                        help='Scaling factor for SD of abrupt transition.',
+                        help='If 1, ....',
                         type=float,
                         default=1)
 
     parser.add_argument('--survival_type',
-                        help='Type of fitness used. Choose between "no-presure", "FP-global"',
+                        help="Type of fitness used. Choose between 'FP-Grove', 'limited-capacity' and "
+                             "'capacity-fitness'.",
                         type=str,
-                        default="no-pressure")
+                        default="capacity-fitness")
 
     parser.add_argument('--genome_type',
-                        help='Type of genome used. Choose between 1D and 1D_mutate',
+                        help="Type of genome used. Choose 'between 1D', '1D_mutate' and '1D_mutate_fixed'",
                         type=str,
                         default="1D_mutate")
 
     parser.add_argument('--only_climate',
-                        help='If use, no population is created.',
+                        help='If 1, no population is created.',
                         type=int,
                         default=0)
 
-    parser.add_argument('--scale_weights',
-                        help='If use, we compute the exponential of fitnesses for weighting selection.',
-                        type=int,
-                        default=0)
 
     parser.add_argument('--first_gen',
-                        help='First timestep to start simulating life',
+                        help='First timestep to start simulating life.',
                         type=int,
                         default=0)
 
-    parser.add_argument('--low_value',
-                        help='Low value for climate',
-                        type=float,
-                        default=1)
-
     parser.add_argument('--num_niches',
-                        help='Number of niches (latitudes)',
+                        help='Number of niches (latitudes).',
                         type=int,
                         default=1)
 
     parser.add_argument('--extinctions',
-                        help='If True, extinct individuals disappear from the population',
+                        help='If 1, extinct individuals disappear from the population.',
                         type=int,
                         default=1)
-
 
     args = parser.parse_args()
     return args

@@ -1,16 +1,8 @@
-""" Contains the main simulation.
-"""
+
 from change_environment import ChangeEnv
 from sin_environment import SinEnv
 from combined_environment import CombEnv
-from agent import Agent
-from plotter import Plotter
-from numpy.random import normal
-import random
 import numpy as np
-from numpy.random import choice
-from species import Species
-from genome import Genome
 from population import Population
 from logger import Logger
 
@@ -18,31 +10,35 @@ from logger import Logger
 class Life:
 
     def __init__(self, args):
-        self.config = args
+        self.config = args # contains all configuration necessary for the experiment
 
     def setup(self):
-        # ----- set up ----
+        # ----- set up environment ----
         if self.config.env_type == "change":
-            self.env = ChangeEnv(self.config.climate_mean_init, self.config.capacity/2,
+            self.env = ChangeEnv(mean=self.config.climate_mean_init,
+                                 orig_capacity=self.config.capacity/2,
                                  num_niches=self.config.num_niches,
                                  factor_time_abrupt=self.config.factor_time_abrupt,
-                                 factor_time_steady=self.config.factor_time_steady
-                                 )
+                                 factor_time_steady=self.config.factor_time_steady)
 
         elif self.config.env_type == "sin":
-            self.env = SinEnv(self.config.climate_period,
-                              self.config.capacity/2,
+            self.env = SinEnv(period=self.config.climate_period,
+                              orig_capacity=self.config.capacity/2,
                               num_niches=self.config.num_niches)
 
         elif self.config.env_type == "combined":
-            self.env = CombEnv(orig_capacity=self.config.capacity/2, model=self.config.model,
+            self.env = CombEnv(orig_capacity=self.config.capacity/2,
+                               model=self.config.model,
                                factor_time_abrupt=self.config.factor_time_abrupt,
                                factor_time_variable=self.config.factor_time_variable,
                                factor_time_steady=self.config.factor_time_steady,
-                               var_freq=self.config.var_freq, var_SD=self.config.var_SD,
-                               irregular=self.config.irregular, low_value= self.config.low_value,
+                               var_freq=self.config.var_freq,
+                               var_SD=self.config.var_SD,
+                               irregular=self.config.irregular,
+                               low_value= self.config.low_value,
                                num_niches=self.config.num_niches)
-
+        # -------------------------------------------------------------------------
+        # ----- set up population ----
         pop_size = int(np.min([self.config.num_agents, self.env.capacity]))
         self.population = Population(pop_size=pop_size,
                                      survival_type=self.config.survival_type,
@@ -50,13 +46,16 @@ class Life:
                                      env_mean=self.env.mean,
                                      init_SD=self.config.init_SD,
                                      init_mutate=self.config.init_mutate,
-                                     mutate_rate=self.config.mutate_rate,
-                                     extinctions=self.config.extinctions,
-                                     scale_weights=self.config.scale_weights)
-        self.logger = Logger()
+                                     mutate_mutate_rate=self.config.mutate_mutate_rate,
+                                     extinctions=self.config.extinctions)
+        # -------------------------------------------------------------------------
+        self.logger = Logger(trial=self.config.trial)
 
     def run(self):
+        """ Main routine that simulates the evolution of a population in a varying environment.
+        """
 
+        # prepare environment and population
         self.setup()
 
         # ----- run generations ------
@@ -74,20 +73,16 @@ class Life:
                 self.logger.log_gen(self.population)
 
                 if self.population.has_mass_extinction():
-                    # compute metrics for new generation
-                    self.logger.log_gen(self.population)
                     break
 
+                # reproduce population
                 self.population.reproduce(self.env)
 
+                if gen % 100 == 0:
+                    # print progress
+                    print("Generation: ", gen, len(self.population.agents), " agents")
 
-
-                if gen % 10 == 0:
-                    print("Generation: ", gen, len(self.population.agents), " agents with R:", self.logger.log[
-                        "running_mutate"][-1],  " agents with sigma:", self.logger.log[
-                        "running_SD"][-1], " extinctions ", self.logger.log[
-                        "extinctions"][-1])
-
+        # collect all information for logging
         self.logger.final_log(self.env)
 
         return self.logger.log

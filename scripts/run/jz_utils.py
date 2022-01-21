@@ -3,6 +3,7 @@
 
 import os
 import os.path as op
+from random import random
 
 # ----- jz user configuration -----
 # make sure the following directories exist in your jz workspace
@@ -129,7 +130,7 @@ def run_batch(
             time = "80:00:00"
         else:
             time = "18:00:00"
-        name = parameters
+        name = "temp_" + str(random())
         run_exp(job_name=name,
                 script=script,
                 parameters=parameters,

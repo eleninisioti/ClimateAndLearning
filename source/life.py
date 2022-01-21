@@ -1,6 +1,7 @@
 from change_environment import ChangeEnv
 from sin_environment import SinEnv
 from maslin_environment import MaslinEnv
+from stable_environment import StableEnv
 import numpy as np
 from population import Population
 from logger import Logger
@@ -21,13 +22,20 @@ class Life:
                                  factor_time_steady=self.config.factor_time_steady)
 
         elif self.config.env_type == "sin":
-            self.env = SinEnv(period=self.config.climate_period,
-                              orig_capacity=self.config.capacity / 2,
+            self.env = SinEnv(mean=self.config.climate_mean_init,
+                              ref_capacity=self.config.capacity,
+                              num_niches=self.config.num_niches,
+                              period=self.config.period,
+                              amplitude=self.config.amplitude)
+
+        elif self.config.env_type == "stable":
+            self.env = StableEnv(mean=self.config.climate_mean_init,
+                              ref_capacity=self.config.capacity,
                               num_niches=self.config.num_niches)
 
         elif self.config.env_type == "combined":
             self.env = MaslinEnv(mean=self.config.climate_mean_init,
-                                 ref_capacity=self.config.capacity ,
+                                 ref_capacity=self.config.capacity,
                                  num_niches=self.config.num_niches,
                                  factor_time_abrupt=self.config.factor_time_abrupt,
                                  factor_time_variable=self.config.factor_time_variable,
@@ -36,7 +44,7 @@ class Life:
                                  var_SD=self.config.var_SD)
         # -------------------------------------------------------------------------
         # ----- set up population ----
-        pop_size = int(np.min([self.config.init_num_agents, self.env.current_capacity*self.config.num_niches]))
+        pop_size = int(np.min([self.config.init_num_agents, self.env.current_capacity * self.config.num_niches]))
         self.population = Population(pop_size=pop_size,
                                      selection_type=self.config.selection_type,
                                      genome_type=self.config.genome_type,

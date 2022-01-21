@@ -111,37 +111,6 @@ class Population:
                     # replace the worst agents
                     self.agents[idx + int(len(self.agents) / 2)] = new_agent
 
-        elif self.selection_type == "limited-capacity":
-
-            # everyone is considered for reproduction
-            self.agents_reproduce = self.agents
-
-            # find two partners
-            partners_a = choices(self.agents_reproduce, k=len(self.agents_reproduce))
-            partners_b = choices(self.agents_reproduce, k=len(self.agents_reproduce))
-
-            self.agents = []
-            for idx, agent in enumerate(self.agents_reproduce):
-                agent_genome = Genome(type=self.genome_type,
-                                      env_mean=self.env_mean,
-                                      init_SD=self.init_SD,
-                                      init_mutate=self.init_mutate,
-                                      mutate_mutate_rate=self.mutate_mutate_rate) # could initialize with any genome here
-
-                # first child
-                agent_genome.cross([agent.genome, partners_a[idx].genome])
-                new_agent = Agent(genome=agent_genome)
-                new_agent.mutate()
-
-                if len(self.agents) < env.current_capacity*env.num_niches:
-                    self.agents.append(new_agent)
-
-                # second child
-                agent_genome.cross([agent.genome, partners_b[idx].genome])
-                new_agent.mutate()
-
-                if len(self.agents) < env.current_capacity:
-                    self.agents.append(new_agent)
 
         elif self.selection_type == "capacity-fitness":
             self.agents = self.order_agents(self.agents)
@@ -195,7 +164,7 @@ class Population:
 
             self.agents = new_agents
 
-        elif self.selection_type == "limited-capacityv2":
+        elif self.selection_type == "limited-capacity":
 
             for agent in self.agents:
                 agent.reproduced = False

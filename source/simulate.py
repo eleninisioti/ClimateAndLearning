@@ -187,6 +187,16 @@ def init_parser():
                         type=int,
                         default=1)
 
+    parser.add_argument('--period',
+                        help='Period of sinusoidal.',
+                        type=int,
+                        default=100)
+
+    parser.add_argument('--amplitude',
+                        help='Amplitude of sinusoidal.',
+                        type=float,
+                        default=2)
+
     args = parser.parse_args()
     return args
 

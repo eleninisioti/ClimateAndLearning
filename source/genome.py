@@ -31,13 +31,11 @@ class Genome:
 
         """
         self.type = type
-
-        if self.type == "1D" or self.type == "1D_mutate" or self.type == "1D_mutate_fixed":
-            mu = normal(env_mean, init_SD)
-            sigma = np.abs(normal(0, init_SD))
-            r = init_mutate
-            self.genes = {"mean": mu, "sigma": sigma, "r": r}
-            self.mutate_mutate_rate = mutate_mutate_rate
+        self.mutate_mutate_rate = mutate_mutate_rate
+        mu = normal(env_mean, init_SD)
+        sigma = np.abs(normal(0, init_SD))
+        r = init_mutate
+        self.genes = {"mean": mu, "sigma": sigma, "r": r}
 
     def mutate(self):
         """ Applies mutations to the genome.

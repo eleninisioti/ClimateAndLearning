@@ -23,10 +23,7 @@ class SinEnv(Env):
     self.type = "sin"
     self.num_niches = num_niches
 
-
-
-  def climate_func(self, gen):
-
+  def step(self, gen):
     if gen > self.b1 and gen < self.b2:
       A = self.v2
     else:
@@ -36,8 +33,7 @@ class SinEnv(Env):
     climate = A*np.sin(gen*self.omega) + 1
     self.capacity = climate*self.orig_capacity
     self.climate_values.append(climate)
+    self.mean = climate
     return climate
 
 
-  def step(self, gen):
-    self.mean = self.climate_func(gen)

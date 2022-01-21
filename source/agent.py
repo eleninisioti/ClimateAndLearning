@@ -22,8 +22,8 @@ class Agent:
         env_mean: float
             the state of the environment
         """
-        self.fitness = stats.norm(self.genome.genes["mean"], self.genome.genes["sigma"]).pdf(env_mean)
-        return self.fitness
+        return stats.norm(self.genome.genes["mean"], self.genome.genes["sigma"]).pdf(env_mean)
+
 
     def is_extinct(self, env):
         """ Detect whether an agent goes extinct in a given environment.
@@ -41,7 +41,7 @@ class Agent:
         self.niches = []
         self.fitness_values = []
         num_latitudes = env.num_niches
-        for lat in range(-int(num_latitudes/2), int(num_latitudes/2) + 1):
+        for lat in range(-int(num_latitudes/2), int(num_latitudes/2 + 0.5)):
             lat_climate = env.mean + 0.01 * lat
 
             if ((self.genome.genes["mean"] - 2 * self.genome.genes["sigma"]) < lat_climate) \

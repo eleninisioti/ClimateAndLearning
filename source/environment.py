@@ -9,6 +9,5 @@ class Env:
   def climate_func(self, gen):
     pass
 
-
   def step(self, gen):
-    self.mean = self.climate_func(gen)
+    pass

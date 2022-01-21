@@ -1,195 +1,163 @@
+""" This scripts contains functions for plotting information about an experiment.
+"""
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import os
 import pickle
 import yaml
-from utils import compute_selection_strength, compute_survival
+from utils import compute_SoS, compute_dispersal
 
 class Plotter:
 
-    def __init__(self, project, env_profile={}, climate_noconf=False):
+    def __init__(self, project, log={},log_niches={}, num_niches=1, env_profile={}, climate_noconf=False):
         """
-        Args:
-          climate_noconf (bool): don't plot confidence intervals for climate
-          """
+        Parameters
+        ----------
+        project: str
+            project directory
+
+        env_profile: dict
+            contains information about the climate dynamics
+
+        climate_noconf: bool
+            If True, we don't plot confidence intervals for climate, we only plot one of the trials
+             (useful for highly variable periods)
+        """
         self.project = project
         self.env_profile = env_profile
         self.climate_noconf = climate_noconf
-        plt.rcParams['font.size'] = '16'
-        plt.rc('axes', labelsize='24')
-        # plt.ioff()
+        self.log = log
+        self.log_niches = log_niches
+        self.num_niches = num_niches
+
+        # ----- project-wide plot config -----
+        params = {'legend.fontsize': 20,
+                  'legend.handlelength': 2,
+                  'font.size': 20,
+                  "figure.autolayout": True}
+        plt.rcParams.update(params)
+        self.fig_size_heatmap = (10,10)
+        self.fig_size = (10,5)
 
 
 
+    def plot_SoS(self):
+        """ Plot the evolution of the strength of selection (SoS).
 
-    def plot_trial(self, log, trial):
-        # plot evolution
-        self.plot_evolution(log, trial)
-        self.plot_species(log, trial)
-        self.plot_diversity(log, trial)
+        We also plot the evolution of genes (SD and mutation) to detect patterns in how they interact with SoS
+        """
+        fig, axs = plt.subplots(1, figsize=self.fig_size)
 
-    def plot_with_conf(self, log):
-        # self.plot_species_with_conf(log)
-        self.plot_evolution_with_conf(log)
-        # self.plot_diversity_with_conf(log)
-
-    def plot_selection_pressure(self, log, num_niches):
-        fig, axs = plt.subplots(1, figsize=(20, 10))
-        climate_avg = []
-        for el in list(log["Climate"]):
-            niches_states = [el + 0.01 * idx for idx in range(-int(num_niches / 2), int(num_niches / 2) + 1)]
-            climate_avg.append(np.mean(niches_states))
-        log["Climate_avg"] = climate_avg
-        log = compute_selection_strength(log)
+        log = compute_SoS(self.log, self.log_niches, self.num_niches)
 
         sns.lineplot(data=log, x="Generation", y="Selection", label="SoS")
         sns.lineplot(data=log, x="Generation", y="SD", label="$\sigma$")
         sns.lineplot(data=log, x="Generation", y="R", label="$r$")
         axs.set(xlabel="Time (in generations)")
         axs.set_yscale('log')
-        plt.savefig("../projects/" + self.project + "/plots/selection.png")
+        plt.savefig("../projects/" + self.project + "/plots/SoS.png")
         plt.clf()
 
 
+    def plot_evolution(self,include, cycles=None):
+        """ Plot the evolution of climate and population dynamics.
 
-    def plot_evolution(self, log, trial, include=[1, 1, 1, 1,1], cycles=None):
-        fig, axs = plt.subplots(sum(include), figsize=(5*sum(include), 10))
+        Parameters
+        ----------
+        log: dict
+            results produced during simulation
+
+        include: list of str
+            which parameters to include in the plot. options are ["climate", "mean", "sigma", "mutate",
+            "n_agents", "n_extinctions", "fitness"]
+        """
+        fig, axs = plt.subplots(len(include), figsize=(12, 3*len(include)))
+        if include == ["climate"]:
+            axs = [axs]
+
         count = 0
-        max_gen = int(self.env_profile["ncycles"] * self.env_profile["cycle"])
-
-        if include[0]:
-            axs[count].plot(list(range(len(log["climate_values"][:max_gen]))), log["climate_values"][:max_gen])
-            axs[count].set(ylabel="$e_0$")
-
-            count += 1
-        if include[1]:
-            axs[count].plot(list(range(len(log["running_mean"][:max_gen]))), log["running_mean"][:max_gen])
-            axs[count].set(ylabel="$\\bar{\mu}$")
-            count += 1
-        if include[2]:
-            axs[count].plot(list(range(len(log["running_SD"][:max_gen]))), log["running_SD"][:max_gen])
-            axs[count].set(ylabel="$\\bar{\sigma}$")
-            count += 1
-        if include[3]:
-            axs[count].plot(list(range(len(log["running_fitness"][:max_gen]))), log["running_fitness"][:max_gen])
-            axs[count].set(ylabel="$\\bar{f}$")
-            count += 1
-        # axs[count-1].set(xlabel="Time (in generations)")
-
-        # highlight periods of variability
-        if cycles is None:
-            cycles = len(self.env_profile["start_a"])
-        if len(self.env_profile):
-            plot_regions = True
-        else:
-            plot_regions = False
-
-        if plot_regions:
-            for subplot in range(count):
-                for cycle in range(cycles):
-                    axs[subplot].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle],
-                                         alpha=0.2, color='gray')
-                    axs[subplot].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle],
-                                         alpha=0.2, color='green')
-
-        plt.savefig(
-            "../projects/" + self.project + "/trials/trial_" + str(trial) + "/plots/evolution_" + str(include) + ".png")
-        plt.clf()
-
-    def plot_evolution_with_conf(self, log, include, num_niches, cycles=None):
-        fig, axs = plt.subplots(sum(include), figsize=(12, 3*sum(include)))
-        #if cycles is None:
-            #cycles = len(self.env_profile["start_a"])
-        count = 0
-        #start_cycle = cycles - 3  # which cycles to plot?
-        #end_cycle = cycles - 1
         start_cycle = 0
         end_cycle = cycles
-        # max_gen = int(cycles * self.env_profile["cycle"])
-        #log = log[(start_cycle * self.env_profile["cycle"]) <= log['Generation']]
-        #log = log[log['Generation'] <= (end_cycle * self.env_profile["cycle"])]
 
+        ## TODO: remove
+        #self.log["Generation"] = [idx for idx in range(len(self.log["Climate"]))]
 
-        if include[0]:
+        if "climate" in include:
             if self.climate_noconf:
-
-                log_climate = log.loc[(log['Trial'] == 1)]
+                log_climate = self.log.loc[(self.log['Trial'] == 1)]
             else:
-                log_climate = log
+                log_climate = self.log
 
             # find mean across niches:
             climate_avg = []
             for el in list(log_climate["Climate"]):
-                niches_states = [el + 0.01*idx for idx in range(-int(num_niches/2), int(num_niches/2) + 1)]
+                niches_states = [el + 0.01*idx for idx in range(-int(self.num_niches/2),
+                                                                int(self.num_niches/2 +0.5))]
                 climate_avg.append(np.mean(niches_states))
-            log["Climate_avg"] = climate_avg
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Climate_avg")
+            self.log["Climate_avg"] = climate_avg
+            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Climate_avg")
             axs[count].set(ylabel="$\\bar{e}$")
             axs[count].set(xlabel=None)
-
             count += 1
-        if include[1]:
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Mean")
+
+        if "mean" in include:
+            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Mean")
             axs[count].set(ylabel="$\\bar{\mu}$")
             axs[count].set(xlabel=None)
-
             count += 1
-        if include[2]:
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="SD")
+
+        if "sigma" in include:
+            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="SD")
             axs[count].set(ylabel="$\\bar{\sigma}$")
             axs[count].set(xlabel=None)
             axs[count].set_yscale('log')
-
             count += 1
 
-        if include[3]:
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="R")
+        if "mutate" in include:
+            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="R")
             axs[count].set(ylabel="$\\bar{r}$")
             axs[count].set(xlabel=None)
             axs[count].set_yscale('log')
-
             count += 1
-        if include[4]:
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Fitness")
+
+        if "fitness" in include:
+            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Fitness")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$\\bar{f}$")
             count += 1
 
-        if include[5]:
-            log = compute_selection_strength(log)
-
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Selection")
+        if "extinct" in include:
+            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="extinctions")
             axs[count].set(xlabel="Time (in generations)")
-            axs[count].set(ylabel="$S$")
+            axs[count].set(ylabel="Extinctions")
             count += 1
 
-        if include[6]:
-            log, _ = compute_survival(log, num_niches)
-
+        if "num_agents" in include:
+            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="num_agents")
+            axs[count].set(xlabel="Time (in generations)")
+            axs[count].set(ylabel="$N$, number of agents")
+            count += 1
+        if "diversity" in include:
+            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="diversity")
+            axs[count].set(xlabel="Time (in generations)")
+            axs[count].set(ylabel="$V$, diversity")
+            count += 1
+        if "fixation_index" in include:
+            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="fixation_index")
+            axs[count].set(xlabel="Time (in generations)")
+            axs[count].set(ylabel="$F_{st}$, fixation_index")
+            count += 1
+        if "dispersal" in include:
+            log = compute_dispersal(self.log, self.log_niches, self.num_niches)
             sns.lineplot(ax=axs[count], data=log, x="Generation", y="Dispersal")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$D$")
             count += 1
 
-        if include[7]:
-
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="extinctions")
-            axs[count].set(xlabel="Time (in generations)")
-            axs[count].set(ylabel="Extinctions")
-            count += 1
-
-        if include[8]:
-
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="num_agents")
-            axs[count].set(xlabel="Time (in generations)")
-            axs[count].set(ylabel="$N$")
-            count += 1
-
         axs[count - 1].set(xlabel="Time (in generations)")
 
-        # highlight periods of variability
-
+        # ----- highlight periods of variability of applicable -------
         if len(self.env_profile):
             plot_regions = True
         else:
@@ -204,254 +172,51 @@ class Plotter:
                     axs[subplot].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle],
                                          alpha=0.2,
                                          color='green')
-        plt.savefig("../projects/" + self.project + "/plots/evolution_" + str(include) + "_" + str(self.climate_noconf)
-                    + ".png")
+        # -------------------------------------------------------------
+        plt.savefig("../projects/" + self.project + "/plots/evolution.png")
         plt.clf()
 
-    def plot_generation(self, agents, gen):
-        mean_values = [agent.mean for agent in agents]
-        SD_values = [agent.SD for agent in agents]
-        plt.plot(mean_values, SD_values, 'o')
-        plt.savefig("../projects/" + self.project + "/plots/generations/" + str(gen) + ".png")
-        plt.clf()
 
-    def plot_species(self, log, trial, include=[1, 1, 1, 1], cycles=None):
-        fig, axs = plt.subplots(sum(include), figsize=(20, 10))
-        count = 0
-        max_gen = int(self.env_profile["ncycles"] * self.env_profile["cycle"])
-
-        if include[0]:
-            axs[count].plot(list(range(len(log["climate_values"][:max_gen]))), log["climate_values"][:max_gen])
-            axs[count].set(ylabel="$s$")
-            count += 1
-        if include[1]:
-            # plot species type
-            total_species = [el + log["generalists"]["number"][idx] for idx, el in
-                             enumerate(log["specialists"]["number"])]
-            axs[count].plot(range(len(log["specialists"]["extinctions"][:max_gen])),
-                            log["generalists"]["number"][:max_gen],
-                            label="generalists")
-            axs[count].plot(range(len(log["specialists"]["extinctions"][:max_gen])),
-                            log["specialists"]["number"][:max_gen],
-                            label="specialists")
-            # axs[count].plot(range(len(log["specialists"]["extinctions"][:max_gen])), total_species[:max_gen],
-            # label="total")
-            axs[count].legend(loc="upper right", fontsize=14)
-            axs[count].set(ylabel="$N$")
-            axs[count].set_yscale('log')
-            count += 1
-
-        # plot for extinctions
-        if include[2]:
-            extinctions_total = [el + log["generalists"]["extinctions"][idx] for idx, el in
-                                 enumerate(log["specialists"]["extinctions"])]
-            axs[count].plot(range(len(log["generalists"]["extinctions"][:max_gen])),
-                            log["generalists"]["extinctions"][:max_gen], label="generalists")
-            axs[count].plot(range(len(log["specialists"]["extinctions"][:max_gen])),
-                            log["specialists"]["extinctions"][:max_gen], label="specialists")
-            axs[count].plot(range(len(extinctions_total[:max_gen])), extinctions_total[:max_gen], label="all")
-            axs[count].set(ylabel="Extinctions")
-            axs[count].set_yscale('log')
-            count += 1
-        if include[3]:
-            # plot for diversity
-            axs[count].plot(range(len(log["generalists"]["extinctions"][:max_gen])),
-                            log["generalists"]["diversity"][:max_gen], label="generalists")
-            axs[count].plot(range(len(log["specialists"]["extinctions"][:max_gen])),
-                            log["specialists"]["diversity"][:max_gen], label="specialist")
-
-            # axs[count].plot(range(len(log["total_diversity"][:max_gen])), log["total_diversity"][:max_gen],
-            # label="all")
-            axs[count].legend(loc="upper right", fontsize=14)
-            axs[count].set(ylabel="Diversity")
-            count += 1
-
-        # axs[count - 1].set(xlabel="Time (in generations)")
-
-        # highlight periods of variability
-        if cycles is None:
-            cycles = len(self.env_profile["start_a"])
-        if len(self.env_profile):
-            plot_regions = True
-        else:
-            plot_regions = False
-
-        if plot_regions:
-            for subplot in range(count):
-                for cycle in range(cycles):
-                    axs[subplot].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle],
-                                         alpha=0.2,
-                                         color='gray')
-                    axs[subplot].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle],
-                                         alpha=0.2,
-                                         color='green')
-
-        plt.savefig(
-            "../projects/" + self.project + "/trials/trial_" + str(trial) + "/plots/species_" + str(include) + ".png")
-        plt.clf()
-
-    def plot_species_with_conf(self, log, include, cycles=None):
-
-        fig, axs = plt.subplots(sum(include), figsize=(20, 10))
-        if cycles is None:
-            cycles = len(self.env_profile["start_a"])
-        count = 0
-        start_cycle = cycles - 2  # which cycles to plot?
-        end_cycle = cycles
-        # max_gen = int(cycles * self.env_profile["cycle"])
-        log = log[(start_cycle * self.env_profile["cycle"]) <= log['Generation']]
-        log = log[log['Generation'] <= (end_cycle * self.env_profile["cycle"])]
-
-        if include[0]:
-            if self.climate_noconf:
-
-                log_climate = log.loc[(log['Trial'] == 1)]
-            else:
-                log_climate = log
-            sns.lineplot(ax=axs[count], data=log_climate, x="Generation", y="Climate")
-            axs[count].set(ylabel="$s$")
-            axs[count].set(xlabel=None)
-
-            count += 1
-        if include[1]:
-            # plot species type
-            log["Total_Number"] = log["Specialists_Number"] + log["Generalists_Number"]
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Generalists_Number", label="generalists")
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Specialists_Number", label="specialists")
-            # sns.lineplot(ax=axs[count], data=log, x="Generation", y="Total_Number", label="total")
-            axs[count].legend(loc="upper right", fontsize=14)
-            axs[count].set(ylabel="$N$")
-            axs[count].set_yscale('log')
-            axs[count].set(xlabel=None)
-
-            count += 1
-        if include[2]:
-            log["Total_Extinct"] = log["Specialists_Extinct"] + log["Generalists_Extinct"]
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Generalists_Extinct", label="generalists")
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Specialists_Extinct", label="specialists")
-            # sns.lineplot(ax=axs[count], data=log, x="Generation", y="Total_Extinct", label="total")
-            axs[count].legend(loc="upper right", fontsize=14)
-            axs[count].set(ylabel="Extinctions")
-            axs[count].set(xlabel=None)
-
-            axs[count].set_yscale('log')
-            count += 1
-
-        if include[3]:
-            # plot for diversity
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Generalists_Diversity", label="generalists")
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Specialists_Diversity", label="specialists")
-            # sns.lineplot(ax=axs[count], data=log, x="Generation", y="Total_Diversity", label="total")
-            axs[count].legend(loc="upper right", fontsize=14)
-            axs[count].set(ylabel="Diversity")
-            count += 1
-        print(count, len(axs))
-        axs[count - 1].set(xlabel="Time (in generations)")
-
-        if len(self.env_profile):
-            plot_regions = True
-        else:
-            plot_regions = False
-
-        if plot_regions:
-            for subplot in range(count):
-                for cycle in range(start_cycle, end_cycle):
-                    axs[subplot].axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle],
-                                         alpha=0.2,
-                                         color='gray')
-                    axs[subplot].axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle],
-                                         alpha=0.2,
-                                         color='green')
-
-        plt.savefig(
-            "../projects/" + self.project + "/plots/species_" + str(include) + "_" + str(self.climate_noconf) + ".png")
-        plt.clf()
-
-    def plot_diversity(self, log, trial):
-
-        plt.plot(range(len(log["generalists"]["diversity_mean"])), log["generalists"]["diversity_mean"],
-                 label="generalists-mean")
-        plt.plot(range(len(log["specialists"]["diversity_mean"])), log["specialists"]["diversity_mean"],
-                 label="specialist-mean")
-        plt.plot(range(len(log["generalists"]["diversity_mean"])), log["generalists"]["diversity_std"],
-                 label="generalists-std")
-        plt.plot(range(len(log["specialists"]["diversity_mean"])), log["specialists"]["diversity_std"],
-                 label="specialist-std")
-        plt.legend()
-        plt.ylabel("Diversity")
-
-        # highlight periods of variability
-        if len(self.env_profile):
-            for cycle in range(len(self.env_profile["start_a"])):
-                plt.axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5,
-                            color='red')
-                plt.axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5,
-                            color='blue')
-
-        plt.savefig("../projects/" + self.project + "/trials/trial_" + str(trial) + "/plots/diversity.png")
-        plt.clf()
-
-    def plot_diversity_with_conf(self, log):
-        sns.lineplot(data=log, x="Generation", y="Generalists_Diversity_Mean", label="generalists-mean")
-        sns.lineplot(data=log, x="Generation", y="Specialists_Diversity_Mean", label="specialists-mean")
-        sns.lineplot(data=log, x="Generation", y="Generalists_Diversity_SD", label="generalists-std")
-        sns.lineplot(data=log, x="Generation", y="Specialists_Diversity_SD", label="specialists-std")
-        plt.legend()
-        plt.ylabel("Diversity")
-
-        # highlight periods of variability
-        if len(self.env_profile):
-            for cycle in range(len(self.env_profile["start_a"])):
-                plt.axvspan(self.env_profile["start_a"][cycle], self.env_profile["end_a"][cycle], alpha=0.5,
-                            color='gray')
-                plt.axvspan(self.env_profile["start_b"][cycle], self.env_profile["end_b"][cycle], alpha=0.5,
-                            color='green')
-
-        plt.savefig("../projects/" + self.project + "/plots/diversity.png")
-        plt.clf()
-
-    def plot_heatmap(self, top_dir, trials, x_variables, y_variables):
+    def plot_heatmap(self, top_dir, x_variables, y_variables):
         """ Plots a heatmap based on all projects in a directory
         """
         # find all projects in directory
         # find all parameters for x_variables
-        projects = [os.path.join("../projects/" + top_dir, o) for o in os.listdir("../projects/" + top_dir) if
-                    "plots" not in o]
-
-
+        projects = [os.path.join("../projects/" +top_dir, o) for o in os.listdir("../projects/" + top_dir)]
 
         for y_var in y_variables:
             x1_values = []
             x2_values = []
             keep_projects = {}
             for p in projects:
+                if "plots" not in p:
 
-                # load configuration variables
-                config_file = p + "/config.yml"
-                with open(config_file, "rb") as f:
-                    config = yaml.load(f, Loader=yaml.UnsafeLoader)
-                    x1 = int(getattr(config,x_variables[0] ))
-                    x2 = int(getattr(config,x_variables[1] ))
-                    x1_values.append(x1)
-                    x2_values.append(x2)
-                    keep_projects[(x1,x2)] = p
+                    # load configuration variables
+                    config_file = p + "/config.yml"
+                    with open(config_file, "rb") as f:
+                        config = yaml.load(f, Loader=yaml.UnsafeLoader)
+                        x1 = int(getattr(config,x_variables[0] ))
+                        x2 = int(getattr(config,x_variables[1] ))
+                        x1_values.append(x1)
+                        x2_values.append(x2)
+                        keep_projects[(x1,x2)] = p
             x1_unique = list(set(x1_values))
             x1_unique.sort()
             x2_unique = list(set(x2_values))
             x2_unique.sort()
             y_values = np.zeros((len(x1_unique), len(x2_unique)))
-            for idx1, x1 in enumerate(x1_values):
-                for idx2, x2 in enumerate(x2_values):
+            for idx1, x1 in enumerate(x1_unique):
+                for idx2, x2 in enumerate(x2_unique):
                     p = keep_projects[x1, x2]
                     # load performance variables
-                    _, env_profile = pickle.load(open( p + '/log_total.pickle', 'rb'))
-                    for trial in range(0, trials + 1):
+                    trial_dirs = list(next(os.walk( p+ "/trials"))[1])
 
+                    for trial, trial_dir in enumerate(trial_dirs):
                         if os.path.isfile( p + '/trials/trial_' + str(trial)
                                           + '/log.pickle'):
-                            log = pickle.load(open( p + '/trials/trial_' + str(trial)
+                            log = pickle.load(open(p + '/trials/trial_' + str(trial)
                                                    + '/log.pickle', 'rb'))
-                            if not trial:
+                            if trial:
                                 log_df = log_df.append(log)
                             else:
                                 log_df = log
@@ -459,19 +224,29 @@ class Plotter:
                     locy = x2_unique.index(x2)
                     y_values[locx, locy] = np.mean(log_df[y_var])
 
+                    if len(log_df[y_var]) < config.num_gens:
+                        y_values[locx, locy] =0
 
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=self.fig_size_heatmap)
             extent = [x1_unique[0], x1_unique[-1], x2_unique[0], x2_unique[-1]]
 
-            ax.imshow(y_values)
-            ax.set_xticks(list(range(len(x1_unique))))
-            ax.set_yticks(list(range(len(x2_unique))))
+            pos=ax.imshow(y_values)
+            fig.colorbar(pos, ax=ax)
+            for im in plt.gca().get_images():
+                im.set_clim(0, max(np.max(y_values),0.1))
+
+            ax.set_xticks(list(range(len(x2_unique))))
+            ax.set_yticks(list(range(len(x1_unique))))
             #ax.set_yticks(x2_values)
             # ... and label them with the respective list entries
-            ax.set_xticklabels(x1_unique)
-            ax.set_yticklabels(x2_unique)
-            save_dir = "../projects/" + self.project + "plots"
+            ax.set_xticklabels(x2_unique)
+            ax.set_yticklabels(x1_unique)
+            ax.set_ylabel("Transition scaling")
+            ax.set_xlabel("$N$, Number of niches")
+            ax.set_title(str(y_var))
+
+            save_dir = "../projects/" + top_dir + "/plots"
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
-            plt.savefig(save_dir + "/heatmap_" + y_var + ".png")
+            plt.savefig(save_dir + "/heatmap_" + str(y_var) + ".png")
             plt.clf()

@@ -1,7 +1,6 @@
-
 from change_environment import ChangeEnv
 from sin_environment import SinEnv
-from combined_environment import CombEnv
+from maslin_environment import MaslinEnv
 import numpy as np
 from population import Population
 from logger import Logger
@@ -10,38 +9,36 @@ from logger import Logger
 class Life:
 
     def __init__(self, args):
-        self.config = args # contains all configuration necessary for the experiment
+        self.config = args  # contains all configuration necessary for the experiment
 
     def setup(self):
         # ----- set up environment ----
         if self.config.env_type == "change":
             self.env = ChangeEnv(mean=self.config.climate_mean_init,
-                                 orig_capacity=self.config.capacity/2,
+                                 ref_capacity=self.config.capacity,
                                  num_niches=self.config.num_niches,
                                  factor_time_abrupt=self.config.factor_time_abrupt,
                                  factor_time_steady=self.config.factor_time_steady)
 
         elif self.config.env_type == "sin":
             self.env = SinEnv(period=self.config.climate_period,
-                              orig_capacity=self.config.capacity/2,
+                              orig_capacity=self.config.capacity / 2,
                               num_niches=self.config.num_niches)
 
         elif self.config.env_type == "combined":
-            self.env = CombEnv(orig_capacity=self.config.capacity/2,
-                               model=self.config.model,
-                               factor_time_abrupt=self.config.factor_time_abrupt,
-                               factor_time_variable=self.config.factor_time_variable,
-                               factor_time_steady=self.config.factor_time_steady,
-                               var_freq=self.config.var_freq,
-                               var_SD=self.config.var_SD,
-                               irregular=self.config.irregular,
-                               low_value= self.config.low_value,
-                               num_niches=self.config.num_niches)
+            self.env = MaslinEnv(mean=self.config.climate_mean_init,
+                                 ref_capacity=self.config.capacity ,
+                                 num_niches=self.config.num_niches,
+                                 factor_time_abrupt=self.config.factor_time_abrupt,
+                                 factor_time_variable=self.config.factor_time_variable,
+                                 factor_time_steady=self.config.factor_time_steady,
+                                 var_freq=self.config.var_freq,
+                                 var_SD=self.config.var_SD)
         # -------------------------------------------------------------------------
         # ----- set up population ----
-        pop_size = int(np.min([self.config.num_agents, self.env.capacity]))
+        pop_size = int(np.min([self.config.init_num_agents, self.env.current_capacity*self.config.num_niches]))
         self.population = Population(pop_size=pop_size,
-                                     survival_type=self.config.survival_type,
+                                     selection_type=self.config.selection_type,
                                      genome_type=self.config.genome_type,
                                      env_mean=self.env.mean,
                                      init_SD=self.config.init_SD,
@@ -49,7 +46,7 @@ class Life:
                                      mutate_mutate_rate=self.config.mutate_mutate_rate,
                                      extinctions=self.config.extinctions)
         # -------------------------------------------------------------------------
-        self.logger = Logger(trial=self.config.trial)
+        self.logger = Logger(trial=self.config.trial, env=self.env)
 
     def run(self):
         """ Main routine that simulates the evolution of a population in a varying environment.
@@ -78,11 +75,11 @@ class Life:
                 # reproduce population
                 self.population.reproduce(self.env)
 
-                if gen % 100 == 0:
+                if gen % 10 == 0:
                     # print progress
                     print("Generation: ", gen, len(self.population.agents), " agents")
 
         # collect all information for logging
-        self.logger.final_log(self.env)
+        self.logger.final_log()
 
-        return self.logger.log
+        return self.logger.log, self.logger.env_profile, self.logger.log_niches

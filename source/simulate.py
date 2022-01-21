@@ -4,7 +4,6 @@
 import argparse
 import os
 from life import Life
-from plotter import Plotter
 import pickle
 import yaml
 import random
@@ -41,16 +40,23 @@ def simulate(args):
             life_simul = Life(args)
 
             try:
-                log = life_simul.run()
-
-                with open(trial_dir + '/log.pickle', 'wb') as pfile:
-                    pickle.dump(log, pfile, protocol=pickle.HIGHEST_PROTOCOL)
+                log, env_profile, log_niches = life_simul.run()
 
             except KeyboardInterrupt:
                 print("Running aborted. Saving intermediate results.")
-                log = life_simul.log
-                with open(trial_dir + '/log.pickle', 'wb') as pfile:
-                    pickle.dump(log, pfile, protocol=pickle.HIGHEST_PROTOCOL)
+                life_simul.logger.final_log()
+                log = life_simul.logger.log
+                env_profile = life_simul.logger.env_profile
+                log_niches = life_simul.logger.log_niches
+
+            with open(trial_dir + '/log.pickle', 'wb') as pfile:
+                pickle.dump(log, pfile, protocol=pickle.HIGHEST_PROTOCOL)
+
+            with open(trial_dir + '/env_profile.pickle', 'wb') as pfile:
+                pickle.dump(env_profile, pfile, protocol=pickle.HIGHEST_PROTOCOL)
+
+            with open(trial_dir + '/log_niches.pickle', 'wb') as pfile:
+                pickle.dump(log_niches, pfile, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 
@@ -64,7 +70,7 @@ def init_parser():
                         type=str,
                         default="temp")
 
-    parser.add_argument('--num_agents',
+    parser.add_argument('--init_num_agents',
                         help="Number of agents",
                         type=int,
                         default=500)
@@ -149,7 +155,7 @@ def init_parser():
                         type=float,
                         default=1)
 
-    parser.add_argument('--survival_type',
+    parser.add_argument('--selection_type',
                         help="Type of fitness used. Choose between 'FP-Grove', 'limited-capacity' and "
                              "'capacity-fitness'.",
                         type=str,

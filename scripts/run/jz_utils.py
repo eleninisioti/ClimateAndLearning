@@ -51,11 +51,9 @@ def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=F
     slurm_dir = f"/gpfsscratch/rech/imi/{account}/slurm"
 
     # create logging directories
-    if not os.path.exists(slurm_dir + "/" + job_name):
-        os.makedirs(slurm_dir + "/" + job_name)
-    if not os.path.exists(logs_dir + "/" + job_name):
-        os.makedirs(logs_dir + "/" + job_name)
-
+    #logs_dir = "../temp_jz/logs"
+    code_dir = "."
+    #slurm_dir = "../temp_jz/jz_logs"
     slurmjob_path = op.join(slurm_dir + "/" + job_name + ".sh")
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)

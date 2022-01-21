@@ -48,7 +48,7 @@ def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=F
     # ----- prepare submission script in slurmjob file ------
     logs_dir = f"/gpfsscratch/rech/imi/{account}/ClimateAndLearning_log/jz_logs"
     python_path = "python"
-    slurm_dir = f"/gpfsscratch/rech/imi/{account}/slurm"
+    slurm_dir = f"/gpfsscratch/rech/imi/{account}/ClimateAndLearning_log/slurm"
 
     # create logging directories
     #logs_dir = "../temp_jz/logs"

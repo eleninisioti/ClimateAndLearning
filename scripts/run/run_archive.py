@@ -253,7 +253,7 @@ def smallscale_sin(gpu, trial,  mode, long_run=False):
     genome_types = ["1D"]
     extinctions = [1]
     num_niches_values = [1]
-    climate_only = 1
+    climate_only = 0
     climate_mean_init = 0
     periods = [int(num_gens), int(num_gens/2), int(num_gens/8), int(num_gens/16), int(num_gens/32)]
     num_gens = num_gens*3 # make sure we have at least 3 cycles
@@ -340,7 +340,7 @@ if __name__ == "__main__":
     trials = int(sys.argv[1])
     mode = sys.argv[2] # server for jz experiments and local otherwise
     for trial in range(1, trials+1):
-        smallscale_stable(gpu=True, trial=trial, mode=mode)
+        #smallscale_stable(gpu=True, trial=trial, mode=mode)
         smallscale_sin(gpu=True, trial=trial, mode=mode)
 
 

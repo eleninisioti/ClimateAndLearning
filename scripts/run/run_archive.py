@@ -55,6 +55,7 @@ def parametric_Grove(gpu, trial,  mode, long_run=False):
 
     if mode == "server":
         run_batch(
+
             experiments,
             param_names,
             long_run=long_run,

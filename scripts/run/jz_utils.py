@@ -91,7 +91,7 @@ def run_exp(script, parameters, gpu=False, time="20:00:00", long_run=False, n_ta
         os.system("sbatch %s" % slurmjob_path)
 
 
-def run_batch(job_name,
+def run_batch(
         experiments,
         param_names,
         long_run=False,

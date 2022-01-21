@@ -9,12 +9,10 @@ from random import random
 # make sure the following directories exist in your jz workspace
 email = "enisioti@inria.fr"
 job_name = "ClimateAndLearning"
-logs_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/logs"
-code_dir = "/gpfswork/rech/imi/utw61ti/workspace/ClimateAndLearning/source"
-slurm_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/jz_logs"
-logs_dir = "../temp_jz/logs"
-code_dir = "."
-slurm_dir = "../temp_jz/jz_logs"
+
+#logs_dir = "../temp_jz/logs"
+#code_dir = "."
+#slurm_dir = "../temp_jz/jz_logs"
 prep = "module purge\n module load pytorch-gpu/py3/1.7.1\n"
 python_path = "python"
 
@@ -87,7 +85,7 @@ def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=F
         fh.writelines(batch_cmd)
         # ----------------------------------------------------------------------
         # submit job
-        os.system("sbatch %s" % slurmjob_path)
+    os.system("sbatch %s" % slurmjob_path)
 
 
 def run_batch(

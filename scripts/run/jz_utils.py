@@ -130,7 +130,7 @@ def run_batch(
             time = "80:00:00"
         else:
             time = "18:00:00"
-        name = "temp_" + str(random())
+        name = "temp_" + str(random()) + ".sh"
         run_exp(job_name=name,
                 script=script,
                 parameters=parameters,

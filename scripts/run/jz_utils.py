@@ -56,7 +56,7 @@ def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=F
     if not os.path.exists(logs_dir + "/" + job_name):
         os.makedirs(logs_dir + "/" + job_name)
 
-    slurmjob_path = op.join(slurm_dir + "/" + job_name + "/script.sh")
+    slurmjob_path = op.join(slurm_dir + "/" + job_name + ".sh")
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
     slurmjob_path = op.join(slurm_dir, "{}.sh".format(job_name))
@@ -130,7 +130,7 @@ def run_batch(
             time = "80:00:00"
         else:
             time = "18:00:00"
-        name = "temp_" + str(random()) + ".sh"
+        name = "temp_" + str(random())
         run_exp(job_name=name,
                 script=script,
                 parameters=parameters,

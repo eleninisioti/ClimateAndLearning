@@ -20,7 +20,7 @@ python_path = "python"
 
 # ---------------------------------
 
-def run_exp(script, parameters, gpu=False, time="20:00:00", long_run=False, n_tasks=1):
+def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=False, n_tasks=1):
     """ Submit jz jobs.
 
     Parameters
@@ -130,7 +130,7 @@ def run_batch(
         else:
             time = "18:00:00"
         name = parameters
-        run_exp(name=name,
+        run_exp(job_name=name,
                 script=script,
                 parameters=parameters,
                 gpu=gpu,

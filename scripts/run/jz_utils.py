@@ -11,6 +11,9 @@ job_name = "ClimateAndLearning"
 logs_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/logs"
 code_dir = "/gpfswork/rech/imi/utw61ti/workspace/ClimateAndLearning/source"
 slurm_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/jz_logs"
+logs_dir = "../temp_jz/logs"
+code_dir = "."
+slurm_dir = "../temp_jz/jz_logs"
 prep = "module purge\n module load pytorch-gpu/py3/1.7.1\n"
 python_path = "python"
 
@@ -40,8 +43,21 @@ def run_exp(script, parameters, gpu=False, time="20:00:00", long_run=False, n_ta
     n_tasks: int
         configure cpus
     """
-
+    account = "utw61ti"
     # ----- prepare submission script in slurmjob file ------
+    logs_dir = f"/gpfsscratch/rech/imi/{account}/ClimateAndLearning_log/jz_logs"
+    python_path = "python"
+    slurm_dir = f"/gpfsscratch/rech/imi/{account}/slurm"
+
+    # create logging directories
+    if not os.path.exists(slurm_dir + "/" + job_name):
+        os.makedirs(slurm_dir + "/" + job_name)
+    if not os.path.exists(logs_dir + "/" + job_name):
+        os.makedirs(logs_dir + "/" + job_name)
+
+    slurmjob_path = op.join(slurm_dir + "/" + job_name + "/script.sh")
+    create_slurmjob_cmd = "touch {}".format(slurmjob_path)
+    os.system(create_slurmjob_cmd)
     slurmjob_path = op.join(slurm_dir, "{}.sh".format(job_name))
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
@@ -75,7 +91,7 @@ def run_exp(script, parameters, gpu=False, time="20:00:00", long_run=False, n_ta
         os.system("sbatch %s" % slurmjob_path)
 
 
-def run_batch(
+def run_batch(job_name,
         experiments,
         param_names,
         long_run=False,
@@ -113,7 +129,9 @@ def run_batch(
             time = "80:00:00"
         else:
             time = "18:00:00"
-        run_exp(script=script,
+        name = parameters
+        run_exp(name=name,
+                script=script,
                 parameters=parameters,
                 gpu=gpu,
                 time=time,

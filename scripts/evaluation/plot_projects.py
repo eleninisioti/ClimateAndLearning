@@ -37,7 +37,7 @@ def run(project, climate_noconf):
             log_niches_total = [log_niches]
         else:
             log_df = log_df.append(log)
-            log_niches_total = log_niches_total.append(log_niches)
+            log_niches_total.append(log_niches)
 
 
     # load configuration
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     projects = [os.path.join(top_dir, o) for o in os.listdir("../projects/" + top_dir)]
     for idx, p in enumerate(projects):
         print(p)
-        run(project=p, climate_noconf=0)
+        run(project=p, climate_noconf=1)
 
 
 

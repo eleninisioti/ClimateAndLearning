@@ -48,7 +48,7 @@ class Life:
         self.population = Population(pop_size=pop_size,
                                      selection_type=self.config.selection_type,
                                      genome_type=self.config.genome_type,
-                                     env_mean=self.env.mean,
+                                     env_mean=self.env.climate,
                                      init_SD=self.config.init_SD,
                                      init_mutate=self.config.init_mutate,
                                      mutate_mutate_rate=self.config.mutate_mutate_rate,

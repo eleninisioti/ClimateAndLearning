@@ -84,10 +84,7 @@ class Plotter:
         #self.log["Generation"] = [idx for idx in range(len(self.log["Climate"]))]
 
         if "climate" in include:
-            if self.climate_noconf:
-                log_climate = self.log.loc[(self.log['Trial'] == 1)]
-            else:
-                log_climate = self.log
+            log_climate = self.log.loc[(self.log['Trial'] == 0)]
 
             # find mean across niches:
             climate_avg = []
@@ -95,62 +92,107 @@ class Plotter:
                 niches_states = [el + 0.01*idx for idx in range(-int(self.num_niches/2),
                                                                 int(self.num_niches/2 +0.5))]
                 climate_avg.append(np.mean(niches_states))
-            self.log["Climate_avg"] = climate_avg
-            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Climate_avg")
+            log_climate["Climate_avg"] = climate_avg
+            #sns.lineplot(, data=self.log, x="Generation", y="Climate_avg")
+            x = log_climate["Generation"]
+            y = log_climate["Climate_avg"]
+            if self.climate_noconf:
+                sns.lineplot(ax=axs[count], x=x, y=y, ci=None)
+            else:
+                sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+            #axs[count].plot(self.log["Generation"], self.log["Climate_avg"])
+            #axs[count].fill_between(x, (y - ci), (y + ci), color='b', alpha=.1)
             axs[count].set(ylabel="$\\bar{e}$")
             axs[count].set(xlabel=None)
             count += 1
 
         if "mean" in include:
-            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Mean")
+            x = self.log["Generation"]
+            y = self.log["Mean"]
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+
+            #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Mean")
             axs[count].set(ylabel="$\\bar{\mu}$")
             axs[count].set(xlabel=None)
             count += 1
 
         if "sigma" in include:
-            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="SD")
+            x = self.log["Generation"]
+            y = self.log["SD"]
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+
+            #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="SD")
             axs[count].set(ylabel="$\\bar{\sigma}$")
             axs[count].set(xlabel=None)
             axs[count].set_yscale('log')
             count += 1
 
         if "mutate" in include:
-            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="R")
+            x = self.log["Generation"]
+            y = self.log["R"]
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+
+            #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="R")
             axs[count].set(ylabel="$\\bar{r}$")
             axs[count].set(xlabel=None)
             axs[count].set_yscale('log')
             count += 1
 
         if "fitness" in include:
-            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Fitness")
+            x = self.log["Generation"]
+            y = self.log["Fitness"]
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+
+            #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Fitness")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$\\bar{f}$")
             count += 1
 
         if "extinct" in include:
-            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="extinctions")
+            x = self.log["Generation"]
+            y = self.log["extinctions"]
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+
+            #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="extinctions")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="Extinctions")
             count += 1
 
         if "num_agents" in include:
-            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="num_agents")
+            x = self.log["Generation"]
+            y = self.log["num_agents"]
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+
+            #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="num_agents")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$N$, number of agents")
             count += 1
         if "diversity" in include:
-            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="diversity")
+            x = self.log["Generation"]
+            y = self.log["diversity"]
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+
+            #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="diversity")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$V$, diversity")
             count += 1
         if "fixation_index" in include:
-            sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="fixation_index")
+            x = self.log["Generation"]
+            y = self.log["fixation_index"]
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+
+            #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="fixation_index")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$F_{st}$, fixation_index")
             count += 1
         if "dispersal" in include:
-            log = compute_dispersal(self.log, self.log_niches, self.num_niches)
-            sns.lineplot(ax=axs[count], data=log, x="Generation", y="Dispersal")
+
+            self.log = compute_dispersal(self.log, self.log_niches, self.num_niches)
+            x = self.log["Generation"]
+            y = self.log["Dispersal"]
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+
+            #sns.lineplot(ax=axs[count], data=log, x="Generation", y="Dispersal")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$D$")
             count += 1

@@ -135,23 +135,23 @@ def parametric_sin(gpu, trial,  mode, long_run=False):
     #var_freq_values = np.arange(10, 100, 20)
     now = datetime.datetime.now()
     project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
-    top_dir = "papers/gecco/debug/" + project + "/"
+    top_dir = "papers/gecco/parametric_sin/" + project + "/"
 
     experiments = []
 
     param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",
                    "--mutate_mutate_rate", "--genome_type", "--extinctions",  "--num_niches",
                    "--only_climate",  "--climate_mean_init", "--amplitude", "--period"]
-    amplitudes = [0.2, 0.5, 1, 2, 4]
+    amplitudes = [0.2, 0.5, 1, 2, 4, 8]
     env_type = "sin"
     num_gens = 1500
     survival_types = ["FP-Grove", "capacity-fitness", "limited-capacity"]
     mutate_mutate_rate = 0.001
     genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
     extinctions = [1]
-    num_niches_values = [1]
-    climate_only = 1
-    climate_mean_init = 0
+    num_niches_values = [1, 10, 100, 200]
+    climate_only = 0
+    climate_mean_init = 0.2
     periods = [int(num_gens),int(num_gens/2), int(num_gens/8), int(num_gens/16), int(num_gens/32)]
     num_gens = num_gens*3 # make sure we have at least 3 cycles
 
@@ -188,7 +188,7 @@ def parametric_stable(gpu, trial,  mode, long_run=False):
     #var_freq_values = np.arange(10, 100, 20)
     now = datetime.datetime.now()
     project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
-    top_dir = "papers/gecco/debug_stable/" + project + "/"
+    top_dir = "papers/gecco/parametric_stable/" + project + "/"
 
     experiments = []
 
@@ -201,9 +201,9 @@ def parametric_stable(gpu, trial,  mode, long_run=False):
     mutate_mutate_rate = 0.001
     genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
     extinctions = [1]
-    num_niches_values = [1]
+    num_niches_values = [1, 10, 100, 200]
     climate_only = 0
-    climate_mean_init_values = [0, 0.2, 1, 2]
+    climate_mean_init_values = [0.1, 0.2, 1, 2, 4]
     num_gens = num_gens*3 # make sure we have at least 3 cycles
 
     for num_niches in num_niches_values:
@@ -254,7 +254,7 @@ def smallscale_sin(gpu, trial,  mode, long_run=False):
     extinctions = [1]
     num_niches_values = [1]
     climate_only = 0
-    climate_mean_init = 0
+    climate_mean_init = 0.2
     periods = [int(num_gens), int(num_gens/2), int(num_gens/8), int(num_gens/16), int(num_gens/32)]
     num_gens = num_gens*3 # make sure we have at least 3 cycles
 
@@ -306,7 +306,7 @@ def smallscale_stable(gpu, trial,  mode, long_run=False):
     extinctions = [1]
     num_niches_values = [1]
     climate_only = 0
-    climate_mean_init_values = [0, 0.2, 1, 2]
+    climate_mean_init_values = [0.1, 0.2, 1, 2]
     num_gens = num_gens*3 # make sure we have at least 3 cycles
 
     for num_niches in num_niches_values:
@@ -325,6 +325,8 @@ def smallscale_stable(gpu, trial,  mode, long_run=False):
                                 for idx, el in enumerate(param_names):
                                     command += el + " " + str(new_exp[idx]) + " "
                                 command += "&"
+                                print(command)
+
                                 os.system("bash -c '{}'".format(command))
 
     if mode == "server":
@@ -340,7 +342,7 @@ if __name__ == "__main__":
     trials = int(sys.argv[1])
     mode = sys.argv[2] # server for jz experiments and local otherwise
     for trial in range(1, trials+1):
-        #smallscale_stable(gpu=True, trial=trial, mode=mode)
-        smallscale_sin(gpu=True, trial=trial, mode=mode)
+        parametric_stable(gpu=True, trial=trial, mode=mode)
+        parametric_sin(gpu=True, trial=trial, mode=mode)
 
 

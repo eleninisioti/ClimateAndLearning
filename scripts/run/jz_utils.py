@@ -123,7 +123,7 @@ def run_batch(
         script = "simulate.py"
 
         if long_run:
-            time = "40:00:00"
+            time = "100:00:00"
         else:
             time = "18:00:00"
         name = "temp_" + str(random())

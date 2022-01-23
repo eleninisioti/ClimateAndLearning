@@ -289,15 +289,15 @@ class Plotter:
             fig.colorbar(pos, ax=ax)
             for im in plt.gca().get_images():
                 im.set_clim(0, max(np.max(y_values),0.1))
-            ax.invert_yaxis()
+            #ax.invert_yaxis()
             ax.set_xticks(list(range(len(x2_unique))))
             ax.set_yticks(list(range(len(x1_unique))))
             #ax.set_yticks(x2_values)
             # ... and label them with the respective list entries
             ax.set_xticklabels(x2_unique)
             ax.set_yticklabels(x1_unique)
-            ax.set_ylabel("Transition scaling")
-            ax.set_xlabel("$N$, Number of niches")
+            ax.set_ylabel("Period, $T$")
+            ax.set_xlabel("$A$, Amplitude")
             ax.set_title(str(y_var))
 
             save_dir = "../projects/" + top_dir + "/plots"

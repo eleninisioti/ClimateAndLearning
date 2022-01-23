@@ -153,7 +153,7 @@ def parametric_sin(gpu, trial,  mode, long_run=False):
     climate_only = 0
     climate_mean_init = 0.2
     periods = [int(num_gens),int(num_gens/2), int(num_gens/8), int(num_gens/16), int(num_gens/32)]
-    num_gens = num_gens*3 # make sure we have at least 3 cycles
+    num_gens = num_gens # make sure we have at least 3 cycles
 
     for num_niches in num_niches_values:
         for amplitude in amplitudes:
@@ -204,7 +204,7 @@ def parametric_stable(gpu, trial,  mode, long_run=False):
     num_niches_values = [100]
     climate_only = 0
     climate_mean_init_values = [0.1, 0.2, 1, 2, 4]
-    num_gens = num_gens*3 # make sure we have at least 3 cycles
+    num_gens = num_gens # make sure we have at least 3 cycles
 
     for num_niches in num_niches_values:
         for climate_mean_init in climate_mean_init_values:

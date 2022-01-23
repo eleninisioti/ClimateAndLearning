@@ -149,7 +149,7 @@ def parametric_sin(gpu, trial,  mode, long_run=False):
     mutate_mutate_rate = 0.001
     genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
     extinctions = [1]
-    num_niches_values = [1, 10, 100, 200]
+    num_niches_values = [100]
     climate_only = 0
     climate_mean_init = 0.2
     periods = [int(num_gens),int(num_gens/2), int(num_gens/8), int(num_gens/16), int(num_gens/32)]
@@ -201,7 +201,7 @@ def parametric_stable(gpu, trial,  mode, long_run=False):
     mutate_mutate_rate = 0.001
     genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
     extinctions = [1]
-    num_niches_values = [1, 10, 100, 200]
+    num_niches_values = [100]
     climate_only = 0
     climate_mean_init_values = [0.1, 0.2, 1, 2, 4]
     num_gens = num_gens*3 # make sure we have at least 3 cycles
@@ -342,7 +342,7 @@ if __name__ == "__main__":
     trials = int(sys.argv[1])
     mode = sys.argv[2] # server for jz experiments and local otherwise
     for trial in range(1, trials+1):
-        parametric_stable(gpu=True, trial=trial, mode=mode)
-        parametric_sin(gpu=True, trial=trial, mode=mode)
+        parametric_stable(gpu=True, trial=trial, mode=mode, long_run=True)
+        parametric_sin(gpu=True, trial=trial, mode=mode, long_run=True)
 
 

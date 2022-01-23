@@ -6,7 +6,7 @@ import numpy as np
 import os
 import pickle
 import yaml
-from utils import compute_SoS, compute_dispersal
+from source.utils import compute_SoS, compute_dispersal
 
 class Plotter:
 
@@ -219,7 +219,7 @@ class Plotter:
         plt.clf()
 
 
-    def plot_heatmap(self, top_dir, x_variables, y_variables):
+    def plot_heatmap(self, top_dir, x_variables_sin, x_variables_stable, y_variables):
         """ Plots a heatmap based on all projects in a directory
         """
         # find all projects in directory
@@ -231,14 +231,23 @@ class Plotter:
             x2_values = []
             keep_projects = {}
             for p in projects:
+                print(p)
                 if "plots" not in p:
 
                     # load configuration variables
                     config_file = p + "/config.yml"
                     with open(config_file, "rb") as f:
                         config = yaml.load(f, Loader=yaml.UnsafeLoader)
-                        x1 = int(getattr(config,x_variables[0] ))
-                        x2 = int(getattr(config,x_variables[1] ))
+                        if config.env_type == "sin":
+                            x_variables = x_variables_sin
+                            x1 = int(getattr(config, x_variables[0]))
+                            x2 = int(getattr(config, x_variables[1]))
+                        else:
+                            x_variables = x_variables_stable
+                            x1 = float("Inf")
+                            x1 = config.num_gens
+                            x2 = int(getattr(config,x_variables[0] ))
+
                         x1_values.append(x1)
                         x2_values.append(x2)
                         keep_projects[(x1,x2)] = p
@@ -249,9 +258,10 @@ class Plotter:
             y_values = np.zeros((len(x1_unique), len(x2_unique)))
             for idx1, x1 in enumerate(x1_unique):
                 for idx2, x2 in enumerate(x2_unique):
-                    p = keep_projects[x1, x2]
+                    p = keep_projects[(x1, x2)]
                     # load performance variables
-                    trial_dirs = list(next(os.walk( p+ "/trials"))[1])
+                    trial_dirs = list(next(os.walk(p + "/trials"))[1])
+                    print(trial_dirs)
 
                     for trial, trial_dir in enumerate(trial_dirs):
                         if os.path.isfile( p + '/trials/trial_' + str(trial)
@@ -262,6 +272,9 @@ class Plotter:
                                 log_df = log_df.append(log)
                             else:
                                 log_df = log
+                        else:
+                            print("sth wron gwith ", p + '/trials/trial_' + str(trial)
+                                          + '/log.pickle')
                     locx = x1_unique.index(x1)
                     locy = x2_unique.index(x2)
                     y_values[locx, locy] = np.mean(log_df[y_var])
@@ -276,7 +289,7 @@ class Plotter:
             fig.colorbar(pos, ax=ax)
             for im in plt.gca().get_images():
                 im.set_clim(0, max(np.max(y_values),0.1))
-
+            ax.invert_yaxis()
             ax.set_xticks(list(range(len(x2_unique))))
             ax.set_yticks(list(range(len(x1_unique))))
             #ax.set_yticks(x2_values)

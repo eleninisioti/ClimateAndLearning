@@ -145,14 +145,14 @@ def parametric_sin(gpu, trial,  mode, long_run=False):
     param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",
                    "--mutate_mutate_rate", "--genome_type", "--extinctions",  "--num_niches",
                    "--only_climate",  "--climate_mean_init", "--amplitude", "--period"]
-    amplitudes = [0.2, 1, 8]
+    amplitudes = [4]
     env_type = "sin"
     num_gens = 1500
     survival_types = ["capacity-fitness"]
     mutate_mutate_rate = 0.001
     genome_types = ["1D_mutate"]
     extinctions = [1]
-    num_niches_values = [100]
+    num_niches_values = [1,10,100]
     climate_only = 0
     climate_mean_init = 0.2
     periods = [int(num_gens),int(num_gens/2), int(num_gens/8), int(num_gens/16), int(num_gens/32)]

@@ -135,7 +135,10 @@ def parametric_sin(gpu, trial,  mode, long_run=False):
     #var_freq_values = np.arange(10, 100, 20)
     now = datetime.datetime.now()
     project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
-    top_dir = "papers/gecco/parametric_sin/" + project + "/"
+    if mode == "local":
+        top_dir = "papers/gecco/parametric_stable/" + project + "/"
+    else:
+        top_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/projects"
 
     experiments = []
 
@@ -241,7 +244,10 @@ def parametric_stable(gpu, trial,  mode, long_run=False):
     #var_freq_values = np.arange(10, 100, 20)
     now = datetime.datetime.now()
     project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
-    top_dir = "papers/gecco/parametric_stable/" + project + "/"
+    if mode == "local":
+        top_dir = "papers/gecco/parametric_stable/" + project + "/"
+    else:
+        top_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/projects"
 
     experiments = []
 

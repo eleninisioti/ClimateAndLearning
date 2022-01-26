@@ -136,7 +136,7 @@ def parametric_sin(gpu, trial,  mode, long_run=False):
     now = datetime.datetime.now()
     project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
     if mode == "local":
-        top_dir = "papers/gecco/parametric_stable/" + project + "/"
+        top_dir = "papers/gecco/parametric_sin/" + project + "/"
     else:
         top_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/projects"
 
@@ -255,14 +255,14 @@ def parametric_stable(gpu, trial,  mode, long_run=False):
                    "--mutate_mutate_rate", "--genome_type", "--extinctions",  "--num_niches",
                    "--only_climate",  "--climate_mean_init"]
     env_type = "stable"
-    num_gens = 1500
-    survival_types = ["FP-Grove", "capacity-fitness", "limited-capacity"]
+    num_gens = 1000
+    survival_types = ["limited-capacity"]
     mutate_mutate_rate = 0.001
-    genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
+    genome_types = ["1D_mutate"]
     extinctions = [1]
     num_niches_values = [100]
     climate_only = 0
-    climate_mean_init_values = [0.1, 0.2, 1, 2, 4]
+    climate_mean_init_values = [ 0.2]
     num_gens = num_gens # make sure we have at least 3 cycles
 
     for num_niches in num_niches_values:
@@ -451,8 +451,8 @@ if __name__ == "__main__":
     trials = int(sys.argv[1])
     mode = sys.argv[2] # server for jz experiments and local otherwise
     for trial in range(1, trials+1):
-        #parametric_stable(gpu=True, trial=trial, mode=mode, long_run=True)
-        parametric_sin(gpu=True, trial=trial, mode=mode, long_run=True)
+        parametric_stable(gpu=True, trial=trial, mode=mode, long_run=True)
+        #parametric_sin(gpu=True, trial=trial, mode=mode, long_run=True)
         #fig_sigma_constant(gpu=True, trial=trial, mode=mode, long_run=False)
         #parametric_noisy(gpu=True, trial=trial, mode=mode, long_run=True)
 

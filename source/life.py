@@ -2,6 +2,7 @@ from change_environment import ChangeEnv
 from sin_environment import SinEnv
 from maslin_environment import MaslinEnv
 from stable_environment import StableEnv
+from noisy_environment import NoisyEnv
 import numpy as np
 from population import Population
 from logger import Logger
@@ -42,6 +43,12 @@ class Life:
                                  factor_time_steady=self.config.factor_time_steady,
                                  var_freq=self.config.var_freq,
                                  var_SD=self.config.var_SD)
+
+        elif self.config.env_type == "noisy":
+            self.env = NoisyEnv(mean=self.config.climate_mean_init,
+                                 std = self.config.noise_std,
+                                 ref_capacity=self.config.capacity,
+                                 num_niches=self.config.num_niches)
         # -------------------------------------------------------------------------
         # ----- set up population ----
         pop_size = int(np.min([self.config.init_num_agents, self.env.current_capacity * self.config.num_niches]))

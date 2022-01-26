@@ -184,6 +184,59 @@ def parametric_sin(gpu, trial,  mode, long_run=False):
             gpu=gpu,
         )
 
+
+def parametric_noisy(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    top_dir = "papers/gecco/parametric_noisy/" + project + "/"
+
+    experiments = []
+
+    param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",
+                   "--mutate_mutate_rate", "--genome_type", "--extinctions",  "--num_niches",
+                   "--only_climate",  "--climate_mean_init", "--noise_std"]
+    noise_stds = [0.05, 0.2, 0.4, 0.8, 1.6]
+    env_type = "noisy"
+    num_gens = 1500
+    survival_types = ["FP-Grove", "capacity-fitness", "limited-capacity"]
+    mutate_mutate_rate = 0.001
+    genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
+    extinctions = [1]
+    num_niches_values = [1, 5, 10, 40, 100]
+    climate_only = 1
+    climate_mean_init_values = [0.2, 0.5, 1, 2, 4, 8]
+
+    for num_niches in num_niches_values:
+        for noise_std in noise_stds:
+            for climate_mean_init in climate_mean_init_values:
+                for genome_type in genome_types:
+                    for survival_type in survival_types:
+                        for extinction in extinctions:
+                            project = top_dir + "survival_" + survival_type + "genome_" + genome_type + "extinctions_" + \
+                                      str(extinction) + "_num_niches_" + \
+                                      str(num_niches) + "_climate_" + str(climate_mean_init) +\
+                                      "_noisestd_" + str(noise_std)
+                            new_exp = [project, env_type, num_gens, trial, survival_type, mutate_mutate_rate,
+                                       genome_type, extinction, num_niches, climate_only, climate_mean_init,
+                                       noise_std]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                command += "&"
+                                print(command)
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
 def parametric_stable(gpu, trial,  mode, long_run=False):
     #var_freq_values = np.arange(10, 100, 20)
     now = datetime.datetime.now()
@@ -394,6 +447,7 @@ if __name__ == "__main__":
     for trial in range(1, trials+1):
         #parametric_stable(gpu=True, trial=trial, mode=mode, long_run=True)
         #parametric_sin(gpu=True, trial=trial, mode=mode, long_run=True)
-        fig_sigma_constant(gpu=True, trial=trial, mode=mode, long_run=False)
+        #fig_sigma_constant(gpu=True, trial=trial, mode=mode, long_run=False)
+        parametric_noisy(gpu=True, trial=trial, mode=mode, long_run=True)
 
 

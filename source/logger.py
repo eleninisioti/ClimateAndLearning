@@ -123,7 +123,7 @@ class Logger:
             self.env_profile = {"start_a": env.b1_values, "end_a": env.b2_values,
                                        "start_b": env.b3_values, "end_b": env.b4_values,
                                        "ncycles": env.cycles, "cycle": env.b5_values[0]}
-        elif env.type == "stable":
+        elif env.type == "stable" or env.type == "noisy":
             self.env_profile = {}
 
         # convert to dataframe and save trial data

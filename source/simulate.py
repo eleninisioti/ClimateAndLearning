@@ -197,6 +197,11 @@ def init_parser():
                         type=float,
                         default=2)
 
+    parser.add_argument('--noise_std',
+                        help='Standard deviation of gaussian noise in noisy channel.',
+                        type=float,
+                        default=0.2)
+
     args = parser.parse_args()
     return args
 

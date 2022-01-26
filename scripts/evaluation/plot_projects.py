@@ -64,7 +64,7 @@ def run(project, climate_noconf):
                                               "num_agents",
                                             "extinct", "diversity"])
 
-        plotter.plot_SoS()
+            plotter.plot_SoS()
 
         # break log into trials for saving (with computed dispersal)
         for trial, trial_dir in enumerate(trial_dirs):

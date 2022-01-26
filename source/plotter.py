@@ -124,8 +124,8 @@ class Plotter:
             #sns.lineplot(, data=self.log, x="Generation", y="Climate_avg")
             x = log_climate["Generation"][::self.interval]
             y = log_climate["Climate_avg"][::self.interval]
-            y = y.clip(upper=y_upper_thres)
-            y = y.clip(lower=y_lower_thres)
+            #y = y.clip(upper=y_upper_thres)
+            #y = y.clip(lower=y_lower_thres)
 
 
             if self.climate_noconf:

@@ -11,11 +11,8 @@ import pickle5 as pickle
 import sys
 import os
 import yaml
-sys.path.append(os.getcwd())
-
-sys.path.append(os.getcwd() + "/../scripts")
-sys.path.insert(0, os.getcwd() + "/../plotter")
-from plotter import Plotter
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+from source.plotter import Plotter
 
 
 def run(project, climate_noconf):
@@ -49,31 +46,43 @@ def run(project, climate_noconf):
     print(len(log_niches["inhabited_niches"]), config["num_gens"])
     if len(log_niches["inhabited_niches"]) == config["num_gens"]:
         print("No mass extinction for ", project)
+    print(config["env_type"])
+    if not os.path.exists(top_dir + project + "/trials/" + trial_dir + '/log_updated.pickle'):
+        plotter = Plotter(project=project,
+                          env_profile=[],
+                          climate_noconf=climate_noconf,
+                          log=log_df,
+                          log_niches=log_niches_total,
+                          num_niches=config["num_niches"])
 
-    plotter = Plotter(project=project,
-                      env_profile=[],
-                      climate_noconf=climate_noconf,
-                      log=log_df,
-                      log_niches=log_niches_total,
-                      num_niches=config["num_niches"])
 
+        if config["only_climate"]:
+            # if the simulation had no population just plot the climate dynamics
+            log = plotter.plot_evolution(include=["climate"])
+        else:
+            log = plotter.plot_evolution(include=["climate", "mean", "sigma","mutate", "dispersal",  "fitness",
+                                              "num_agents",
+                                            "extinct", "diversity"])
 
-    if config["only_climate"]:
-        # if the simulation had no population just plot the climate dynamics
-        plotter.plot_evolution(include=["climate"])
-    else:
-        plotter.plot_evolution(include=["climate", "mean", "sigma", "dispersal", "mutate", "fitness", "num_agents",
-                                        "extinct", "diversity"])
         plotter.plot_SoS()
+
+        # break log into trials for saving (with computed dispersal)
+        for trial, trial_dir in enumerate(trial_dirs):
+            log_trial = log.loc[(log['Trial'] == trial)]
+            pickle.dump(log_trial, open(top_dir + project + "/trials/" + trial_dir + '/log_updated.pickle', 'wb'))
 
 
 if __name__ == "__main__":
     top_dir = sys.argv[1] # choose the top directory containing the projects you want to plot
 
-    projects = [os.path.join(top_dir, o) for o in os.listdir("../projects/" + top_dir)]
-    for idx, p in enumerate(projects):
-        print(p)
-        run(project=p, climate_noconf=1)
+    sub_dirs = [os.path.join(top_dir, o) for o in os.listdir("../projects/" + top_dir)]
+    for idx, sub_dir in enumerate(sub_dirs):
+        print(sub_dir)
+        projects = [os.path.join(sub_dir,o) for o in os.listdir("../projects/" + sub_dir)]
+        for p in projects:
+            if "plots" not in p:
+                print(p)
+                run(project=p, climate_noconf=1)
 
 
 

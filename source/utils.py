@@ -10,7 +10,11 @@ def compute_SoS(log, log_niches, num_niches):
         log_trial = log.loc[(log['Trial'] == trial)]
 
         climate_mean = []
-        for gen, el in enumerate(list(log_trial["Climate"])):
+        num_gens = min([len(log_niches[trial]["inhabited_niches"]), len(list(log_trial["Climate"]))])
+        log_trial = log_trial.loc[log_trial['Generation'] < num_gens]
+
+        for gen in range(num_gens):
+            el = list(log_trial["Climate"])[gen]
             climate_values = []
             for lat in range(-int(num_niches/2), int(num_niches/2 +0.5)):
                 lat_climate = list(log_trial["Climate"])[gen] + 0.01 *lat
@@ -25,7 +29,7 @@ def compute_SoS(log, log_niches, num_niches):
             pop_mean = pop_mean.to_list()
         strength = [0 if el==0 else np.abs(el - pop_mean[idx]) for idx, el in enumerate(climate_mean)]
         all_strengths.append(strength)
-        log_trial["Selection"]= np.mean(np.array(all_strengths), axis=0)
+        log_trial["Selection"] = np.mean(np.array(all_strengths), axis=0)
         if not trial:
             new_log = log_trial
         else:
@@ -43,14 +47,15 @@ def compute_dispersal(log, log_niches, num_niches):
     for trial in range(trials):
         all_dispersals = []
         all_DI = []
+        log_trial = log.loc[(log['Trial'] == trial)]
+        climate = log_trial["Climate"].to_list()
+        # inhabited_niches = [len(el) for el in log["inhabited_niches"].to_list()]
+        inhabited_niches = log_niches[trial]["inhabited_niches"]
+        num_gens = min([len(inhabited_niches), len(climate)])
 
         for lat in range(-int(num_latitudes/2), int(num_latitudes/2 +0.5)):
             survivals = []
-            log_trial = log.loc[(log['Trial'] == trial)]
-            climate = log_trial["Climate"].to_list()
-            num_gens = len(climate)
-            #inhabited_niches = [len(el) for el in log["inhabited_niches"].to_list()]
-            inhabited_niches = log_niches[trial]["inhabited_niches"]
+
             for gen in range(num_gens):
                 lat_climate = climate[gen] + 0.01 * lat
 
@@ -72,7 +77,7 @@ def compute_dispersal(log, log_niches, num_niches):
         while len(dispersal) < num_gens:
             dispersal = [1] + dispersal
 
-        x= np.mean(np.array(dispersal), axis=0)
+        x = np.mean(np.array(dispersal), axis=0)
         log_trial["Dispersal"] = x
 
         if not trial:

@@ -7,16 +7,30 @@ from source.plotter import Plotter
 
 if __name__ == "__main__":
     top_dir = sys.argv[1]
+    type = sys.argv[2]
+
     # produce heatmaps for all subdirectories
     projects = [os.path.join(top_dir, o) for o in os.listdir("../projects/" + top_dir)]
-    x_variables_sin = ["period", "amplitude"]
-    x_variables_stable = ["climate_mean_init"]
-    y_variables = ["SD", "R", "diversity", "extinctions"]
+    #x_variables_sin =
+    if type == "stable":
+        x_variables = ["climate_mean_init", "num_niches"]
+
+    elif type == "sin_niches":
+        x_variables = ["period", "num_niches"]
+
+    elif type == "sin_amplitude":
+        x_variables = ["period", "amplitude"]
+
+    y_variables = ["SD", "R", "diversity", "extinctions", "Mean", "Dispersal"]
     plotter = Plotter(project=top_dir, env_profile={}, climate_noconf=False)
+
+
 
     for idx, p in enumerate(projects):
         plotter.plot_heatmap(top_dir=p,
-                             x_variables_sin=x_variables_sin,
-                             x_variables_stable=x_variables_stable,
+                             x_variables=x_variables,
                              y_variables=y_variables)
+
+
+
 

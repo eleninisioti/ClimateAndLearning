@@ -7,10 +7,16 @@ import os
 import pickle
 import yaml
 from source.utils import compute_SoS, compute_dispersal
+import pandas as pd
+
+labels = {"climate_mean_init": "$\\bar{e}$, Mean climate",
+          "num_niches": "$N$, Number of niches",
+          "period": "$T$, Period of sin",
+          "amplitude": "$A$, Amplitude of sin"}
 
 class Plotter:
 
-    def __init__(self, project, log={},log_niches={}, num_niches=1, env_profile={}, climate_noconf=False):
+    def __init__(self, project, log=pd.DataFrame(),log_niches={}, num_niches=1, env_profile={}, climate_noconf=False):
         """
         Parameters
         ----------
@@ -37,8 +43,17 @@ class Plotter:
                   'font.size': 20,
                   "figure.autolayout": True}
         plt.rcParams.update(params)
-        self.fig_size_heatmap = (10,10)
+        self.fig_size_heatmap = (12,12)
         self.fig_size = (10,5)
+        if not self.log.empty:
+
+            self.y_upper_thres = 10**(10)
+            self.y_lower_thres = 1/(10**(10))
+            self.ci=None
+            self.interval = int(len(self.log["Climate"])/2000)
+            print("printing every", self.interval)
+            if self.interval < 2:
+                self.interval = 1
 
 
 
@@ -50,10 +65,19 @@ class Plotter:
         fig, axs = plt.subplots(1, figsize=self.fig_size)
 
         log = compute_SoS(self.log, self.log_niches, self.num_niches)
-
-        sns.lineplot(data=log, x="Generation", y="Selection", label="SoS")
-        sns.lineplot(data=log, x="Generation", y="SD", label="$\sigma$")
-        sns.lineplot(data=log, x="Generation", y="R", label="$r$")
+        x = log["Generation"][::self.interval]
+        y = log["Selection"][::self.interval]
+        y = y.clip(upper=self.y_upper_thres)
+        y = y.clip(lower=self.y_lower_thres)
+        sns.lineplot(data=log, x=x, y=y, label="SoS", ci=self.ci)
+        y = log["SD"][::self.interval]
+        y = y.clip(upper=self.y_upper_thres)
+        y = y.clip(lower=self.y_lower_thres)
+        sns.lineplot(data=log, x=x, y=y, label="$\sigma$", ci=self.ci)
+        y = log["R"][::self.interval]
+        y = y.clip(upper=self.y_upper_thres)
+        y = y.clip(lower=self.y_lower_thres)
+        sns.lineplot(data=log, x=x, y=y, label="$r$", ci=self.ci)
         axs.set(xlabel="Time (in generations)")
         axs.set_yscale('log')
         plt.savefig("../projects/" + self.project + "/plots/SoS.png")
@@ -79,6 +103,10 @@ class Plotter:
         count = 0
         start_cycle = 0
         end_cycle = cycles
+        ci = self.ci
+        y_upper_thres = self.y_upper_thres
+        y_lower_thres = self.y_lower_thres
+
 
         ## TODO: remove
         #self.log["Generation"] = [idx for idx in range(len(self.log["Climate"]))]
@@ -94,12 +122,16 @@ class Plotter:
                 climate_avg.append(np.mean(niches_states))
             log_climate["Climate_avg"] = climate_avg
             #sns.lineplot(, data=self.log, x="Generation", y="Climate_avg")
-            x = log_climate["Generation"]
-            y = log_climate["Climate_avg"]
+            x = log_climate["Generation"][::self.interval]
+            y = log_climate["Climate_avg"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+
             if self.climate_noconf:
                 sns.lineplot(ax=axs[count], x=x, y=y, ci=None)
             else:
-                sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+                sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
             #axs[count].plot(self.log["Generation"], self.log["Climate_avg"])
             #axs[count].fill_between(x, (y - ci), (y + ci), color='b', alpha=.1)
             axs[count].set(ylabel="$\\bar{e}$")
@@ -107,9 +139,12 @@ class Plotter:
             count += 1
 
         if "mean" in include:
-            x = self.log["Generation"]
-            y = self.log["Mean"]
-            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+            x = log_climate["Generation"][::self.interval]
+            y = log_climate["Mean"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Mean")
             axs[count].set(ylabel="$\\bar{\mu}$")
@@ -117,9 +152,12 @@ class Plotter:
             count += 1
 
         if "sigma" in include:
-            x = self.log["Generation"]
-            y = self.log["SD"]
-            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+            x = log_climate["Generation"][::self.interval]
+            y = log_climate["SD"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="SD")
             axs[count].set(ylabel="$\\bar{\sigma}$")
@@ -128,9 +166,12 @@ class Plotter:
             count += 1
 
         if "mutate" in include:
-            x = self.log["Generation"]
-            y = self.log["R"]
-            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+            x = log_climate["Generation"][::self.interval]
+            y = log_climate["R"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="R")
             axs[count].set(ylabel="$\\bar{r}$")
@@ -139,9 +180,12 @@ class Plotter:
             count += 1
 
         if "fitness" in include:
-            x = self.log["Generation"]
-            y = self.log["Fitness"]
-            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+            x = log_climate["Generation"][::self.interval]
+            y = log_climate["Fitness"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Fitness")
             axs[count].set(xlabel="Time (in generations)")
@@ -149,9 +193,12 @@ class Plotter:
             count += 1
 
         if "extinct" in include:
-            x = self.log["Generation"]
-            y = self.log["extinctions"]
-            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+            x = log_climate["Generation"][::self.interval]
+            y = log_climate["extinctions"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="extinctions")
             axs[count].set(xlabel="Time (in generations)")
@@ -159,27 +206,36 @@ class Plotter:
             count += 1
 
         if "num_agents" in include:
-            x = self.log["Generation"]
-            y = self.log["num_agents"]
-            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+            x = log_climate["Generation"][::self.interval]
+            y = log_climate["num_agents"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="num_agents")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$N$, number of agents")
             count += 1
         if "diversity" in include:
-            x = self.log["Generation"]
-            y = self.log["diversity"]
-            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+            x = log_climate["Generation"][::self.interval]
+            y = log_climate["diversity"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="diversity")
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$V$, diversity")
             count += 1
         if "fixation_index" in include:
-            x = self.log["Generation"]
-            y = self.log["fixation_index"]
-            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+            x = log_climate["Generation"][::self.interval]
+            y = log_climate["fixation_index"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="fixation_index")
             axs[count].set(xlabel="Time (in generations)")
@@ -188,9 +244,12 @@ class Plotter:
         if "dispersal" in include:
 
             self.log = compute_dispersal(self.log, self.log_niches, self.num_niches)
-            x = self.log["Generation"]
-            y = self.log["Dispersal"]
-            sns.lineplot(ax=axs[count], x=x, y=y, ci=80)
+            x = self.log["Generation"][::self.interval]
+            y = self.log["Dispersal"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
 
             #sns.lineplot(ax=axs[count], data=log, x="Generation", y="Dispersal")
             axs[count].set(xlabel="Time (in generations)")
@@ -205,6 +264,8 @@ class Plotter:
         else:
             plot_regions = False
 
+        plot_regions = False
+
         if plot_regions and end_cycle:
             for subplot in range(count):
                 for cycle in range(start_cycle, end_cycle):
@@ -217,11 +278,13 @@ class Plotter:
         # -------------------------------------------------------------
         plt.savefig("../projects/" + self.project + "/plots/evolution.png")
         plt.clf()
+        return self.log
 
 
-    def plot_heatmap(self, top_dir, x_variables_sin, x_variables_stable, y_variables):
+    def plot_heatmap(self, top_dir, x_variables, y_variables):
         """ Plots a heatmap based on all projects in a directory
         """
+
         # find all projects in directory
         # find all parameters for x_variables
         projects = [os.path.join("../projects/" +top_dir, o) for o in os.listdir("../projects/" + top_dir)]
@@ -236,21 +299,25 @@ class Plotter:
 
                     # load configuration variables
                     config_file = p + "/config.yml"
+
                     with open(config_file, "rb") as f:
                         config = yaml.load(f, Loader=yaml.UnsafeLoader)
-                        if config.env_type == "sin":
-                            x_variables = x_variables_sin
-                            x1 = int(getattr(config, x_variables[0]))
-                            x2 = int(getattr(config, x_variables[1]))
+                        if config.num_niches > 200:
+                            print("bump")
+                            return 0
                         else:
-                            x_variables = x_variables_stable
-                            x1 = float("Inf")
-                            x1 = config.num_gens
-                            x2 = int(getattr(config,x_variables[0] ))
 
-                        x1_values.append(x1)
-                        x2_values.append(x2)
-                        keep_projects[(x1,x2)] = p
+                            x1 = float(getattr(config, x_variables[0]))
+                            x2 = float(getattr(config, x_variables[1]))
+
+                            x1_values.append(x1)
+                            x2_values.append(x2)
+                            keep_projects[(x1,x2)] = p
+
+            # TODO: remove this
+            #x1_values =[el for el in x1_values if el <100]
+            #x2_values =[el for el in x2_values if el <100]
+
             x1_unique = list(set(x1_values))
             x1_unique.sort()
             x2_unique = list(set(x2_values))
@@ -265,16 +332,18 @@ class Plotter:
 
                     for trial, trial_dir in enumerate(trial_dirs):
                         if os.path.isfile( p + '/trials/trial_' + str(trial)
-                                          + '/log.pickle'):
+                                          + '/log_updated.pickle'):
+
+
                             log = pickle.load(open(p + '/trials/trial_' + str(trial)
-                                                   + '/log.pickle', 'rb'))
+                                                   + '/log_updated.pickle', 'rb'))
                             if trial:
                                 log_df = log_df.append(log)
                             else:
                                 log_df = log
                         else:
                             print("sth wron gwith ", p + '/trials/trial_' + str(trial)
-                                          + '/log.pickle')
+                                          + '/log_updated.pickle')
                     locx = x1_unique.index(x1)
                     locy = x2_unique.index(x2)
                     y_values[locx, locy] = np.mean(log_df[y_var])
@@ -283,7 +352,6 @@ class Plotter:
                         y_values[locx, locy] =0
 
             fig, ax = plt.subplots(figsize=self.fig_size_heatmap)
-            extent = [x1_unique[0], x1_unique[-1], x2_unique[0], x2_unique[-1]]
 
             pos=ax.imshow(y_values)
             fig.colorbar(pos, ax=ax)
@@ -296,8 +364,9 @@ class Plotter:
             # ... and label them with the respective list entries
             ax.set_xticklabels(x2_unique)
             ax.set_yticklabels(x1_unique)
-            ax.set_ylabel("Period, $T$")
-            ax.set_xlabel("$A$, Amplitude")
+            ax.set_ylabel(labels[x_variables[0]])
+            ax.set_xlabel(labels[x_variables[1]])
+
             ax.set_title(str(y_var))
 
             save_dir = "../projects/" + top_dir + "/plots"

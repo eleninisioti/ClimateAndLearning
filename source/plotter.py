@@ -11,12 +11,13 @@ import pandas as pd
 
 labels = {"climate_mean_init": "$\\bar{e}$, Mean climate",
           "num_niches": "$N$, Number of niches",
-          "period": "$T$, Period of sin",
-          "amplitude": "$A$, Amplitude of sin"}
+          "period": "$T$, Period of sinusoid",
+          "amplitude": "$A$, Amplitude of sinusoid"}
 
 class Plotter:
 
-    def __init__(self, project, log=pd.DataFrame(),log_niches={}, num_niches=1, env_profile={}, climate_noconf=False):
+    def __init__(self, project, axs,log=pd.DataFrame(),log_niches={}, num_niches=1, env_profile={},
+                 climate_noconf=False):
         """
         Parameters
         ----------
@@ -30,6 +31,7 @@ class Plotter:
             If True, we don't plot confidence intervals for climate, we only plot one of the trials
              (useful for highly variable periods)
         """
+        self.axs=axs
         self.project = project
         self.env_profile = env_profile
         self.climate_noconf = climate_noconf
@@ -42,14 +44,22 @@ class Plotter:
                   'legend.handlelength': 2,
                   'font.size': 20,
                   "figure.autolayout": True}
-        plt.rcParams.update(params)
-        self.fig_size_heatmap = (12,12)
-        self.fig_size = (10,5)
+        #plt.rcParams.update(params)
+        params = {'legend.fontsize': 6,
+                  "figure.autolayout": True,
+                  'font.size': 8}
+        #plt.rcParams.update(params)
+        self.ci = 95
+        cm = 1 / 2.54
+        scale = 1
+        self.fig_size = (8.48*cm/scale, 6*cm/scale)
+        self.figsize_heatmaps = (8.48*cm/scale, 8.48*cm/scale)
+
         if not self.log.empty:
 
             self.y_upper_thres = 10**(10)
             self.y_lower_thres = 1/(10**(10))
-            self.ci=None
+            self.ci=95
             self.interval = int(len(self.log["Climate"])/2000)
             print("printing every", self.interval)
             if self.interval < 2:
@@ -96,10 +106,10 @@ class Plotter:
             which parameters to include in the plot. options are ["climate", "mean", "sigma", "mutate",
             "n_agents", "n_extinctions", "fitness"]
         """
-        fig, axs = plt.subplots(len(include), figsize=(12, 3*len(include)))
-        if include == ["climate"]:
-            axs = [axs]
-
+        #fig, axs = plt.subplots(len(include), figsize=(self.fig_size[0], self.fig_size[1]/2*len(include)))
+        #if include == ["climate"]:
+        #    axs = [axs]
+        axs=self.axs
         count = 0
         start_cycle = 0
         end_cycle = cycles
@@ -157,12 +167,14 @@ class Plotter:
             y = y.clip(upper=y_upper_thres)
             y = y.clip(lower=y_lower_thres)
 
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="SD")
             axs[count].set(ylabel="$\\bar{\sigma}$")
             axs[count].set(xlabel=None)
             axs[count].set_yscale('log')
+            axs[count].set_ylim([0.0001, 1])
             count += 1
 
         if "mutate" in include:
@@ -276,8 +288,8 @@ class Plotter:
                                          alpha=0.2,
                                          color='green')
         # -------------------------------------------------------------
-        plt.savefig("../projects/" + self.project + "/plots/evolution.png")
-        plt.clf()
+        #plt.savefig("../projects/" + self.project + "/plots/evolution.png")
+        #plt.clf()
         return self.log
 
 
@@ -293,6 +305,7 @@ class Plotter:
             x1_values = []
             x2_values = []
             keep_projects = {}
+
             for p in projects:
                 print(p)
                 if "plots" not in p:
@@ -323,6 +336,7 @@ class Plotter:
             x2_unique = list(set(x2_values))
             x2_unique.sort()
             y_values = np.zeros((len(x1_unique), len(x2_unique)))
+            mass_extinctions = []
             for idx1, x1 in enumerate(x1_unique):
                 for idx2, x2 in enumerate(x2_unique):
                     p = keep_projects[(x1, x2)]
@@ -346,13 +360,27 @@ class Plotter:
                                           + '/log_updated.pickle')
                     locx = x1_unique.index(x1)
                     locy = x2_unique.index(x2)
-                    y_values[locx, locy] = np.mean(log_df[y_var])
 
-                    if len(log_df[y_var]) < config.num_gens:
+                    config_file = p + "/config.yml"
+                    with open(config_file, "rb") as f:
+                        config = yaml.load(f, Loader=yaml.UnsafeLoader)
+                    num_trials = len(trial_dirs)
+                    mass_extinction = (len(log_df[y_var]) != config.num_gens*num_trials)
+
+                    if mass_extinction:
+                        #y_values[locx, locy] = np.max(log_df["num_agents"])
+                        mass_extinctions.append([locx,locy])
+                    else:
+                        y_values[locx, locy] = np.mean(log_df[y_var])
+
+                    if len(log_df[y_var]) < config.num_gens and y_var!="extinctions":
                         y_values[locx, locy] =0
 
-            fig, ax = plt.subplots(figsize=self.fig_size_heatmap)
 
+            fig, ax = plt.subplots(figsize=self.figsize_heatmaps)
+            for locx, locy in mass_extinctions:
+                    text = ax.text(locx, locy, "X",
+                                   ha="center", va="center", color="red")
             pos=ax.imshow(y_values)
             fig.colorbar(pos, ax=ax)
             for im in plt.gca().get_images():
@@ -372,5 +400,5 @@ class Plotter:
             save_dir = "../projects/" + top_dir + "/plots"
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
-            plt.savefig(save_dir + "/heatmap_" + str(y_var) + ".png")
+            plt.savefig(save_dir + "/heatmap_" + str(y_var) + "_small.png")
             plt.clf()

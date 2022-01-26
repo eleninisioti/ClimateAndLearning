@@ -6,6 +6,7 @@ For each project it plots:
 """
 
 
+import matplotlib.pyplot as plt
 
 import pickle5 as pickle
 import sys
@@ -15,7 +16,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 from source.plotter import Plotter
 
 
-def run(project, climate_noconf):
+def run(project, climate_noconf,axs):
     top_dir = "../projects/"
 
     trial_dirs = list(next(os.walk(top_dir + project + "/trials"))[1])
@@ -53,18 +54,20 @@ def run(project, climate_noconf):
                           climate_noconf=climate_noconf,
                           log=log_df,
                           log_niches=log_niches_total,
-                          num_niches=config["num_niches"])
+                          num_niches=config["num_niches"],axs=axs)
 
 
         if config["only_climate"]:
             # if the simulation had no population just plot the climate dynamics
             log = plotter.plot_evolution(include=["climate"])
         else:
-            log = plotter.plot_evolution(include=["climate", "mean", "sigma","mutate", "dispersal",  "fitness",
-                                              "num_agents",
-                                            "extinct", "diversity"])
+            include_features = ["climate", "mean",
+                                "sigma", "mutate", "extinct",
+                                "dispersal",  "diversity"]
+            log = plotter.plot_evolution(include=include_features)
 
-            plotter.plot_SoS()
+
+            #plotter.plot_SoS()
 
         # break log into trials for saving (with computed dispersal)
         for trial, trial_dir in enumerate(trial_dirs):
@@ -72,17 +75,39 @@ def run(project, climate_noconf):
             pickle.dump(log_trial, open(top_dir + project + "/trials/" + trial_dir + '/log_updated.pickle', 'wb'))
 
 
+
+
 if __name__ == "__main__":
     top_dir = sys.argv[1] # choose the top directory containing the projects you want to plot
-
+    params = {'legend.fontsize': 20,
+              'legend.handlelength': 2,
+              'font.size': 20,
+              "figure.autolayout": True}
+    plt.rcParams.update(params)
+    params = {'legend.fontsize': 6,
+              "figure.autolayout": True,
+              'font.size': 8}
+    plt.rcParams.update(params)
+    include = ["climate", "mean",
+               "sigma", "mutate", "extinct",
+               "dispersal", "diversity"]
+    cm = 1 / 2.54
+    scale = 1
+    fig_size = (8.48 * cm / scale, 6 * cm / scale)
+    fig, axs = plt.subplots(len(include), figsize=(fig_size[0], fig_size[1] / 2 * len(include)))
+    if include == ["climate"]:
+        axs = [axs]
     sub_dirs = [os.path.join(top_dir, o) for o in os.listdir("../projects/" + top_dir)]
     for idx, sub_dir in enumerate(sub_dirs):
         print(sub_dir)
+
         projects = [os.path.join(sub_dir,o) for o in os.listdir("../projects/" + sub_dir)]
         for p in projects:
             if "plots" not in p:
                 print(p)
-                run(project=p, climate_noconf=1)
+                run(project=p, climate_noconf=1,axs=axs)
+        plt.savefig("../projects/" + sub_dir+ "/plots/evolution_new.png")
+        plt.clf()
 
 
 

@@ -142,12 +142,12 @@ def parametric_sin(gpu, trial,  mode, long_run=False):
     param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",
                    "--mutate_mutate_rate", "--genome_type", "--extinctions",  "--num_niches",
                    "--only_climate",  "--climate_mean_init", "--amplitude", "--period"]
-    amplitudes = [0.2, 0.5, 1, 2, 4, 8]
+    amplitudes = [0.2, 1, 8]
     env_type = "sin"
     num_gens = 1500
-    survival_types = ["FP-Grove", "capacity-fitness", "limited-capacity"]
+    survival_types = ["capacity-fitness"]
     mutate_mutate_rate = 0.001
-    genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
+    genome_types = ["1D_mutate"]
     extinctions = [1]
     num_niches_values = [100]
     climate_only = 0
@@ -446,8 +446,8 @@ if __name__ == "__main__":
     mode = sys.argv[2] # server for jz experiments and local otherwise
     for trial in range(1, trials+1):
         #parametric_stable(gpu=True, trial=trial, mode=mode, long_run=True)
-        #parametric_sin(gpu=True, trial=trial, mode=mode, long_run=True)
+        parametric_sin(gpu=True, trial=trial, mode=mode, long_run=True)
         #fig_sigma_constant(gpu=True, trial=trial, mode=mode, long_run=False)
-        parametric_noisy(gpu=True, trial=trial, mode=mode, long_run=True)
+        #parametric_noisy(gpu=True, trial=trial, mode=mode, long_run=True)
 
 

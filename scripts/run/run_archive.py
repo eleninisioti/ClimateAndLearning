@@ -139,7 +139,8 @@ def survival_s2g2_A4(gpu, trial,  mode, long_run=False):
         top_dir = "papers/gecco/parametric_sin/" + project + "/"
     else:
         top_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/projects/survival_s2g2_A4/" + project + "/"
-
+    if not os.path.exists(top_dir):
+        os.makedirs(top_dir)
     experiments = []
 
     param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",
@@ -196,7 +197,8 @@ def survival_s2g2_N100(gpu, trial,  mode, long_run=False):
         top_dir = "papers/gecco/parametric_sin/" + project + "/"
     else:
         top_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/projects/survival_s2g2_N100/" + project + "/"
-
+    if not os.path.exists(top_dir):
+        os.makedirs(top_dir)
     experiments = []
 
     param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",
@@ -305,7 +307,8 @@ def sigma_stable_parta(gpu, trial,  mode, long_run=False):
         top_dir = "papers/gecco/parametric_stable/" + project + "/"
     else:
         top_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/projects/sigma_stable_parta/" + project + "/"
-
+    if not os.path.exists(top_dir):
+        os.makedirs(top_dir)
     experiments = []
 
     param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",
@@ -357,7 +360,8 @@ def sigma_stable_partb(gpu, trial,  mode, long_run=False):
         top_dir = "papers/gecco/parametric_stable/" + project + "/"
     else:
         top_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/projects/sigma_stable_partb/" + project + "/"
-
+    if not os.path.exists(top_dir):
+        os.makedirs(top_dir)
     experiments = []
 
     param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",

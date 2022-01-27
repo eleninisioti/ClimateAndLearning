@@ -13,11 +13,16 @@ from pathlib import Path
 
 def simulate(args):
     # create project sub-directories
-    if not os.path.exists("../projects/" + args.project + "/plots"):
-        os.makedirs("../projects/" + args.project + "/plots")
+    local=False
+    if local:
+        project = "../projects/" + args.project
+    else:
+        project = "../projects/" + args.project
+    if not os.path.exists(project  + "/plots"):
+        os.makedirs(project + "/plots")
 
     # save project configuration
-    with open("../projects/" + args.project + '/config.yml', 'w') as outfile:
+    with open(project  + '/config.yml', 'w') as outfile:
         yaml.dump(args, outfile)
 
 
@@ -28,7 +33,7 @@ def simulate(args):
             # run multiple trials
             trials_range = list(range(args.num_trials))
         for trial in trials_range:
-            trial_dir = "../projects/" + args.project + "/trials/trial_" + str(trial)
+            trial_dir = project + "/trials/trial_" + str(trial)
             if not os.path.exists(trial_dir + "/plots"):
                 Path(trial_dir + "/plots").mkdir(parents=True, exist_ok=True)
 

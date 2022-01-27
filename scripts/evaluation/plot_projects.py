@@ -106,8 +106,8 @@ if __name__ == "__main__":
             if "plots" not in p:
                 print(p)
                 run(project=p, climate_noconf=1,axs=axs)
-        plt.savefig("../projects/" + sub_dir+ "/plots/evolution_new.png")
-        plt.clf()
+            #plt.savefig("../projects/" + sub_dir+ "/plots/evolution_new.png")
+            #plt.clf()
 
 
 

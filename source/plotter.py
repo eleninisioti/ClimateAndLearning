@@ -106,9 +106,9 @@ class Plotter:
             which parameters to include in the plot. options are ["climate", "mean", "sigma", "mutate",
             "n_agents", "n_extinctions", "fitness"]
         """
-        #fig, axs = plt.subplots(len(include), figsize=(self.fig_size[0], self.fig_size[1]/2*len(include)))
-        #if include == ["climate"]:
-        #    axs = [axs]
+        fig, axs = plt.subplots(len(include), figsize=(self.fig_size[0], self.fig_size[1]/2*len(include)))
+        if include == ["climate"]:
+            axs = [axs]
         axs=self.axs
         count = 0
         start_cycle = 0
@@ -122,18 +122,18 @@ class Plotter:
         #self.log["Generation"] = [idx for idx in range(len(self.log["Climate"]))]
 
         if "climate" in include:
-            log_climate = self.log.loc[(self.log['Trial'] == 0)]
+            log_trial = self.log.loc[(self.log['Trial'] == 0)]
 
             # find mean across niches:
             climate_avg = []
-            for el in list(log_climate["Climate"]):
+            for el in list(log_trial["Climate"]):
                 niches_states = [el + 0.01*idx for idx in range(-int(self.num_niches/2),
                                                                 int(self.num_niches/2 +0.5))]
                 climate_avg.append(np.mean(niches_states))
-            log_climate["Climate_avg"] = climate_avg
+            log_trial["Climate_avg"] = climate_avg
             #sns.lineplot(, data=self.log, x="Generation", y="Climate_avg")
-            x = log_climate["Generation"][::self.interval]
-            y = log_climate["Climate_avg"][::self.interval]
+            x = log_trial["Generation"][::self.interval]
+            y = log_trial["Climate_avg"][::self.interval]
             #y = y.clip(upper=y_upper_thres)
             #y = y.clip(lower=y_lower_thres)
 
@@ -149,8 +149,8 @@ class Plotter:
             count += 1
 
         if "mean" in include:
-            x = log_climate["Generation"][::self.interval]
-            y = log_climate["Mean"][::self.interval]
+            x = self.log["Generation"][::self.interval]
+            y = self.log["Mean"][::self.interval]
             y = y.clip(upper=y_upper_thres)
             y = y.clip(lower=y_lower_thres)
 
@@ -162,8 +162,8 @@ class Plotter:
             count += 1
 
         if "sigma" in include:
-            x = log_climate["Generation"][::self.interval]
-            y = log_climate["SD"][::self.interval]
+            x = self.log["Generation"][::self.interval]
+            y = self.log["SD"][::self.interval]
             y = y.clip(upper=y_upper_thres)
             y = y.clip(lower=y_lower_thres)
 
@@ -178,8 +178,8 @@ class Plotter:
             count += 1
 
         if "mutate" in include:
-            x = log_climate["Generation"][::self.interval]
-            y = log_climate["R"][::self.interval]
+            x = self.log["Generation"][::self.interval]
+            y = self.log["R"][::self.interval]
             y = y.clip(upper=y_upper_thres)
             y = y.clip(lower=y_lower_thres)
 
@@ -192,8 +192,8 @@ class Plotter:
             count += 1
 
         if "fitness" in include:
-            x = log_climate["Generation"][::self.interval]
-            y = log_climate["Fitness"][::self.interval]
+            x = self.log["Generation"][::self.interval]
+            y = self.log["Fitness"][::self.interval]
             y = y.clip(upper=y_upper_thres)
             y = y.clip(lower=y_lower_thres)
 
@@ -205,8 +205,8 @@ class Plotter:
             count += 1
 
         if "extinct" in include:
-            x = log_climate["Generation"][::self.interval]
-            y = log_climate["extinctions"][::self.interval]
+            x = self.log["Generation"][::self.interval]
+            y = self.log["extinctions"][::self.interval]
             y = y.clip(upper=y_upper_thres)
             y = y.clip(lower=y_lower_thres)
 
@@ -218,8 +218,8 @@ class Plotter:
             count += 1
 
         if "num_agents" in include:
-            x = log_climate["Generation"][::self.interval]
-            y = log_climate["num_agents"][::self.interval]
+            x = self.log["Generation"][::self.interval]
+            y =self.log["num_agents"][::self.interval]
             y = y.clip(upper=y_upper_thres)
             y = y.clip(lower=y_lower_thres)
 
@@ -230,8 +230,8 @@ class Plotter:
             axs[count].set(ylabel="$N$, number of agents")
             count += 1
         if "diversity" in include:
-            x = log_climate["Generation"][::self.interval]
-            y = log_climate["diversity"][::self.interval]
+            x = self.log["Generation"][::self.interval]
+            y = self.log["diversity"][::self.interval]
             y = y.clip(upper=y_upper_thres)
             y = y.clip(lower=y_lower_thres)
 
@@ -242,8 +242,8 @@ class Plotter:
             axs[count].set(ylabel="$V$, diversity")
             count += 1
         if "fixation_index" in include:
-            x = log_climate["Generation"][::self.interval]
-            y = log_climate["fixation_index"][::self.interval]
+            x = self.log["Generation"][::self.interval]
+            y = self.log["fixation_index"][::self.interval]
             y = y.clip(upper=y_upper_thres)
             y = y.clip(lower=y_lower_thres)
 
@@ -288,8 +288,8 @@ class Plotter:
                                          alpha=0.2,
                                          color='green')
         # -------------------------------------------------------------
-        #plt.savefig("../projects/" + self.project + "/plots/evolution.png")
-        #plt.clf()
+        plt.savefig("../projects/" + self.project + "/plots/evolution.png")
+        plt.clf()
         return self.log
 
 

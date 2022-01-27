@@ -36,9 +36,9 @@ def sigma_constant(results_dir):
             log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
             trial_sigma = np.mean(log["SD"][-100:])
             new_row = pd.DataFrame.from_dict({ 'SD': [trial_sigma],
-                                                      "Trial": [trial],
-                                        "Num_niches": [config.num_niches],
-                                        "Climate": [config.climate_mean_init]})
+                                               "Trial": [trial],
+                                               "Num_niches": [config.num_niches],
+                                               "Climate": [config.climate_mean_init]})
             if not count:
                 results = new_row
             else:
@@ -57,7 +57,10 @@ def sigma_constant(results_dir):
     plt.xlabel("$e_0$, Reference Environmental State")
     plt.ylabel("$\\bar{\sigma}$, Average Plasticity")
     plt.legend(loc="best")
-    plt.savefig(results_dir + "/plots/sigma_constant.png")
+    save_dir = results_dir + "/plots"
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    plt.savefig(save_dir + "/sigma_stable_main.png")
     plt.clf()
 
 def extinctions_stable(results_dir):
@@ -379,7 +382,7 @@ def mass_periodic(results_dir, label="Amplitude"):
 
 
 if __name__ == "__main__":
-    #results_dir = "../projects/papers/gecco/heatmaps_stable/s2_g0_1"
+    results_dir = "../projects/papers/gecco/stable/sigma_main"
     #sigma_constant(results_dir=results_dir)
 
     #results_dir = "../projects/papers/gecco/stable/extinct_main"
@@ -395,15 +398,15 @@ if __name__ == "__main__":
     #extinctions_stable_appendices(results_dir, label="Niches")
 
     results_dir = "../projects/papers/gecco/stable/diversity_main"
-    #diversity_stable(results_dir)
+    diversity_stable(results_dir)
 
     #results_dir = "../projects/papers/gecco/stable/dispersal_main"
     #dispersal_stable(results_dir)
 
-    results_dir = "../projects/papers/gecco/stable/diversity_appendices_g"
+    #results_dir = "../projects/papers/gecco/stable/diversity_appendices_g"
     #diversity_stable_appendices(results_dir, label="Genome")
 
-    results_dir = "../projects/papers/gecco/stable/diversity_appendices_N"
+    #results_dir = "../projects/papers/gecco/stable/diversity_appendices_N"
     #diversity_stable_appendices(results_dir, label="Niches")
 
     results_dir = "../projects/papers/gecco/periodic/survival/s2_g2_100"
@@ -411,3 +414,15 @@ if __name__ == "__main__":
 
     results_dir = "../projects/papers/gecco/periodic/survival/s2_g2_A4"
     mass_periodic(results_dir, label="num_niches")
+
+    #results_dir = "../projects/papers/gecco/periodic/survival/s0_g2_100"
+    #mass_periodic(results_dir)
+
+    #results_dir = "../projects/papers/gecco/periodic/survival/s0_g2_A4"
+    #mass_periodic(results_dir, label="num_niches")
+
+    #results_dir = "../projects/papers/gecco/periodic/survival/s1_g2_100"
+    #mass_periodic(results_dir)
+
+    #results_dir = "../projects/papers/gecco/periodic/survival/s1_g2_A4"
+    #mass_periodic(results_dir, label="num_niches")

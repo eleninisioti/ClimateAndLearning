@@ -17,7 +17,7 @@ def simulate(args):
     if local:
         project = "../projects/" + args.project
     else:
-        project = "../projects/" + args.project
+        project =  args.project
     if not os.path.exists(project  + "/plots"):
         os.makedirs(project + "/plots")
 

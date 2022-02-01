@@ -302,11 +302,10 @@ def diversity_stable(results_dir):
                 results = results.append(new_row)
             count = 1
     selections = list(set(results["Selection"].to_list()))
-    cm = 1 / 2.54
-    plt.figure(figsize=(8.48 * cm, 6 * cm))
+    plt.figure(figsize=figsize)
     for selection in selections:
         results_niche = results.loc[results['Selection'] == selection]
-        sns.lineplot(data=results_niche, x="Climate", y="Diversity", ci=ci, label="Selection=" + selection)
+        sns.lineplot(data=results_niche, x="Climate", y="Diversity", ci=ci, label=selection)
 
     plt.xlabel("$e_{0,0}$, Reference Environmental State")
     plt.ylabel("$V$, Divesity")
@@ -428,7 +427,7 @@ def dispersal_stable(results_dir):
     plt.savefig(save_dir + "/dispersal_stable.png")
     plt.clf()
 
-def mass_periodic(results_dir, label="Amplitude"):
+def mass_periodic(results_dir, label="$A_e$"):
     """ Plot with sigma in the vertical axis, climate value in the horizontal and different lines for number of niches"
     """
     labels = {"FP-Grove": "Q-selection",
@@ -451,11 +450,12 @@ def mass_periodic(results_dir, label="Amplitude"):
             # load outcome of trial
             log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
             trial_diversity = np.mean(log["diversity"][100:])
+            print(len(log["Climate"]), config.num_gens)
             trial_duration = len(log["Climate"])/config.num_gens
             print(config.num_gens)
-            if label == "Amplitude":
+            if label == "$A_e$":
                 label_value = config.amplitude
-            elif label== "num_niches":
+            elif label== "N":
                 label_value = config.num_niches
             new_row = pd.DataFrame.from_dict({"Duration": [trial_duration],
                                               "Trial": [trial],
@@ -547,10 +547,10 @@ if __name__ == "__main__":
     #diversity_stable_appendices(results_dir, label="Niches")
 
     results_dir = "../projects/papers/gecco/periodic/survival/s2_g2_100"
-    mass_periodic(results_dir)
+    #mass_periodic(results_dir)
 
     results_dir = "../projects/papers/gecco/periodic/survival/s2_g2_A4"
-    mass_periodic(results_dir, label="num_niches")
+    #mass_periodic(results_dir, label="N")
 
     #results_dir = "../projects/papers/gecco/periodic/survival/s0_g2_100"
     #mass_periodic(results_dir)

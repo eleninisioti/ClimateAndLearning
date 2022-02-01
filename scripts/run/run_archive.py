@@ -266,7 +266,7 @@ def parametric_noisy(gpu, trial,  mode, long_run=False):
     genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
     extinctions = [1]
     num_niches_values = [1, 5, 10, 40, 100]
-    climate_only = 1
+    climate_only = 0
     climate_mean_init_values = [0.2, 0.5, 1, 2, 4, 8]
 
     for num_niches in num_niches_values:
@@ -472,6 +472,6 @@ if __name__ == "__main__":
         #survival_s2g2_A4(gpu=True, trial=trial, mode=mode, long_run=True)
         #parametric_sin(gpu=True, trial=trial, mode=mode, long_run=True)
         #fig_sigma_constant(gpu=True, trial=trial, mode=mode, long_run=False)
-        #parametric_noisy(gpu=True, trial=trial, mode=mode, long_run=True)
+        parametric_noisy(gpu=True, trial=trial, mode=mode, long_run=True)
 
 

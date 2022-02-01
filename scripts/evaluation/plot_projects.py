@@ -62,7 +62,7 @@ def run(project, climate_noconf,axs):
             log = plotter.plot_evolution(include=["climate"])
         else:
             include_features = ["climate", "mean",
-                                "sigma", "mutate", "extinct",
+                                "sigma", "mutate",
                                 "dispersal",  "diversity"]
             log = plotter.plot_evolution(include=include_features)
 

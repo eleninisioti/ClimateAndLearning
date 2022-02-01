@@ -106,10 +106,10 @@ class Plotter:
             which parameters to include in the plot. options are ["climate", "mean", "sigma", "mutate",
             "n_agents", "n_extinctions", "fitness"]
         """
-        fig, axs = plt.subplots(len(include), figsize=(self.fig_size[0], self.fig_size[1]/2*len(include)))
+        fig, axs = plt.subplots(len(include), figsize=(self.fig_size[0], self.fig_size[1]/3*len(include)))
         if include == ["climate"]:
             axs = [axs]
-        axs=self.axs
+        #axs=self.axs
         count = 0
         start_cycle = 0
         end_cycle = cycles
@@ -117,9 +117,6 @@ class Plotter:
         y_upper_thres = self.y_upper_thres
         y_lower_thres = self.y_lower_thres
 
-
-        ## TODO: remove
-        #self.log["Generation"] = [idx for idx in range(len(self.log["Climate"]))]
 
         if "climate" in include:
             log_trial = self.log.loc[(self.log['Trial'] == 0)]
@@ -144,7 +141,7 @@ class Plotter:
                 sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
             #axs[count].plot(self.log["Generation"], self.log["Climate_avg"])
             #axs[count].fill_between(x, (y - ci), (y + ci), color='b', alpha=.1)
-            axs[count].set(ylabel="$\\bar{e}$")
+            axs[count].set(ylabel="$e_0$")
             axs[count].set(xlabel=None)
             count += 1
 
@@ -157,7 +154,7 @@ class Plotter:
             sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Mean")
-            axs[count].set(ylabel="$\\bar{\mu}$")
+            axs[count].set(ylabel="$\\bar{\mu}$ ")
             axs[count].set(xlabel=None)
             count += 1
 
@@ -214,7 +211,7 @@ class Plotter:
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="extinctions")
             axs[count].set(xlabel="Time (in generations)")
-            axs[count].set(ylabel="Extinctions")
+            axs[count].set(ylabel="$E$")
             count += 1
 
         if "num_agents" in include:
@@ -239,7 +236,7 @@ class Plotter:
 
             #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="diversity")
             axs[count].set(xlabel="Time (in generations)")
-            axs[count].set(ylabel="$V$, diversity")
+            axs[count].set(ylabel="$V$")
             count += 1
         if "fixation_index" in include:
             x = self.log["Generation"][::self.interval]

@@ -63,6 +63,8 @@ def compute_dispersal(log, log_niches, num_niches):
                     survivals.append(1)
                 else:
                     survivals.append(0)
+            if not len(survivals):
+                survivals = [0]*window
             DI = list(np.convolve(survivals, np.ones(window, dtype=int), 'valid'))
             DI = [1 if el==window else 0 for el in DI]
             all_DI.append(DI)

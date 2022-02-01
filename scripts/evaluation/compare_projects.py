@@ -88,70 +88,80 @@ def find_label(config):
 
 
 
-def sigma_appendices(results_dir, y_variable, label="Num_niches"):
+def sigma_appendices(results_dir, y_variables, label="Num_niches"):
     """ Plot with sigma in the vertical axis, climate value in the horizontal and different lines for number of niches"
 
     Args:
         case (str): pick among: "s2_g0","s2_g1", "s0_g2", "s1_g2"
         y_variable (str): pick among "SD" and "R"
     """
-    # find all projects
-    projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
-    projects = [el for el in projects if "plots" not in el ]
+    fig, axs = plt.subplots(len(y_variables), figsize=(figsize[0], figsize[1] / 2*len(y_variables)))
+    for y_idx, y_variable in enumerate(y_variables):
+        # find all projects
+        projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
+        projects = [el for el in projects if "plots" not in el ]
 
-    count = 0
-    for p in projects:
-        config_file = p + "/config.yml"
+        count = 0
+        for p in projects:
+            config_file = p + "/config.yml"
 
-        with open(config_file, "rb") as f:
-            config = yaml.load(f, Loader=yaml.UnsafeLoader)
+            with open(config_file, "rb") as f:
+                config = yaml.load(f, Loader=yaml.UnsafeLoader)
 
-        trial_dirs = list(next(os.walk(p+ "/trials"))[1])
-        for trial, trial_dir in enumerate(trial_dirs):
-            # load outcome of trial
-            log = pickle.load(open(p + "/trials/" + trial_dir + '/log_updated.pickle', 'rb'))
-            trial_sigma = np.mean(log[y_variable][-100:])
+            trial_dirs = list(next(os.walk(p+ "/trials"))[1])
+            for trial, trial_dir in enumerate(trial_dirs):
+                # load outcome of trial
+                log = pickle.load(open(p + "/trials/" + trial_dir + '/log_updated.pickle', 'rb'))
+                trial_sigma = np.mean(log[y_variable][-100:])
+                if label == "Num_niches":
+                    new_row = pd.DataFrame.from_dict({ y_variable: [trial_sigma],
+                                                       "Trial": [trial],
+                                                       "Num_niches": [config.num_niches],
+                                                       "Climate": [config.climate_mean_init]})
+                else:
+                    new_row = pd.DataFrame.from_dict({y_variable: [trial_sigma],
+                                                      "Trial": [trial],
+                                                      "model": [find_label(config)],
+                                                      "Climate": [config.climate_mean_init]})
+                if not count:
+                    results = new_row
+                else:
+                    results = results.append(new_row)
+                count =1
+
+        niches = list(set(results[label].to_list()))
+        niches.sort()
+
+        #plt.figure(figsize=(8.48*cm, 6*cm/scale_y))
+        for niche in niches:
+            results_niche = results.loc[results[label] == niche]
+
             if label == "Num_niches":
-                new_row = pd.DataFrame.from_dict({ y_variable: [trial_sigma],
-                                                   "Trial": [trial],
-                                                   "Num_niches": [config.num_niches],
-                                                   "Climate": [config.climate_mean_init]})
+
+                sns.lineplot(ax=axs[y_idx], data=results_niche, x="Climate", y=y_variable, ci=ci, label="$N=$" + str(
+                    niche),legend=0)
             else:
-                new_row = pd.DataFrame.from_dict({y_variable: [trial_sigma],
-                                                  "Trial": [trial],
-                                                  "model": [find_label(config)],
-                                                  "Climate": [config.climate_mean_init]})
-            if not count:
-                results = new_row
-            else:
-                results = results.append(new_row)
-            count =1
+                sns.lineplot(ax=axs[y_idx], data=results_niche, x="Climate", y=y_variable, ci=ci, label= str(
+                    niche),legend=0)
 
-    niches = list(set(results[label].to_list()))
-    niches.sort()
-    cm = 1 / 2.54
-    plt.figure(figsize=(8.48*cm, 6*cm))
-    for niche in niches:
-        results_niche = results.loc[results[label] == niche]
+        if y_variable == "SD":
+            axs[y_idx].set(ylabel="$\\bar{\sigma}$, Plasticity")
+        elif y_variable == "R":
+            axs[y_idx].set(ylabel="$\\bar{r}$, Evolvability")
+        elif y_variable == "Dispersal":
+            axs[y_idx].set(ylabel="$D$, Dispersal")
+        axs[y_idx].set_yscale('log')
 
-        if label == "Num_niches":
+        handles, labels = axs[-1].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='upper left')
 
-            sns.lineplot(data=results_niche, x="Climate", y=y_variable, ci=ci, label="$N=$" + str(
-                niche))
-        else:
-            sns.lineplot(data=results_niche, x="Climate", y=y_variable, ci=ci, label= str(
-                niche))
+    #plt.legend(loc="best")
     plt.yscale('log')
     plt.xlabel("$e_{0,0}$, Reference Environmental State")
-    if y_variable == "SD":
-        plt.ylabel("$\\bar{\sigma}$, Plasticity")
-    else:
-        plt.ylabel("$\\bar{r}$, Evolvability")
-    plt.legend(loc="best")
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/" + y_variable + ".png")
+    plt.savefig(save_dir + "/combined.png")
     plt.clf()
 
 def extinctions_stable(results_dir):
@@ -501,13 +511,13 @@ if __name__ == "__main__":
     #sigma_appendices(results_dir=results_dir, y_variable="R")
 
     results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
-    sigma_appendices(results_dir=results_dir, y_variable="R", label="model")
+    sigma_appendices(results_dir=results_dir, y_variables=["R","SD", "Dispersal"], label="model")
 
     results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
-    sigma_appendices(results_dir=results_dir, y_variable="SD", label="model")
+    #sigma_appendices(results_dir=results_dir, y_variable="SD", label="model")
 
     results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
-    sigma_appendices(results_dir=results_dir, y_variable="", label="model")
+    #sigma_appendices(results_dir=results_dir, y_variable="Dispersal", label="model")
 
     #results_dir = "../projects/papers/gecco/stable/extinct_main"
     #extinctions_stable(results_dir)

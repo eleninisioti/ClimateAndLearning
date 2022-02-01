@@ -316,7 +316,7 @@ def sigma_stable_parta(gpu, trial,  mode, long_run=False):
                    "--only_climate",  "--climate_mean_init"]
     env_type = "stable"
     num_gens = 1000
-    survival_types = ["limited-capacity"]
+    survival_types = ["capacity-fitness"]
     mutate_mutate_rate = 0.001
     genome_types = ["1D_mutate"]
     extinctions = [1]
@@ -369,7 +369,7 @@ def sigma_stable_partb(gpu, trial,  mode, long_run=False):
                    "--only_climate",  "--climate_mean_init"]
     env_type = "stable"
     num_gens = 1000
-    survival_types = ["limited-capacity"]
+    survival_types = ["capacity-fitness"]
     mutate_mutate_rate = 0.001
     genome_types = ["1D_mutate"]
     extinctions = [1]
@@ -466,8 +466,8 @@ if __name__ == "__main__":
     mode = sys.argv[2] # server for jz experiments and local otherwise
     for trial in range(1, trials+1):
         missing_s1_N100(gpu=True, trial=trial, mode=mode, long_run=True)
-        #sigma_stable_parta(gpu=True, trial=trial, mode=mode, long_run=True)
-        #sigma_stable_partb(gpu=True, trial=trial, mode=mode, long_run=True)
+        sigma_stable_parta(gpu=True, trial=trial, mode=mode, long_run=True)
+        sigma_stable_partb(gpu=True, trial=trial, mode=mode, long_run=True)
         #survival_s2g2_N100(gpu=True, trial=trial, mode=mode, long_run=True)
         #survival_s2g2_A4(gpu=True, trial=trial, mode=mode, long_run=True)
         #parametric_sin(gpu=True, trial=trial, mode=mode, long_run=True)

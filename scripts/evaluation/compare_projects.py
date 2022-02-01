@@ -9,12 +9,13 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-params = {'legend.fontsize': 6,
+params = {'legend.fontsize': 5,
           "figure.autolayout": True,
           'font.size': 8}
 plt.rcParams.update(params)
 ci=95
-
+cm = 1 / 2.54
+figsize=(8.48 * cm, 6 * cm)
 
 def sigma_constant(results_dir):
     """ Plot with sigma in the vertical axis, climate value in the horizontal and different lines for number of niches"
@@ -54,13 +55,103 @@ def sigma_constant(results_dir):
             niche))
     plt.yscale('log')
     #plt.ylim([10**(-19), 100])
-    plt.xlabel("$e_0$, Reference Environmental State")
-    plt.ylabel("$\\bar{\sigma}$, Average Plasticity")
+    plt.xlabel("$e_{0,0}$, Reference Environmental State")
+    plt.ylabel("$\\bar{\sigma}$, Plasticity")
     plt.legend(loc="best")
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     plt.savefig(save_dir + "/sigma_stable_main.png")
+    plt.clf()
+
+def find_label(config):
+    label=""
+    if config.selection_type == "capacity-fitness":
+        label += "$S$=QD, "
+    elif config.selection_type == "limited-capacity":
+        label += "$S$=D, "
+    elif config.selection_type == "FP-Grove":
+        label += "$S$=Q, "
+        
+    if config.genome_type == "1D":
+        label+= "$G=G_{no-evolve}$"
+
+    elif config.genome_type == "1D_mutate_fixed":
+        label +=  "$G=G_{evolve_constant}$"
+
+    elif config.genome_type == "1D_mutate":
+        label += "$G=G_{evolve}$"
+
+    return label
+
+
+
+
+
+def sigma_appendices(results_dir, y_variable, label="Num_niches"):
+    """ Plot with sigma in the vertical axis, climate value in the horizontal and different lines for number of niches"
+
+    Args:
+        case (str): pick among: "s2_g0","s2_g1", "s0_g2", "s1_g2"
+        y_variable (str): pick among "SD" and "R"
+    """
+    # find all projects
+    projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
+    projects = [el for el in projects if "plots" not in el ]
+
+    count = 0
+    for p in projects:
+        config_file = p + "/config.yml"
+
+        with open(config_file, "rb") as f:
+            config = yaml.load(f, Loader=yaml.UnsafeLoader)
+
+        trial_dirs = list(next(os.walk(p+ "/trials"))[1])
+        for trial, trial_dir in enumerate(trial_dirs):
+            # load outcome of trial
+            log = pickle.load(open(p + "/trials/" + trial_dir + '/log_updated.pickle', 'rb'))
+            trial_sigma = np.mean(log[y_variable][-100:])
+            if label == "Num_niches":
+                new_row = pd.DataFrame.from_dict({ y_variable: [trial_sigma],
+                                                   "Trial": [trial],
+                                                   "Num_niches": [config.num_niches],
+                                                   "Climate": [config.climate_mean_init]})
+            else:
+                new_row = pd.DataFrame.from_dict({y_variable: [trial_sigma],
+                                                  "Trial": [trial],
+                                                  "model": [find_label(config)],
+                                                  "Climate": [config.climate_mean_init]})
+            if not count:
+                results = new_row
+            else:
+                results = results.append(new_row)
+            count =1
+
+    niches = list(set(results[label].to_list()))
+    niches.sort()
+    cm = 1 / 2.54
+    plt.figure(figsize=(8.48*cm, 6*cm))
+    for niche in niches:
+        results_niche = results.loc[results[label] == niche]
+
+        if label == "Num_niches":
+
+            sns.lineplot(data=results_niche, x="Climate", y=y_variable, ci=ci, label="$N=$" + str(
+                niche))
+        else:
+            sns.lineplot(data=results_niche, x="Climate", y=y_variable, ci=ci, label= str(
+                niche))
+    plt.yscale('log')
+    plt.xlabel("$e_{0,0}$, Reference Environmental State")
+    if y_variable == "SD":
+        plt.ylabel("$\\bar{\sigma}$, Plasticity")
+    else:
+        plt.ylabel("$\\bar{r}$, Evolvability")
+    plt.legend(loc="best")
+    save_dir = results_dir + "/plots"
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    plt.savefig(save_dir + "/" + y_variable + ".png")
     plt.clf()
 
 def extinctions_stable(results_dir):
@@ -383,7 +474,40 @@ def mass_periodic(results_dir, label="Amplitude"):
 
 if __name__ == "__main__":
     results_dir = "../projects/papers/gecco/stable/sigma_main"
-    #sigma_constant(results_dir=results_dir)
+    sigma_constant(results_dir=results_dir)
+
+    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s2_g0"
+    #sigma_appendices(results_dir=results_dir, y_variable="SD")
+
+    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s2_g0"
+    #sigma_appendices(results_dir=results_dir, y_variable="R")
+
+    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s2_g1"
+    #sigma_appendices(results_dir=results_dir, y_variable="SD")
+
+    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s2_g1"
+    #sigma_appendices(results_dir=results_dir, y_variable="R")
+
+    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s0_g2"
+    #sigma_appendices(results_dir=results_dir, y_variable="SD")
+
+    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s0_g2"
+    #sigma_appendices(results_dir=results_dir, y_variable="R")
+
+    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s1_g2"
+    #sigma_appendices(results_dir=results_dir, y_variable="SD")
+
+    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s1_g2"
+    #sigma_appendices(results_dir=results_dir, y_variable="R")
+
+    results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
+    sigma_appendices(results_dir=results_dir, y_variable="R", label="model")
+
+    results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
+    sigma_appendices(results_dir=results_dir, y_variable="SD", label="model")
+
+    results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
+    sigma_appendices(results_dir=results_dir, y_variable="", label="model")
 
     #results_dir = "../projects/papers/gecco/stable/extinct_main"
     #extinctions_stable(results_dir)

@@ -258,16 +258,16 @@ def parametric_noisy(gpu, trial,  mode, long_run=False):
     param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",
                    "--mutate_mutate_rate", "--genome_type", "--extinctions",  "--num_niches",
                    "--only_climate",  "--climate_mean_init", "--noise_std"]
-    noise_stds = [0.05, 0.2, 0.4, 0.8, 1.6]
+    noise_stds = [0.2, 0.4, 0.8, 1.6]
     env_type = "noisy"
     num_gens = 1500
     survival_types = ["FP-Grove", "capacity-fitness", "limited-capacity"]
     mutate_mutate_rate = 0.001
     genome_types = ["1D", "1D_mutate", "1D_mutate_fixed"]
     extinctions = [1]
-    num_niches_values = [1, 5, 10, 40, 100]
+    num_niches_values = [1, 10, 40, 100]
     climate_only = 0
-    climate_mean_init_values = [0.2, 0.5, 1, 2, 4, 8]
+    climate_mean_init_values = [0.2, 1, 2, 4]
 
     for num_niches in num_niches_values:
         for noise_std in noise_stds:

@@ -429,7 +429,7 @@ def missing_s1_N100(gpu, trial,  mode, long_run=False):
     extinctions = [1]
     num_niches_values = [100]
     climate_only = 0
-    climate_mean_init_values = [2]
+    climate_mean_init_values = [0.2]
     num_gens = num_gens # make sure we have at least 3 cycles
 
     for num_niches in num_niches_values:

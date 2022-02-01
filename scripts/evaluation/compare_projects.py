@@ -67,20 +67,20 @@ def sigma_constant(results_dir):
 def find_label(config):
     label=""
     if config.selection_type == "capacity-fitness":
-        label += "$S$=QD, "
+        label += "QD-selection"
     elif config.selection_type == "limited-capacity":
-        label += "$S$=D, "
+        label += "D-selection"
     elif config.selection_type == "FP-Grove":
-        label += "$S$=Q, "
+        label += "Q-selection"
         
-    if config.genome_type == "1D":
+    """if config.genome_type == "1D":
         label+= "$G=G_{no-evolve}$"
 
     elif config.genome_type == "1D_mutate_fixed":
         label +=  "$G=G_{evolve_constant}$"
 
     elif config.genome_type == "1D_mutate":
-        label += "$G=G_{evolve}$"
+        label += "$G=G_{evolve}$"""""
 
     return label
 
@@ -153,7 +153,7 @@ def sigma_appendices(results_dir, y_variables, label="Num_niches"):
         axs[y_idx].set_yscale('log')
 
         handles, labels = axs[-1].get_legend_handles_labels()
-    fig.legend(handles, labels, loc='upper left')
+    fig.legend(handles, labels, loc='lower left')
 
     #plt.legend(loc="best")
     plt.yscale('log')
@@ -184,7 +184,10 @@ def extinctions_stable(results_dir):
         for trial, trial_dir in enumerate(trial_dirs):
             # load outcome of trial
             log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
-            trial_extinctions = np.mean(log["extinctions"])
+            total_pop = config.capacity*config.climate_mean_init
+            print(total_pop, labels[config.selection_type], config.climate_mean_init)
+            total_pop=1
+            trial_extinctions = np.mean(log["extinctions"])/total_pop
             new_row = pd.DataFrame.from_dict({"extinctions": [trial_extinctions],
                                               "Trial": [trial],
                                               "Selection": [labels[config.selection_type]],
@@ -201,8 +204,8 @@ def extinctions_stable(results_dir):
         results_niche = results.loc[results['Selection'] == selection]
         sns.lineplot(data=results_niche, x="Climate", y="extinctions", ci=ci, label="$s=$" + selection)
 
-    plt.xlabel("$e_0$, Reference Environmental State")
-    plt.ylabel("$E$, Extinction events")
+    plt.xlabel("$e_{0,0}$, Reference Environmental State")
+    plt.ylabel("$E$, Number of extinctions")
     plt.legend(loc="best")
     plt.savefig(results_dir + "/plots/extinct_constant.png")
     plt.clf()
@@ -305,8 +308,8 @@ def diversity_stable(results_dir):
         results_niche = results.loc[results['Selection'] == selection]
         sns.lineplot(data=results_niche, x="Climate", y="Diversity", ci=ci, label="Selection=" + selection)
 
-    plt.xlabel("$e_0$, Reference Environmental State")
-    plt.ylabel("$\\bar{v}$, Average Divesity")
+    plt.xlabel("$e_{0,0}$, Reference Environmental State")
+    plt.ylabel("$V$, Divesity")
     plt.legend(loc="best")
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
@@ -369,8 +372,8 @@ def diversity_stable_appendices(results_dir, label):
         results_niche = results.loc[results[label] == method]
         sns.lineplot(data=results_niche, x="Climate", y="diversity", ci=ci, label= label + "=" + str(method))
 
-    plt.xlabel("$e_0$, Reference Environmental State")
-    plt.ylabel("$\\bar{v}$, Average_diversity")
+    plt.xlabel("$e_{0,0}$, Reference Environmental State")
+    plt.ylabel("$D$, D")
     plt.legend(loc="best")
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
@@ -416,8 +419,8 @@ def dispersal_stable(results_dir):
         results_niche = results.loc[results['Selection'] == selection]
         sns.lineplot(data=results_niche, x="Climate", y="Dispersal", ci=ci, label="Selection=" + selection)
 
-    plt.xlabel("$e_0$, Reference Environmental State")
-    plt.ylabel("$\\bar{d}$, Average Dispersal")
+    plt.xlabel("$e_{0,0}$, Reference Environmental State")
+    plt.ylabel("D, Dispersal")
     plt.legend(loc="best")
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
@@ -511,7 +514,7 @@ if __name__ == "__main__":
     #sigma_appendices(results_dir=results_dir, y_variable="R")
 
     results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
-    sigma_appendices(results_dir=results_dir, y_variables=["R","SD", "Dispersal"], label="model")
+    sigma_appendices(results_dir=results_dir, y_variables=["SD","R", "Dispersal"], label="model")
 
     results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
     #sigma_appendices(results_dir=results_dir, y_variable="SD", label="model")
@@ -519,7 +522,7 @@ if __name__ == "__main__":
     results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
     #sigma_appendices(results_dir=results_dir, y_variable="Dispersal", label="model")
 
-    #results_dir = "../projects/papers/gecco/stable/extinct_main"
+    results_dir = "../projects/papers/gecco/stable/extinct_main"
     #extinctions_stable(results_dir)
 
     #results_dir = "../projects/papers/gecco/stable/extinct_appendices_s"

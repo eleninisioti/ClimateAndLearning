@@ -429,7 +429,7 @@ def missing_s1_N100(gpu, trial,  mode, long_run=False):
     extinctions = [1]
     num_niches_values = [100]
     climate_only = 0
-    climate_mean_init_values = [4]
+    climate_mean_init_values = [2]
     num_gens = num_gens # make sure we have at least 3 cycles
 
     for num_niches in num_niches_values:
@@ -466,8 +466,8 @@ if __name__ == "__main__":
     mode = sys.argv[2] # server for jz experiments and local otherwise
     for trial in range(1, trials+1):
         missing_s1_N100(gpu=True, trial=trial, mode=mode, long_run=True)
-        sigma_stable_parta(gpu=True, trial=trial, mode=mode, long_run=True)
-        sigma_stable_partb(gpu=True, trial=trial, mode=mode, long_run=True)
+        #sigma_stable_parta(gpu=True, trial=trial, mode=mode, long_run=True)
+        #sigma_stable_partb(gpu=True, trial=trial, mode=mode, long_run=True)
         #survival_s2g2_N100(gpu=True, trial=trial, mode=mode, long_run=True)
         #survival_s2g2_A4(gpu=True, trial=trial, mode=mode, long_run=True)
         #parametric_sin(gpu=True, trial=trial, mode=mode, long_run=True)

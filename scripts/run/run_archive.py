@@ -264,6 +264,7 @@ def parametric_noisy(gpu, trial,  mode, long_run=False):
                    "--mutate_mutate_rate", "--genome_type", "--extinctions",  "--num_niches",
                    "--only_climate",  "--climate_mean_init", "--noise_std"]
     noise_stds = [0.2, 0.4, 0.8, 1.6]
+    noise_stds = [0.05]
     env_type = "noisy"
     num_gens = 1500
     survival_types = ["FP-Grove", "capacity-fitness", "limited-capacity"]

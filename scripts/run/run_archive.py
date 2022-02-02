@@ -263,7 +263,7 @@ def parametric_noisy(gpu, trial,  mode, long_run=False):
     param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",
                    "--mutate_mutate_rate", "--genome_type", "--extinctions",  "--num_niches",
                    "--only_climate",  "--climate_mean_init", "--noise_std"]
-    noise_stds = [0.05, 0.2, 0.4, 0.8, 1.6]
+    noise_stds = [0.05, 0.2, 0.4, 0.8]
     env_type = "noisy"
     num_gens = 1500
     survival_types = ["FP-Grove", "capacity-fitness", "limited-capacity"]
@@ -292,10 +292,9 @@ def parametric_noisy(gpu, trial,  mode, long_run=False):
                                 command = "python simulate.py "
                                 for idx, el in enumerate(param_names):
                                     command += el + " " + str(new_exp[idx]) + " "
-                                #command += "&"
+                                command += "&"
                                 print(command)
                                 os.system("bash -c '{}'".format(command))
-                                quit()
 
     if mode == "server":
         run_batch(

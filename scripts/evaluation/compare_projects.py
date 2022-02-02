@@ -8,6 +8,7 @@ import pickle5 as pickle
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from types import SimpleNamespace
 
 params = {'legend.fontsize': 5,
           "figure.autolayout": True,
@@ -484,43 +485,270 @@ def mass_periodic(results_dir, label="$A_e$"):
 
 
 
+def evolution_compare(results_dir, include):
+    """ Plot the evolution of climate and population dynamics.
+
+    Parameters
+    ----------
+    log: dict
+        results produced during simulation
+
+    include: list of str
+        which parameters to include in the plot. options are ["climate", "mean", "sigma", "mutate",
+        "n_agents", "n_extinctions", "fitness"]
+    """
+    ci = 95
+    cm = 1 / 2.54
+    scale = 1
+    fig_size = (8.48 * cm / scale, 6 * cm / scale)
+    fig, axs = plt.subplots(len(include), figsize=(fig_size[0], fig_size[1]/3*len(include)))
+    count = 0
+    y_upper_thres = 10**(10)
+    y_lower_thres = 1/(10**(10))
+    interval = 1
+
+    # load and config files for both projects
+    results = {}
+    projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
+    for p in projects:
+        if "plots" not in p:
+            trial_dirs = list(next(os.walk(p + "/trials"))[1])
+            for trial, trial_dir in enumerate(trial_dirs):
+                # load outcome of trial
+                try:
+                    log = pickle.load(open(p+ "/trials/" + trial_dir + '/log_updated.pickle', 'rb'))
+                    log_niches = pickle.load(open(p+ "/trials/" + trial_dir + '/log_niches.pickle', 'rb'))
+
+                except IOError:
+                    print("No log file for project")
+                    return 1
+
+                if trial == 0:
+                    log_df = log
+                    log_niches_total = [log_niches]
+                else:
+                    log_df = log_df.append(log)
+                    log_niches_total.append(log_niches)
+
+            skip_lines = 1
+            with open(p + "/config.yml") as f:
+                for i in range(skip_lines):
+                    _ = f.readline()
+                config = yaml.load(f)
+                config = SimpleNamespace(**config)
+
+            label = find_label(config)
+            results[label] = [log_df, log_niches_total, config]
+
+
+    if "climate" in include:
+
+        for key, value in results.items():
+            label = key
+            log = value[0]
+            log_niches = value[1]
+            config = value[2]
+            log_trial = log.loc[(log['Trial'] == 0)]
+
+            # find mean across niches:
+            climate_avg = []
+            for el in list(log_trial["Climate"]):
+                niches_states = [el + 0.01*idx for idx in range(-int(config.num_niches/2),
+                                                                int(config.num_niches/2 +0.5))]
+                climate_avg.append(np.mean(niches_states))
+            log_trial["Climate_avg"] = climate_avg
+            x = log_trial["Generation"][::interval]
+            y = log_trial["Climate_avg"][::interval]
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci, label=label,legend=0)
+            break
+        axs[count].set(ylabel="$e_0$")
+        axs[count].set(xlabel=None)
+        count += 1
+
+    if "mean" in include:
+        for key, value in results.items():
+            label = key
+            log = value[0]
+            log_niches = value[1]
+            config = value[2]
+            x = log["Generation"][::interval]
+            y = log["Mean"][::interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci, label=label,legend=0)
+
+        axs[count].set(ylabel="$\\bar{\mu}$ ")
+        axs[count].set(xlabel=None)
+        count += 1
+
+    if "sigma" in include:
+        for key, value in results.items():
+            label = key
+            log = value[0]
+            log_niches = value[1]
+            config = value[2]
+            x = log["Generation"][::interval]
+            y = log["SD"][::interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci,label=label,legend=0)
+
+        #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="SD")
+        axs[count].set(ylabel="$\\bar{\sigma}$")
+        axs[count].set(xlabel=None)
+        axs[count].set_yscale('log')
+        axs[count].set_ylim([0.0001, 1])
+        count += 1
+
+    if "mutate" in include:
+        for key, value in results.items():
+            label = key
+            log = value[0]
+            log_niches = value[1]
+            config = value[2]
+            x = log["Generation"][::interval]
+            y = log["R"][::interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci,label=label,legend=0)
+
+        #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="R")
+        axs[count].set(ylabel="$\\bar{r}$")
+        axs[count].set(xlabel=None)
+        axs[count].set_yscale('log')
+        count += 1
+
+    if "fitness" in include:
+        for key, value in results.items():
+            label = key
+            log = value[0]
+            log_niches = value[1]
+            config = value[2]
+            x = log["Generation"][::interval]
+            y = log["Fitness"][::interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci, label=label,legend=0)
+
+        #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="Fitness")
+        axs[count].set(xlabel="Time (in generations)")
+        axs[count].set(ylabel="$\\bar{f}$")
+        count += 1
+
+    if "extinct" in include:
+        for key, value in results.items():
+            label = key
+            log = value[0]
+            log_niches = value[1]
+            config = value[2]
+            x = log["Generation"][::interval]
+            y = log["extinctions"][::interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci,label=label,legend=0)
+
+        #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="extinctions")
+        axs[count].set(xlabel="Time (in generations)")
+        axs[count].set(ylabel="$E$")
+        count += 1
+
+    if "num_agents" in include:
+        for key, value in results.items():
+            label = key
+            log = value[0]
+            log_niches = value[1]
+            config = value[2]
+            x = log["Generation"][::interval]
+            y = log["num_agents"][::interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci, label="label",legend=0)
+
+        #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="num_agents")
+        axs[count].set(xlabel="Time (in generations)")
+        axs[count].set(ylabel="$N$, number of agents")
+        count += 1
+    if "diversity" in include:
+        for key, value in results.items():
+            label = key
+            log = value[0]
+            log_niches = value[1]
+            config = value[2]
+            x = log["Generation"][::interval]
+            y = log["diversity"][::interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci,label=label,legend=0)
+
+        #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="diversity")
+        axs[count].set(xlabel="Time (in generations)")
+        axs[count].set(ylabel="$V$")
+        count += 1
+    if "fixation_index" in include:
+        for key, value in results.items():
+            label = key
+            log = value[0]
+            log_niches = value[1]
+            config = value[2]
+            x = log["Generation"][::interval]
+            y = log["fixation_index"][::interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci,label=label,legend=0)
+
+        #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="fixation_index")
+        axs[count].set(xlabel="Time (in generations)")
+        axs[count].set(ylabel="$F_{st}$, fixation_index")
+        count += 1
+    if "dispersal" in include:
+        for key, value in results.items():
+            label = key
+            log = value[0]
+            log_niches = value[1]
+            config = value[2]
+
+            x = log["Generation"][::interval]
+            y = log["Dispersal"][::interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci, label=label,legend=0)
+
+        #sns.lineplot(ax=axs[count], data=log, x="Generation", y="Dispersal")
+        axs[count].set(xlabel="Time (in generations)")
+        axs[count].set(ylabel="$D$")
+        count += 1
+        handles, labels = axs[-1].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower left')
+
+    axs[count - 1].set(xlabel="Time (in generations)")
+
+
+    # -------------------------------------------------------------
+    save_dir = results_dir + "/plots"
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    plt.savefig(save_dir + "/evolution_other.png")
+    plt.clf()
+    return
+
 
 if __name__ == "__main__":
     results_dir = "../projects/papers/gecco/stable/sigma_main"
-    sigma_constant(results_dir=results_dir)
-
-    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s2_g0"
-    #sigma_appendices(results_dir=results_dir, y_variable="SD")
-
-    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s2_g0"
-    #sigma_appendices(results_dir=results_dir, y_variable="R")
-
-    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s2_g1"
-    #sigma_appendices(results_dir=results_dir, y_variable="SD")
-
-    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s2_g1"
-    #sigma_appendices(results_dir=results_dir, y_variable="R")
-
-    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s0_g2"
-    #sigma_appendices(results_dir=results_dir, y_variable="SD")
-
-    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s0_g2"
-    #sigma_appendices(results_dir=results_dir, y_variable="R")
-
-    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s1_g2"
-    #sigma_appendices(results_dir=results_dir, y_variable="SD")
-
-    results_dir = "../projects/papers/gecco/stable/sigma_appendices/s1_g2"
-    #sigma_appendices(results_dir=results_dir, y_variable="R")
+    #sigma_constant(results_dir=results_dir)
 
     results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
-    sigma_appendices(results_dir=results_dir, y_variables=["SD","R", "Dispersal"], label="model")
-
-    results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
-    #sigma_appendices(results_dir=results_dir, y_variable="SD", label="model")
-
-    results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
-    #sigma_appendices(results_dir=results_dir, y_variable="Dispersal", label="model")
+    #sigma_appendices(results_dir=results_dir, y_variables=["SD","R", "Dispersal"], label="model")
 
     results_dir = "../projects/papers/gecco/stable/extinct_main"
     #extinctions_stable(results_dir)
@@ -535,7 +763,13 @@ if __name__ == "__main__":
     #extinctions_stable_appendices(results_dir, label="Niches")
 
     results_dir = "../projects/papers/gecco/stable/diversity_main"
-    diversity_stable(results_dir)
+    #diversity_stable(results_dir)
+
+    results_dir = "../projects/papers/gecco/periodic/evolution/compare"
+    include = ["climate", "mean",
+                        "sigma", "mutate",
+                        "dispersal", "diversity"]
+    evolution_compare(results_dir, include)
 
     #results_dir = "../projects/papers/gecco/stable/dispersal_main"
     #dispersal_stable(results_dir)

@@ -252,7 +252,7 @@ def parametric_noisy(gpu, trial,  mode, long_run=False):
     now = datetime.datetime.now()
     project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
     if mode == "local":
-        top_dir = "papers/gecco/parametric_noisy/" + project + "/"
+        top_dir = "../projects/papers/gecco/parametric_noisy/" + project + "/"
     else:
         top_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/projects/parametric_noisy/" + project + "/"
     if not os.path.exists(top_dir):
@@ -263,8 +263,7 @@ def parametric_noisy(gpu, trial,  mode, long_run=False):
     param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",
                    "--mutate_mutate_rate", "--genome_type", "--extinctions",  "--num_niches",
                    "--only_climate",  "--climate_mean_init", "--noise_std"]
-    noise_stds = [0.2, 0.4, 0.8, 1.6]
-    noise_stds = [0.05]
+    noise_stds = [0.05, 0.2, 0.4, 0.8, 1.6]
     env_type = "noisy"
     num_gens = 1500
     survival_types = ["FP-Grove", "capacity-fitness", "limited-capacity"]
@@ -293,9 +292,10 @@ def parametric_noisy(gpu, trial,  mode, long_run=False):
                                 command = "python simulate.py "
                                 for idx, el in enumerate(param_names):
                                     command += el + " " + str(new_exp[idx]) + " "
-                                command += "&"
+                                #command += "&"
                                 print(command)
                                 os.system("bash -c '{}'".format(command))
+                                quit()
 
     if mode == "server":
         run_batch(
@@ -471,7 +471,7 @@ if __name__ == "__main__":
     trials = int(sys.argv[1])
     mode = sys.argv[2] # server for jz experiments and local otherwise
     for trial in range(1, trials+1):
-        missing_s1_N100(gpu=True, trial=trial, mode=mode, long_run=True)
+        #missing_s1_N100(gpu=True, trial=trial, mode=mode, long_run=True)
         #sigma_stable_parta(gpu=True, trial=trial, mode=mode, long_run=True)
         #sigma_stable_partb(gpu=True, trial=trial, mode=mode, long_run=True)
         #survival_s2g2_N100(gpu=True, trial=trial, mode=mode, long_run=True)

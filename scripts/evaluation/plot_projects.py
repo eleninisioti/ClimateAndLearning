@@ -14,7 +14,7 @@ import os
 import yaml
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 from source.plotter import Plotter
-
+from types import SimpleNamespace
 
 def run(project, climate_noconf,axs):
     top_dir = "../projects/"

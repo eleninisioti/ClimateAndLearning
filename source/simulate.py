@@ -13,11 +13,8 @@ from pathlib import Path
 
 def simulate(args):
     # create project sub-directories
-    local=False
-    if local:
-        project = "../projects/" + args.project
-    else:
-        project =  args.project
+
+    project =  args.project
     if not os.path.exists(project  + "/plots"):
         os.makedirs(project + "/plots")
 

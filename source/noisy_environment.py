@@ -25,7 +25,7 @@ class NoisyEnv(Env):
 
   def step(self, gen):
     # A is the amplitude and omega is the frequency in rad
-    self.mean = np.random.normal(self.noise_mean, self.noise_std, 1)
+    self.mean = np.random.normal(self.noise_mean, self.noise_std, 1)[0]
     self.current_capacity = self.mean*self.niche_capacity
     self.climate_values.append(self.mean)
     return self.mean

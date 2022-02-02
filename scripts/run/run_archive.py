@@ -251,7 +251,12 @@ def parametric_noisy(gpu, trial,  mode, long_run=False):
     #var_freq_values = np.arange(10, 100, 20)
     now = datetime.datetime.now()
     project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
-    top_dir = "papers/gecco/parametric_noisy/" + project + "/"
+    if mode == "local":
+        top_dir = "papers/gecco/parametric_noisy/" + project + "/"
+    else:
+        top_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/projects/parametric_noisy/" + project + "/"
+    if not os.path.exists(top_dir):
+        os.makedirs(top_dir)
 
     experiments = []
 

@@ -238,6 +238,42 @@ class Plotter:
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$V$")
             count += 1
+        if "diversity_mean" in include:
+            x = self.log["Generation"][::self.interval]
+            y = self.log["diversity_mean"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
+
+            #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="diversity")
+            axs[count].set(xlabel="Time (in generations)")
+            axs[count].set(ylabel="$V_{\mu}$")
+            count += 1
+        if "diversity_sigma" in include:
+            x = self.log["Generation"][::self.interval]
+            y = self.log["diversity_sigma"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
+
+            #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="diversity")
+            axs[count].set(xlabel="Time (in generations)")
+            axs[count].set(ylabel="$V_{\sigma}$")
+            count += 1
+        if "diversity_mutate" in include:
+            x = self.log["Generation"][::self.interval]
+            y = self.log["diversity_mutate"][::self.interval]
+            y = y.clip(upper=y_upper_thres)
+            y = y.clip(lower=y_lower_thres)
+
+            sns.lineplot(ax=axs[count], x=x, y=y, ci=ci)
+
+            #sns.lineplot(ax=axs[count], data=self.log, x="Generation", y="diversity")
+            axs[count].set(xlabel="Time (in generations)")
+            axs[count].set(ylabel="$V_{r}$")
+            count += 1
         if "fixation_index" in include:
             x = self.log["Generation"][::self.interval]
             y = self.log["fixation_index"][::self.interval]
@@ -264,8 +300,9 @@ class Plotter:
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$D$")
             count += 1
-
-        axs[count - 1].set(xlabel="Time (in generations)")
+        for ax in axs.flat:
+            ax.label_outer()
+        axs[count - 1].set(xlabel="$G$, Generation")
 
         # ----- highlight periods of variability of applicable -------
         if len(self.env_profile):
@@ -285,7 +322,7 @@ class Plotter:
                                          alpha=0.2,
                                          color='green')
         # -------------------------------------------------------------
-        plt.savefig("../projects/" + self.project + "/plots/evolution.png")
+        plt.savefig("../projects/" + self.project + "/plots/evolution.pdf",dpi=300)
         plt.clf()
         return self.log
 

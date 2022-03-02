@@ -56,23 +56,23 @@ def sigma_constant(results_dir):
             niche))
     plt.yscale('log')
     #plt.ylim([10**(-19), 100])
-    plt.xlabel("$e_{0,0}$, Reference Environmental State")
-    plt.ylabel("$\\bar{\sigma}$, Plasticity")
+    plt.xlabel("$e_{0}^0$, Reference Environmental State")
+    plt.ylabel("$\\bar{\sigma}^*$, Plasticity")
     plt.legend(loc="best")
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/sigma_stable_main.png")
+    plt.savefig(save_dir + "/sigma_stable_main.pdf", dpi=300)
     plt.clf()
 
 def find_label(config):
     label=""
     if config.selection_type == "capacity-fitness":
-        label += "QD-selection"
+        label += "NF-selection"
     elif config.selection_type == "limited-capacity":
-        label += "D-selection"
+        label += "N-selection"
     elif config.selection_type == "FP-Grove":
-        label += "Q-selection"
+        label += "F-selection"
         
     """if config.genome_type == "1D":
         label+= "$G=G_{no-evolve}$"
@@ -146,33 +146,36 @@ def sigma_appendices(results_dir, y_variables, label="Num_niches"):
                     niche),legend=0)
 
         if y_variable == "SD":
-            axs[y_idx].set(ylabel="$\\bar{\sigma}$, Plasticity")
+            axs[y_idx].set(ylabel="$\\bar{\sigma}^*$, Plasticity")
         elif y_variable == "R":
-            axs[y_idx].set(ylabel="$\\bar{r}$, Evolvability")
+            axs[y_idx].set(ylabel="$\\bar{r}^*$, Evolvability")
         elif y_variable == "Dispersal":
-            axs[y_idx].set(ylabel="$D$, Dispersal")
+            axs[y_idx].set(ylabel="$D^*$, Dispersal")
         axs[y_idx].set_yscale('log')
+        axs[y_idx].set(xlabel="$e_{0}^0$, Reference Environmental State")
 
         handles, labels = axs[-1].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower left')
-
+    for ax in axs.flat:
+        ax.label_outer()
     #plt.legend(loc="best")
     plt.yscale('log')
-    plt.xlabel("$e_{0,0}$, Reference Environmental State")
+    axs[1].set(xlabel="$e_{0}^0$, Reference Environmental State")
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/combined.png")
+    plt.savefig(save_dir + "/stable_ablation.pdf", dpi=300)
     plt.clf()
 
 def extinctions_stable(results_dir):
     """ Plot with sigma in the vertical axis, climate value in the horizontal and different lines for number of niches"
     """
-    labels = {"FP-Grove": "Q-selection",
-              "capacity-fitness": "QD-selection"}
+    labels = {"FP-Grove": "F-selection",
+              "capacity-fitness": "NF-selection"}
     # find all projects
     projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
     projects = [el for el in projects if "plots" not in el]
+    labels_genome = {"1D": "$O_{no-evolve}$", "1D_mutate": "$O_{evolve}$", "1D_mutate_fixed": "$R_{constant}$"}
 
     count = 0
     for p in projects:
@@ -192,23 +195,28 @@ def extinctions_stable(results_dir):
             new_row = pd.DataFrame.from_dict({"extinctions": [trial_extinctions],
                                               "Trial": [trial],
                                               "Selection": [labels[config.selection_type]],
-                                              "Climate": [config.climate_mean_init]})
+                                              "Climate": [config.climate_mean_init],
+                                             "Genome": [labels_genome[config.genome_type]]}
+            )
             if not count:
                 results = new_row
             else:
                 results = results.append(new_row)
             count = 1
     selections = list(set(results["Selection"].to_list()))
+    genomes = list(set(results["Genome"].to_list()))
     cm = 1 / 2.54
     plt.figure(figsize=(8.48 * cm, 6 * cm))
     for selection in selections:
-        results_niche = results.loc[results['Selection'] == selection]
-        sns.lineplot(data=results_niche, x="Climate", y="extinctions", ci=ci, label="$s=$" + selection)
+        for genome in genomes:
+            results_niche = results.loc[results['Selection'] == selection]
+            results_niche = results_niche.loc[results_niche['Genome'] == genome]
+            sns.lineplot(data=results_niche, x="Climate", y="extinctions", ci=ci, label=selection+ ", " + genome)
 
-    plt.xlabel("$e_{0,0}$, Reference Environmental State")
-    plt.ylabel("$E$, Number of extinctions")
+    plt.xlabel("$e_{0}^0$, Reference Environmental State")
+    plt.ylabel("$X^*$, Number of extinctions")
     plt.legend(loc="best")
-    plt.savefig(results_dir + "/plots/extinct_constant.png")
+    plt.savefig(results_dir + "/plots/extinct_constant.pdf", dpi=300)
     plt.clf()
 
 def extinctions_stable_appendices(results_dir, label):
@@ -219,7 +227,7 @@ def extinctions_stable_appendices(results_dir, label):
                         "capacity-fitness": "QD-selection",
                         "limited-capacity": "D-selection"}
 
-    labels_genome = {"1D": "$R_{no-evolve}$", "1D_mutate": "$R$", "1D_mutate_fixed": "$R_{constant}$"}
+    labels_genome = {"1D": "$O_{no-evolve}$", "1D_mutate": "$O_{evolve}$", "1D_mutate_fixed": "$R_{constant}$"}
 
     # find all projects
     projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
@@ -264,7 +272,7 @@ def extinctions_stable_appendices(results_dir, label):
         results_niche = results.loc[results[label] == method]
         sns.lineplot(data=results_niche, x="Climate", y="extinctions", ci=ci, label= label + "=" + str(method))
 
-    plt.xlabel("$e_0$, Reference Environmental State")
+    plt.xlabel("$e_{0}^0$, Reference Environmental State")
     plt.ylabel("$E$, Extinction events")
     plt.legend(loc="best")
     plt.savefig(results_dir + "/plots/extinct_stable.png")
@@ -274,9 +282,7 @@ def extinctions_stable_appendices(results_dir, label):
 def diversity_stable(results_dir):
     """ Plot with sigma in the vertical axis, climate value in the horizontal and different lines for number of niches"
     """
-    labels = {"FP-Grove": "Q-selection",
-              "capacity-fitness": "QD-selection",
-                        "limited-capacity": "D-selection"}
+
     # find all projects
     projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
     projects = [el for el in projects if "plots" not in el]
@@ -295,7 +301,7 @@ def diversity_stable(results_dir):
             trial_diversity = np.mean(log["diversity"][100:])
             new_row = pd.DataFrame.from_dict({"Diversity": [trial_diversity],
                                               "Trial": [trial],
-                                              "Selection": [labels[config.selection_type]],
+                                              "Selection": [find_label(config)],
                                               "Climate": [config.climate_mean_init]})
             if not count:
                 results = new_row
@@ -308,13 +314,13 @@ def diversity_stable(results_dir):
         results_niche = results.loc[results['Selection'] == selection]
         sns.lineplot(data=results_niche, x="Climate", y="Diversity", ci=ci, label=selection)
 
-    plt.xlabel("$e_{0,0}$, Reference Environmental State")
-    plt.ylabel("$V$, Divesity")
+    plt.xlabel("$e_{0}^0$, Reference Environmental State")
+    plt.ylabel("$V^*$, Divesity")
     plt.legend(loc="best")
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/diversity_stable.png")
+    plt.savefig(save_dir + "/diversity_stable.pdf",dpi=300)
     plt.clf()
 
 
@@ -372,7 +378,7 @@ def diversity_stable_appendices(results_dir, label):
         results_niche = results.loc[results[label] == method]
         sns.lineplot(data=results_niche, x="Climate", y="diversity", ci=ci, label= label + "=" + str(method))
 
-    plt.xlabel("$e_{0,0}$, Reference Environmental State")
+    plt.xlabel("$e_{0}^0$, Reference Environmental State")
     plt.ylabel("$D$, D")
     plt.legend(loc="best")
     save_dir = results_dir + "/plots"
@@ -419,7 +425,7 @@ def dispersal_stable(results_dir):
         results_niche = results.loc[results['Selection'] == selection]
         sns.lineplot(data=results_niche, x="Climate", y="Dispersal", ci=ci, label="Selection=" + selection)
 
-    plt.xlabel("$e_{0,0}$, Reference Environmental State")
+    plt.xlabel("$e_{0}^0$, Reference Environmental State")
     plt.ylabel("D, Dispersal")
     plt.legend(loc="best")
     save_dir = results_dir + "/plots"
@@ -472,15 +478,77 @@ def mass_periodic(results_dir, label="$A_e$"):
     plt.figure(figsize=(8.48 * cm, 6 * cm))
     for amplitude in amplitudes:
         results_ampl = results.loc[results[label] == amplitude]
-        sns.lineplot(data=results_ampl, x="Period", y="Duration", ci=ci, label=label + "=" + str(amplitude))
 
-    plt.xlabel("$T$, Period of sinusoid")
-    plt.ylabel("$\\bar{v}$, Average Survival")
+        sns.lineplot(data=results_ampl, x="Period", y="Duration", ci=ci, label=label + "=" +str(amplitude))
+
+    plt.xlabel("$T_e$, Period of sinusoid")
+    plt.ylabel("$A$, Survival")
     plt.legend(loc="best")
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/survival_stable.png")
+    plt.savefig(save_dir + "/survival_stable.pdf",dpi=300)
+    plt.clf()
+
+
+def mass_noisy(results_dir, label="$A_e$"):
+    """ Plot with sigma in the vertical axis, climate value in the horizontal and different lines for number of niches"
+    """
+    labels = {"FP-Grove": "Q-selection",
+              "capacity-fitness": "QD-selection",
+                        "limited-capacity": "D-selection"}
+    # find all projects
+    projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
+    projects = [el for el in projects if "plots" not in el]
+
+    count = 0
+    for p in projects:
+        print(p)
+        config_file = p + "/config.yml"
+
+        with open(config_file, "rb") as f:
+            config = yaml.load(f, Loader=yaml.UnsafeLoader)
+
+        trial_dirs = list(next(os.walk(p + "/trials"))[1])
+        for trial, trial_dir in enumerate(trial_dirs):
+            # load outcome of trial
+            log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+            trial_diversity = np.mean(log["diversity"][100:])
+            print(len(log["Climate"]), config.num_gens)
+            trial_duration = len(log["Climate"])/config.num_gens
+            print(config.num_gens)
+            if label == "$A_e$":
+                label_value = config.amplitude
+            elif label== "N":
+                label_value = config.num_niches
+            new_row = pd.DataFrame.from_dict({"Duration": [trial_duration],
+                                              "Trial": [trial],
+                                              "Noise": [config.noise_std],
+                                              "Method": [find_label(config)],
+                                              label: [label_value]})
+            if not count:
+                results = new_row
+            else:
+                results = results.append(new_row)
+            count = 1
+    amplitudes= list(set(results[label].to_list()))
+    methods = list(set(results["Method"].to_list()))
+    cm = 1 / 2.54
+    plt.figure(figsize=(8.48 * cm, 6 * cm))
+    for amplitude in amplitudes:
+        for method in methods:
+            results_ampl = results.loc[results[label] == amplitude]
+            results_ampl = results_ampl.loc[results_ampl["Method"] == method]
+
+            sns.lineplot(data=results_ampl, x="Noise", y="Duration", ci=ci, label=method )
+
+    plt.xlabel("$\sigma_{N}$, Standard deviation of noise")
+    plt.ylabel("$A$, Survival")
+    plt.legend(loc="best")
+    save_dir = results_dir + "/plots"
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    plt.savefig(save_dir + "/survival_noisy.pdf",dpi=300)
     plt.clf()
 
 
@@ -537,6 +605,8 @@ def evolution_compare(results_dir, include):
                 config = yaml.load(f)
                 config = SimpleNamespace(**config)
 
+            log_df = log_df.loc[(log_df['Generation'] < 500)]
+
             label = find_label(config)
             results[label] = [log_df, log_niches_total, config]
 
@@ -561,7 +631,8 @@ def evolution_compare(results_dir, include):
             y = log_trial["Climate_avg"][::interval]
 
             sns.lineplot(ax=axs[count], x=x, y=y, ci=ci, label=label,legend=0)
-            break
+            if len(y) > 100:
+                break
         axs[count].set(ylabel="$e_0$")
         axs[count].set(xlabel=None)
         count += 1
@@ -621,6 +692,8 @@ def evolution_compare(results_dir, include):
         axs[count].set(ylabel="$\\bar{r}$")
         axs[count].set(xlabel=None)
         axs[count].set_yscale('log')
+        axs[count].set_yticks(ticks=[1,10**(-5),10**(-10)])
+
         count += 1
 
     if "fitness" in include:
@@ -730,15 +803,15 @@ def evolution_compare(results_dir, include):
         count += 1
         handles, labels = axs[-1].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower left')
-
-    axs[count - 1].set(xlabel="Time (in generations)")
-
+    for ax in axs.flat:
+        ax.label_outer()
+    axs[count - 1].set(xlabel="$G$, Generation")
 
     # -------------------------------------------------------------
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/evolution_other.png")
+    plt.savefig(save_dir + "/evolution_other.pdf",dpi=300)
     plt.clf()
     return
 
@@ -748,27 +821,35 @@ if __name__ == "__main__":
     #sigma_constant(results_dir=results_dir)
 
     results_dir = "../projects/papers/gecco/stable/sigma_appendices/N_100"
-    #sigma_appendices(results_dir=results_dir, y_variables=["SD","R", "Dispersal"], label="model")
+    #sigma_appendices(results_dir=results_dir, y_variables=["SD", "Dispersal"], label="model")
 
     results_dir = "../projects/papers/gecco/stable/extinct_main"
-    #extinctions_stable(results_dir)
-
-    #results_dir = "../projects/papers/gecco/stable/extinct_appendices_s"
-    #extinctions_stable_appendices(results_dir,label="Selection")
-
-    #results_dir = "../projects/papers/gecco/stable/extinct_appendices_g"
-    #extinctions_stable_appendices(results_dir, label="Genome")
-
-    #results_dir = "../projects/papers/gecco/stable/extinct_appendices_N"
-    #extinctions_stable_appendices(results_dir, label="Niches")
+    extinctions_stable(results_dir)
 
     results_dir = "../projects/papers/gecco/stable/diversity_main"
-    #diversity_stable(results_dir)
+    diversity_stable(results_dir)
+
+    results_dir = "../projects/papers/gecco/periodic/survival/s2_g2_100"
+    #mass_periodic(results_dir)
+
+    results_dir = "../projects/papers/gecco/periodic/survival/s2_g2_A4"
+    #mass_periodic(results_dir, label="N")
+
 
     results_dir = "../projects/papers/gecco/periodic/evolution/compare"
     include = ["climate", "mean",
                         "sigma", "mutate",
                         "dispersal", "diversity"]
+    #evolution_compare(results_dir, include)
+
+    results_dir = "../projects/papers/gecco/noisy/survival/parametric"
+    #mass_noisy(results_dir, label="N")
+
+
+    results_dir = "../projects/papers/gecco/noisy/evolution/compare"
+    include = ["climate", "mean",
+               "sigma", "mutate",
+               "dispersal", "diversity"]
     evolution_compare(results_dir, include)
 
     #results_dir = "../projects/papers/gecco/stable/dispersal_main"
@@ -780,11 +861,18 @@ if __name__ == "__main__":
     #results_dir = "../projects/papers/gecco/stable/diversity_appendices_N"
     #diversity_stable_appendices(results_dir, label="Niches")
 
-    results_dir = "../projects/papers/gecco/periodic/survival/s2_g2_100"
-    #mass_periodic(results_dir)
+    results_dir = "../projects/papers/gecco/noisy/survival/parametric"
+    #mass_noisy(results_dir, label="N")
 
-    results_dir = "../projects/papers/gecco/periodic/survival/s2_g2_A4"
-    #mass_periodic(results_dir, label="N")
+    results_dir = "../projects/papers/gecco/noisy/survival/parametric_N1"
+    mass_noisy(results_dir, label="N")
+
+    results_dir = "../projects/papers/gecco/noisy/survival/parametric_e0.2"
+    mass_noisy(results_dir, label="N")
+
+    results_dir = "../projects/papers/gecco/noisy/survival/parametric_e4"
+    #mass_noisy(results_dir, label="N")
+
 
     #results_dir = "../projects/papers/gecco/periodic/survival/s0_g2_100"
     #mass_periodic(results_dir)

@@ -12,6 +12,12 @@ class Logger:
                     "running_SD": [],
                     "running_mutate": [],
                     "diversity": [],
+                    "diversity_mean": [],
+                    "scale_diversity_mean": [],
+                    "diversity_sigma": [],
+                    "scale_diversity_sigma": [],
+                    "diversity_mutate": [],
+                    "scale_diversity_mutate": [],
                     "fixation_index": [],
                     "extinctions": [],
                     "num_agents": [],
@@ -59,6 +65,13 @@ class Logger:
         self.log_niches["inhabited_niches"].append(inhabited_niches)
 
         # compute population diversity
+        self.log["diversity_mean"].append(np.std(mean_values))
+        self.log["diversity_sigma"].append(np.std(SD_values))
+        self.log["diversity_mutate"].append(np.std(mutate_values))
+        self.log["scale_diversity_mean"].append(max(mean_values))
+        self.log["scale_diversity_sigma"].append(max(SD_values))
+        self.log["scale_diversity_mutate"].append(max(mutate_values))
+
         self.log["diversity"].append(np.std(mean_values) + np.std(SD_values) + np.std(mutate_values))
 
         # compute population FP-index
@@ -98,6 +111,12 @@ class Logger:
                      "extinctions": self.log["extinctions"],
                      "num_agents": self.log["num_agents"],
                      "diversity": self.log["diversity"],
+                    "diversity_mean": self.log["diversity_mean"],
+                    "diversity_sigma": self.log["diversity_sigma"],
+                    "diversity_mutate": self.log["diversity_mutate"],
+                    "scale_diversity_mean": self.log["scale_diversity_mean"],
+                    "scale_diversity_sigma": self.log["scale_diversity_sigma"],
+                    "scale_diversity_mutate": self.log["scale_diversity_mutate"],
                      "fixation_index": self.log["fixation_index"],
                      "Specialists_Extinct": self.log["specialists"]["extinctions"],
                      "Specialists_Number": self.log["specialists"]["number"],

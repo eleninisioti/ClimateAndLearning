@@ -416,7 +416,7 @@ def missing_s1_N100(gpu, trial,  mode, long_run=False):
     now = datetime.datetime.now()
     project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
     if mode == "local":
-        top_dir = "papers/gecco/parametric_stable/" + project + "/"
+        top_dir = "../projects/papers/gecco/parametric_stable/" + project + "/"
     else:
         top_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/projects/missing_s1_100/" + project + "/"
     if not os.path.exists(top_dir):
@@ -427,14 +427,14 @@ def missing_s1_N100(gpu, trial,  mode, long_run=False):
                    "--mutate_mutate_rate", "--genome_type", "--extinctions",  "--num_niches",
                    "--only_climate",  "--climate_mean_init"]
     env_type = "stable"
-    num_gens = 1000
+    num_gens = 150
     survival_types = ["limited-capacity"]
     mutate_mutate_rate = 0.001
     genome_types = ["1D_mutate"]
     extinctions = [1]
     num_niches_values = [100]
     climate_only = 0
-    climate_mean_init_values = [0.2]
+    climate_mean_init_values = [2,4]
     num_gens = num_gens # make sure we have at least 3 cycles
 
     for num_niches in num_niches_values:
@@ -466,17 +466,71 @@ def missing_s1_N100(gpu, trial,  mode, long_run=False):
 
 
 
+def compare_diversity(gpu, trial,  mode, long_run=False):
+    #var_freq_values = np.arange(10, 100, 20)
+    now = datetime.datetime.now()
+    project = str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    if mode == "local":
+        top_dir = "../projects/papers/gecco/compare_diversity/" + project + "/"
+    else:
+        top_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/projects/compare_diversity/" + project + "/"
+    if not os.path.exists(top_dir):
+        os.makedirs(top_dir)
+    experiments = []
+
+    param_names = ["--project", "--env_type","--num_gens", "--num_trials", "--selection_type",
+                   "--mutate_mutate_rate", "--genome_type", "--extinctions",  "--num_niches",
+                   "--only_climate",  "--climate_mean_init"]
+    env_type = "stable"
+    num_gens = 150
+    survival_types = ["capacity-fitness", "limited-capacity"]
+    mutate_mutate_rate = 0.001
+    genome_types = ["1D_mutate"]
+    extinctions = [1]
+    num_niches_values = [100]
+    climate_only = 0
+    climate_mean_init_values = [2]
+    num_gens = num_gens # make sure we have at least 3 cycles
+
+    for num_niches in num_niches_values:
+        for climate_mean_init in climate_mean_init_values:
+                for genome_type in genome_types:
+                    for survival_type in survival_types:
+                        for extinction in extinctions:
+                            project = top_dir + "survival_" + survival_type + "genome_" + genome_type + "extinctions_" + \
+                                      str(extinction) + "_num_niches_" + \
+                                      str(num_niches) + "_climate_" + str(climate_mean_init)
+                            new_exp = [project, env_type, num_gens, trial, survival_type, mutate_mutate_rate,
+                                       genome_type, extinction, num_niches, climate_only, climate_mean_init]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                command += "&"
+                                print(command)
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(
+            experiments,
+            param_names,
+            long_run=long_run,
+            gpu=gpu,
+        )
+
 if __name__ == "__main__":
     trials = int(sys.argv[1])
     mode = sys.argv[2] # server for jz experiments and local otherwise
     for trial in range(1, trials+1):
-        #missing_s1_N100(gpu=True, trial=trial, mode=mode, long_run=True)
+        missing_s1_N100(gpu=True, trial=trial, mode=mode, long_run=True)
         #sigma_stable_parta(gpu=True, trial=trial, mode=mode, long_run=True)
         #sigma_stable_partb(gpu=True, trial=trial, mode=mode, long_run=True)
         #survival_s2g2_N100(gpu=True, trial=trial, mode=mode, long_run=True)
         #survival_s2g2_A4(gpu=True, trial=trial, mode=mode, long_run=True)
         #parametric_sin(gpu=True, trial=trial, mode=mode, long_run=True)
         #fig_sigma_constant(gpu=True, trial=trial, mode=mode, long_run=False)
-        parametric_noisy(gpu=True, trial=trial, mode=mode, long_run=True)
+        #parametric_noisy(gpu=True, trial=trial, mode=mode, long_run=True)
+        #compare_diversity(gpu=True, trial=trial, mode=mode, long_run=True)
 
 

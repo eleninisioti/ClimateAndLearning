@@ -40,7 +40,9 @@ class Life:
                                      init_sigma=self.config.init_sigma,
                                      init_mutate=self.config.init_mutate,
                                      mutate_mutate_rate=self.config.mutate_mutate_rate,
-                                     extinctions=self.config.extinctions)
+                                     extinctions=self.config.extinctions,
+                                     mean_fitness = self.config.mean_fitness,
+                                     reproduce_once=self.config.reproduce_once)
         # -------------------------------------------------------------------------
         self.logger = Logger(trial=self.config.trial, env=self.env)
 
@@ -73,7 +75,7 @@ class Life:
                 # reproduce population
                 self.population.reproduce(self.env)
 
-                if gen % 10 == 0:
+                if gen % 1 == 0:
                     # print progress
                     print("Generation: ", gen, len(self.population.agents), " agents")
 

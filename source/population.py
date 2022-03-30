@@ -11,7 +11,7 @@ class Population:
     """
 
     def __init__(self, pop_size, selection_type, genome_type, env_mean, init_sigma, init_mutate,
-                 mutate_mutate_rate, extinctions):
+                 mutate_mutate_rate, extinctions, mean_fitness=True, reproduce_once=True):
         """ Class constructor.
 
         Parameters
@@ -41,9 +41,15 @@ class Population:
         extinctions: int
             If one, extinct individuals are discarded from the population
 
+        mean_fitness: bool
+            If True, an agent's fitness is the mean of its fitnesses in which it survives. If False,
+            the agent reproduces with a different fitness in each niche
+
         """
         self.agents = []
         self.selection_type = selection_type
+        self.mean_fitness = mean_fitness
+        self.reproduce_once = reproduce_once
 
         # keep these variables for initializing future agents
         self.genome_type = genome_type
@@ -95,10 +101,10 @@ class Population:
                     if niche_climate in agent.niches:
                         niche_pop.append(agent)
 
-                for_reproduction.append({"population": niche_pop, "capacity": niche_capacity})
+                for_reproduction.append({"population": niche_pop, "capacity": niche_capacity, "climate": niche_climate})
         else:
             niche_capacity = int(env.current_capacity * env.num_niches)
-            for_reproduction = [{"population": self.agents, "capacity": niche_capacity}]
+            for_reproduction = [{"population": self.agents, "capacity": niche_capacity, "climate": env.mean}]
 
         total_pop = total_cap = 0
         for niche_data in for_reproduction:
@@ -113,11 +119,20 @@ class Population:
             new_niche_agents = []
             niche_pop = niche_data["population"]
             niche_capacity = niche_data["capacity"]
+            niche_climate = niche_data["climate"]
             random.shuffle(niche_pop)
-            niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)] if not el.reproduced]
+
+            if self.reproduce_once:
+                niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)] if not el.reproduced]
+            else:
+                niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)]]
             if "F" in self.selection_type:
                 niche_pop = self.order_agents(niche_pop)
-                weights = [agent.fitness for agent in niche_pop]
+
+                if self.mean_fitness:
+                    weights = [agent.fitness for agent in niche_pop]
+                else:
+                    weights = [agent.fitnesses[niche_climate] for agent in niche_pop]
             else:
                 weights = [1 for agent in niche_pop]
             if len(niche_pop):

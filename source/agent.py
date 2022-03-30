@@ -48,6 +48,7 @@ class Agent:
         survival = 0
         self.niches = []
         self.fitness_values = []
+        self.fitnesses = {}
         for niche_idx, niche_info in env.niches.items():
             niche_climate = niche_info["climate"]
             if ((self.genome.genes["mean"] - 2 * self.genome.genes["sigma"]) < niche_climate) \
@@ -55,6 +56,7 @@ class Agent:
                 survival += 1
                 self.niches.append(niche_climate)
                 self.fitness_values.append(self.compute_fitness(niche_climate))
+                self.fitnesses[niche_climate] = self.compute_fitness(niche_climate)
 
         # the fitness of an agent is the average over its fitnesses in niches where the agent survives
         if len(self.fitness_values):

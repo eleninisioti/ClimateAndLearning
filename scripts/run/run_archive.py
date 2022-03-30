@@ -4,6 +4,95 @@ from jz_utils import  run_batch
 import datetime
 
 
+def stable_v1(trial, long_run):
+    "Reproduce experiments with stable environment"
+    top_dir = setup_dir() + "_stable_v1/"
+    experiments = []
+
+    param_names = ["--project",
+                   "--env_type",
+                   "--num_gens",
+                   "--trial",
+                   "--selection_type",
+                   "--genome_type",
+                   "--num_niches",
+                   "--climate_mean_init",
+                   "--mean_fitness",
+                   "--reproduce_once"]
+    env_type = "stable"
+    num_gens = 500
+    selection_types = ["NF"]
+    genome_types = ["evolv"]
+    num_niches_values = [100]
+    climate_mean_init_values = [0.2,  2,  8]
+    reproduce_once = 1
+    mean_fitness = 0
+
+    for N in num_niches_values:
+        for climate_mean_init in climate_mean_init_values:
+            for G in genome_types:
+                for S in selection_types:
+                        project = top_dir + "S_" + S + "_G_" + G + "_N_" + \
+                                  str(N) + "_climate_" + str(climate_mean_init)
+                        new_exp = [project, env_type, num_gens, trial, S, G, N, climate_mean_init, mean_fitness,
+                                   reproduce_once]
+                        experiments.append(new_exp)
+                        if mode == "local":
+                            command = "python simulate.py "
+                            for idx, el in enumerate(param_names):
+                                command += el + " " + str(new_exp[idx]) + " "
+                            # command += "&" # uncomment to run all experiments simultaneously
+                            print(command)
+                            os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
+
+
+def stable_v2(trial, long_run):
+    "Reproduce experiments with stable environment"
+    top_dir = setup_dir() + "_stable_v1/"
+    experiments = []
+
+    param_names = ["--project",
+                   "--env_type",
+                   "--num_gens",
+                   "--trial",
+                   "--selection_type",
+                   "--genome_type",
+                   "--num_niches",
+                   "--climate_mean_init",
+                   "--mean_fitness",
+                   "--reproduce_once"]
+    env_type = "stable"
+    num_gens = 500
+    selection_types = ["NF"]
+    genome_types = ["evolv"]
+    num_niches_values = [100]
+    climate_mean_init_values = [0.2,  2,  8]
+    reproduce_once = 0
+    mean_fitness = 1
+
+    for N in num_niches_values:
+        for climate_mean_init in climate_mean_init_values:
+            for G in genome_types:
+                for S in selection_types:
+                        project = top_dir + "S_" + S + "_G_" + G + "_N_" + \
+                                  str(N) + "_climate_" + str(climate_mean_init)
+                        new_exp = [project, env_type, num_gens, trial, S, G, N, climate_mean_init, mean_fitness,
+                                   reproduce_once]
+                        experiments.append(new_exp)
+                        if mode == "local":
+                            command = "python simulate.py "
+                            for idx, el in enumerate(param_names):
+                                command += el + " " + str(new_exp[idx]) + " "
+                            # command += "&" # uncomment to run all experiments simultaneously
+                            print(command)
+                            os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
+
 def stable(trial, long_run):
     "Reproduce experiments with stable environment"
     top_dir = setup_dir() + "_stable_sigma/"
@@ -168,7 +257,9 @@ if __name__ == "__main__":
         mode = "local" # this should be server for running jz experiments
 
         for trial in range(1, trials+1):
-            stable(trial, long_run=False)
+            stable_v1(trial, long_run=False)
+            stable_v2(trial, long_run=False)
+
             #noisy(trial, long_run=False)
             #sin(trial,long_run=False)
 

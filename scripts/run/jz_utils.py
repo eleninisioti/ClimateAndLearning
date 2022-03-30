@@ -2,21 +2,16 @@
 """
 
 import os
-import os.path as op
 from random import random
 
 # ----- jz user configuration -----
-# make sure the following directories exist in your jz workspace
+account = "utw61ti"
 email = "enisioti@inria.fr"
 job_name = "ClimateAndLearning"
-
-#logs_dir = "../temp_jz/logs"
-#code_dir = "."
-#slurm_dir = "../temp_jz/jz_logs"
 prep = "module purge\n module load pytorch-gpu/py3/1.7.1\n"
 python_path = "python"
-
-
+logs_dir = f"/gpfsscratch/rech/imi/{account}/ClimateAndLearning_log/jz_logs"
+slurm_dir = f"/gpfsscratch/rech/imi/{account}/ClimateAndLearning_log/slurm"
 # ---------------------------------
 
 def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=False, n_tasks=1):
@@ -24,6 +19,8 @@ def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=F
 
     Parameters
     ----------
+    job_name: str
+        job id name
     script: str
         name of project's interface file (should be simulate.py)
 
@@ -42,20 +39,11 @@ def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=F
     n_tasks: int
         configure cpus
     """
-    account = "utw61ti"
     # ----- prepare submission script in slurmjob file ------
-    logs_dir = f"/gpfsscratch/rech/imi/{account}/ClimateAndLearning_log/jz_logs"
-    python_path = "python"
-    slurm_dir = f"/gpfsscratch/rech/imi/{account}/ClimateAndLearning_log/slurm"
-
-    # create logging directories
-    #logs_dir = "../temp_jz/logs"
-    code_dir = "."
-    #slurm_dir = "../temp_jz/jz_logs"
-    slurmjob_path = op.join(slurm_dir + "/" + job_name + ".sh")
+    slurmjob_path = os.path.join(slurm_dir + "/" + job_name + ".sh")
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
-    slurmjob_path = op.join(slurm_dir, "{}.sh".format(job_name))
+    slurmjob_path = os.path.join(slurm_dir, "{}.sh".format(job_name))
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
     with open(slurmjob_path, "w") as fh:
@@ -74,8 +62,6 @@ def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=F
         fh.writelines("#SBATCH -o {}/{}_%j.out\n".format(logs_dir, job_name))
         fh.writelines("#SBATCH -e {}/{}_%j.err\n".format(logs_dir, job_name))
         fh.writelines(f"#SBATCH --time={time}\n")
-
-        # email alerts
         fh.writelines(f"#SBATCH --ntasks=1\n")
         fh.writelines(f"#SBATCH --cpus-per-task {n_tasks}\n")
         fh.writelines("#SBATCH --hint=nomultithread\n")
@@ -83,18 +69,12 @@ def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=F
         fh.writelines("#SBATCH --mail-user={}\n".format(email))
         batch_cmd = prep + "srun {} {} {}".format(python_path, script, parameters)
         fh.writelines(batch_cmd)
-        # ----------------------------------------------------------------------
-        # submit job
+    # ----------------------------------------------------------------------
+    # submit job
     os.system("sbatch %s" % slurmjob_path)
 
 
-def run_batch(
-        experiments,
-        param_names,
-        long_run=False,
-        gpu=True,
-        n_tasks=1,
-):
+def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
     """
     makes all possible combinations of parameters within the given parameters, and for each combination calls on
     run_exp from looper.py to launch them with SLURM
@@ -115,6 +95,7 @@ def run_batch(
         number of cpus allocated to the task. More cpus gives access to more memory, and more possible parallel
         processes.
     """
+    # process flags
     parameters = ""
     for experiment in experiments:
         for i in range(len(experiment)):

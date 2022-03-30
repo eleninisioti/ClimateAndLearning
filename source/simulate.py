@@ -1,4 +1,4 @@
-""" This script is the main interface to the simulation.
+""" This script is the main interface to the experiment.
 """
 
 import argparse
@@ -13,53 +13,46 @@ from pathlib import Path
 
 def simulate(args):
     # create project sub-directories
-
-    project =  args.project
-    if not os.path.exists(project  + "/plots"):
+    project = args.project
+    if not os.path.exists(project + "/plots"):
         os.makedirs(project + "/plots")
 
     # save project configuration
-    with open(project  + '/config.yml', 'w') as outfile:
+    with open(project + '/config.yml', 'w') as outfile:
         yaml.dump(args, outfile)
 
+    if args.trial:
+        # run a single trial with desired trial index
+        trials_range = [args.trial]
+    else:
+        # run multiple trials
+        trials_range = list(range(args.num_trials))
+    for trial in trials_range:
+        trial_dir = project + "/trials/trial_" + str(trial)
+        if not os.path.exists(trial_dir + "/plots"):
+            Path(trial_dir + "/plots").mkdir(parents=True, exist_ok=True)
 
-        if args.trial:
-            # run a single trial with desired trial index
-            trials_range = [args.trial]
-        else:
-            # run multiple trials
-            trials_range = list(range(args.num_trials))
-        for trial in trials_range:
-            trial_dir = project + "/trials/trial_" + str(trial)
-            if not os.path.exists(trial_dir + "/plots"):
-                Path(trial_dir + "/plots").mkdir(parents=True, exist_ok=True)
+        # seed simulation with trial index
+        random.seed(trial)
+        np.random.seed(trial)
 
-            # seed simulation with trial index
-            random.seed(trial)
-            np.random.seed(trial)
+        args.trial = trial
+        life_simul = Life(args)
 
-            args.trial = trial
-            life_simul = Life(args)
+        try:
+            log, log_niches = life_simul.run()
 
-            try:
-                log, env_profile, log_niches = life_simul.run()
+        except KeyboardInterrupt:
+            print("Running aborted. Saving intermediate results.")
+            life_simul.logger.final_log()
+            log = life_simul.logger.log
+            log_niches = life_simul.logger.log_niches
 
-            except KeyboardInterrupt:
-                print("Running aborted. Saving intermediate results.")
-                life_simul.logger.final_log()
-                log = life_simul.logger.log
-                env_profile = life_simul.logger.env_profile
-                log_niches = life_simul.logger.log_niches
+        with open(trial_dir + '/log.pickle', 'wb') as pfile:
+            pickle.dump(log, pfile, protocol=pickle.HIGHEST_PROTOCOL)
 
-            with open(trial_dir + '/log.pickle', 'wb') as pfile:
-                pickle.dump(log, pfile, protocol=pickle.HIGHEST_PROTOCOL)
-
-            with open(trial_dir + '/env_profile.pickle', 'wb') as pfile:
-                pickle.dump(env_profile, pfile, protocol=pickle.HIGHEST_PROTOCOL)
-
-            with open(trial_dir + '/log_niches.pickle', 'wb') as pfile:
-                pickle.dump(log_niches, pfile, protocol=pickle.HIGHEST_PROTOCOL)
-
+        with open(trial_dir + '/log_niches.pickle', 'wb') as pfile:
+            pickle.dump(log_niches, pfile, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def init_parser():
@@ -102,23 +95,23 @@ def init_parser():
                         type=float,
                         default=10)
 
-    parser.add_argument('--init_SD',
-                        help='Initial SD of agents',
+    parser.add_argument('--init_sigma',
+                        help='Standard deviation used to initialize genomes.',
                         type=float,
                         default=0.1)
 
     parser.add_argument('--init_mutate',
-                        help='Initial value of Mutation rate',
+                        help='Initial value of mutation rate',
                         type=float,
                         default=0.005)
 
     parser.add_argument('--mutate_mutate_rate',
-                        help='Mutation rate of mutation rate',
+                        help='Mutation rate of mutation rate. (only used in genome 1D-mutate-fixed)',
                         type=float,
                         default=0.0005)
 
     parser.add_argument('--env_type',
-                        help='Type of environment. Choose between change, sin and Maslin.',
+                        help='Type of environment. Choose between stable, sid and noise.',
                         type=str,
                         default="combined")
 
@@ -127,39 +120,8 @@ def init_parser():
                         type=int,
                         default=1000)
 
-    parser.add_argument('--factor_time_abrupt',
-                        help='Scaling factor for time for abrupt transition.',
-                        type=int,
-                        default=1)
-
-    parser.add_argument('--factor_time_variable',
-                        help='Scaling factor for time for variable period.',
-                        type=float,
-                        default=1)
-
-    parser.add_argument('--factor_time_steady',
-                        help='Scaling factor for time for steady periods.',
-                        type=float,
-                        default=1)
-
-    parser.add_argument('--var_freq',
-                        help='Scaling factor for frequency for abrupt transition.',
-                        type=int,
-                        default=5)
-
-    parser.add_argument('--var_SD',
-                        help='SD of variable transition.',
-                        type=float,
-                        default=0.2)
-
-    parser.add_argument('--irregular',
-                        help='If 1, ....',
-                        type=float,
-                        default=1)
-
     parser.add_argument('--selection_type',
-                        help="Type of fitness used. Choose between 'FP-Grove', 'limited-capacity' and "
-                             "'capacity-fitness'.",
+                        help="Type of selection used for reproduction. Choose between N, F and NF.",
                         type=str,
                         default="capacity-fitness")
 
@@ -169,13 +131,7 @@ def init_parser():
                         default="1D_mutate")
 
     parser.add_argument('--only_climate',
-                        help='If 1, no population is created.',
-                        type=int,
-                        default=0)
-
-
-    parser.add_argument('--first_gen',
-                        help='First timestep to start simulating life.',
+                        help='If 1, no population is created (used to quickly debug climate functions).',
                         type=int,
                         default=0)
 
@@ -206,11 +162,6 @@ def init_parser():
 
     args = parser.parse_args()
     return args
-
-
-def run():
-    args = init_parser()
-    simulate(args)
 
 
 if __name__ == "__main__":

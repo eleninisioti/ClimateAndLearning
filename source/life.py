@@ -1,6 +1,4 @@
-from change_environment import ChangeEnv
 from sin_environment import SinEnv
-from maslin_environment import MaslinEnv
 from stable_environment import StableEnv
 from noisy_environment import NoisyEnv
 import numpy as np
@@ -14,15 +12,8 @@ class Life:
         self.config = args  # contains all configuration necessary for the experiment
 
     def setup(self):
-        # ----- set up environment ----
-        if self.config.env_type == "change":
-            self.env = ChangeEnv(mean=self.config.climate_mean_init,
-                                 ref_capacity=self.config.capacity,
-                                 num_niches=self.config.num_niches,
-                                 factor_time_abrupt=self.config.factor_time_abrupt,
-                                 factor_time_steady=self.config.factor_time_steady)
-
-        elif self.config.env_type == "sin":
+        # ----- set up environment -----
+        if self.config.env_type == "sin":
             self.env = SinEnv(mean=self.config.climate_mean_init,
                               ref_capacity=self.config.capacity,
                               num_niches=self.config.num_niches,
@@ -31,32 +22,22 @@ class Life:
 
         elif self.config.env_type == "stable":
             self.env = StableEnv(mean=self.config.climate_mean_init,
-                              ref_capacity=self.config.capacity,
-                              num_niches=self.config.num_niches)
-
-        elif self.config.env_type == "combined":
-            self.env = MaslinEnv(mean=self.config.climate_mean_init,
                                  ref_capacity=self.config.capacity,
-                                 num_niches=self.config.num_niches,
-                                 factor_time_abrupt=self.config.factor_time_abrupt,
-                                 factor_time_variable=self.config.factor_time_variable,
-                                 factor_time_steady=self.config.factor_time_steady,
-                                 var_freq=self.config.var_freq,
-                                 var_SD=self.config.var_SD)
+                                 num_niches=self.config.num_niches)
 
         elif self.config.env_type == "noisy":
             self.env = NoisyEnv(mean=self.config.climate_mean_init,
-                                 std = self.config.noise_std,
-                                 ref_capacity=self.config.capacity,
-                                 num_niches=self.config.num_niches)
+                                std=self.config.noise_std,
+                                ref_capacity=self.config.capacity,
+                                num_niches=self.config.num_niches)
         # -------------------------------------------------------------------------
-        # ----- set up population ----
+        # ----- set up population -----
         pop_size = int(np.min([self.config.init_num_agents, self.env.current_capacity * self.config.num_niches]))
         self.population = Population(pop_size=pop_size,
                                      selection_type=self.config.selection_type,
                                      genome_type=self.config.genome_type,
                                      env_mean=self.env.climate,
-                                     init_SD=self.config.init_SD,
+                                     init_sigma=self.config.init_sigma,
                                      init_mutate=self.config.init_mutate,
                                      mutate_mutate_rate=self.config.mutate_mutate_rate,
                                      extinctions=self.config.extinctions)
@@ -71,7 +52,7 @@ class Life:
         self.setup()
 
         # ----- run generations ------
-        for gen in range(self.config.first_gen, self.config.num_gens):
+        for gen in range(self.config.num_gens):
 
             # update environment
             self.env.step(gen)
@@ -87,6 +68,8 @@ class Life:
                 if self.population.has_mass_extinction():
                     break
 
+
+
                 # reproduce population
                 self.population.reproduce(self.env)
 
@@ -97,4 +80,4 @@ class Life:
         # collect all information for logging
         self.logger.final_log()
 
-        return self.logger.log, self.logger.env_profile, self.logger.log_niches
+        return self.logger.log, self.logger.log_niches

@@ -1,20 +1,37 @@
 import numpy as np
 import pandas as pd
 
+
+def find_label(config):
+    label = ""
+    if config.selection_type == "NF":
+        label += "NF-selection"
+    elif config.selection_type == "N":
+        label += "N-selection"
+    elif config.selection_type == "F":
+        label += "F-selection"
+    return label
+
 def compute_SoS(log, log_niches, num_niches):
-    """ Compute Strength of Selection"""
+    """ Compute Strength of Selection.
+
+    Parameters
+    ---------
+    log_niches: Dataframe
+        information about niches
+
+    num_niches: int
+        number of niches
+    """
     trials = len(log_niches)
     for trial in range(trials):
         all_strengths = []
-
         log_trial = log.loc[(log['Trial'] == trial)]
-
         climate_mean = []
         num_gens = min([len(log_niches[trial]["inhabited_niches"]), len(list(log_trial["Climate"]))])
         log_trial = log_trial.loc[log_trial['Generation'] < num_gens]
 
         for gen in range(num_gens):
-            el = list(log_trial["Climate"])[gen]
             climate_values = []
             for lat in range(-int(num_niches/2), int(num_niches/2 +0.5)):
                 lat_climate = list(log_trial["Climate"])[gen] + 0.01 *lat
@@ -40,7 +57,16 @@ def compute_SoS(log, log_niches, num_niches):
 
 
 def compute_dispersal(log, log_niches, num_niches):
+    """ Compute dispersal
 
+    Parameters
+    ---------
+    log_niches: Dataframe
+        information about niches
+
+    num_niches: int
+        number of niches
+    """
     num_latitudes = num_niches
     window = 10
     trials = len(log_niches)

@@ -9,7 +9,7 @@ import datetime
 
 def stable_sigma(trial, long_run):
     "Reproduce experiments with stable environment"
-    top_dir = setup_dir() + "_stable_sigma/"
+    top_dir = setup_dir() + "_stable_sigma_me0_re1/"
     experiments = []
 
     param_names = ["--project",
@@ -54,7 +54,7 @@ def stable_sigma(trial, long_run):
 
 def stable_selection(trial, long_run):
     "Reproduce experiments with stable environment"
-    top_dir = setup_dir() + "_stable_sigma/"
+    top_dir = setup_dir() + "_stable_selection_me0_re1/"
     experiments = []
 
     param_names = ["--project",

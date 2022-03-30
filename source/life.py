@@ -70,8 +70,6 @@ class Life:
                 if self.population.has_mass_extinction():
                     break
 
-
-
                 # reproduce population
                 self.population.reproduce(self.env)
 

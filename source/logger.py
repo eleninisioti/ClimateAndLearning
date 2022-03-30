@@ -135,7 +135,7 @@ class Logger:
 
 
         # convert to dataframe and save trial data
-        for step in range(len(self.log["Climate"])):
+        for step in range(len(self.log["Fitness"])):
             trial_log = {'Generation': [step], 'Trial': [self.trial]}
             for key in self.log.keys():
                 if len(self.log[key]):

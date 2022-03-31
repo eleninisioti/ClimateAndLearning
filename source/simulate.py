@@ -164,13 +164,13 @@ def init_parser():
                         help='If True, an agents fitness is the mean of its fitnesses in which it survives. If False'
                              'the agent reproduces with a different fitness in each niche.',
                         type=int,
-                        default=1)
+                        default=0)
 
     parser.add_argument('--reproduce_once',
                         help='If True, an agents fitness is the mean of its fitnesses in which it survives. If False'
                              'the agent reproduces with a different fitness in each niche.',
                         type=int,
-                        default=1)
+                        default=0)
 
     args = parser.parse_args()
     return args

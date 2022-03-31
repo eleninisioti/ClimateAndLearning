@@ -109,7 +109,7 @@ class Plotter:
 
         # ----- plot climate curve -----
         if "climate" in include:
-            log_trial = self.log.loc[(self.log['Trial'] == 0)]
+            log_trial = self.log.loc[(self.log['Trial'] == 1)]
 
             # find mean climate across niches:
             climate_avg = []

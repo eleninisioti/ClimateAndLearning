@@ -73,7 +73,8 @@ def stable_selection(trial, long_run):
     genome_types = ["evolv"]
     num_niches_values = [100]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 1.5, 2, 2.5, 4]
-    reproduce_once = 0
+    climate_mean_init_values = [4]
+    reproduce_once = 1
     mean_fitness = 1
 
 
@@ -97,6 +98,50 @@ def stable_selection(trial, long_run):
     if mode == "server":
         run_batch(experiments, param_names, long_run=long_run, gpu=True)
 
+
+def noisy(trial, long_run=False):
+    """Reproduce experiments with noisy environment
+    """
+    top_dir = setup_dir() + "_noisy_/"
+    experiments = []
+
+    param_names = ["--project",
+                   "--env_type",
+                   "--num_gens",
+                   "--trial",
+                   "--selection_type",
+                   "--genome_type",
+                   "--num_niches",
+                   "--climate_mean_init",
+                   "--noise_std"]
+    env_type = "noisy"
+    num_gens = 400
+    selection_types = ["NF", "N", "F"]
+    genome_types = ["evolv"]
+    num_niches_values = [40]
+    noise_std_values = [0.2]
+    climate_mean_init_values = [2]
+
+    for noise_std in noise_std_values:
+        for N in num_niches_values:
+            for climate_mean_init in climate_mean_init_values:
+                for G in genome_types:
+                    for S in selection_types:
+                            project = top_dir + "selection_" + S + "_G_" + G + "_N_" + str(N) + "_climate_" +\
+                                      str(climate_mean_init) + "_noise_" + str(noise_std)
+                            new_exp = [project, env_type, num_gens, trial, S,
+                                       G,  N, climate_mean_init, noise_std]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                # command += "&" # uncomment to run all experiments simultaneously
+                                print(command)
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
 
 def setup_dir():
     """ Set up the top directory for this batch of experiments.
@@ -128,6 +173,6 @@ if __name__ == "__main__":
         mode = sys.argv[2] # this should be server for running jz experiments
 
         for trial in range(1, trials+1):
-            stable_sigma(trial, long_run=False)
-            stable_selection(trial, long_run=False)
-
+            #stable_sigma(trial, long_run=False)
+            #stable_selection(trial, long_run=False)
+            noisy(trial, long_run=False)

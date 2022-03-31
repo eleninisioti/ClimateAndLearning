@@ -16,7 +16,7 @@ class Agent:
             the agent's genome
         """
         self.genome = genome
-        self.reproduced = False
+        self.reproduced = 0
 
     def mutate(self):
         self.genome.mutate()

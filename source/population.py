@@ -131,11 +131,11 @@ class Population:
             if self.reproduce_once:
 
                 #niche_pop = [el for el in niche_pop[:int(len(niche_pop)/2)] if el.reproduced < 2]
-                niche_pop = [el for el in niche_pop[:int(len(niche_pop) / 2)] if el.reproduced < 2]
+                niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)] if el.reproduced < 2]
                 #niche_pop = [el for el in niche_pop if el.reproduced < 2]
                 #niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)] if el.reproduced < 1]
             else:
-                niche_pop = [el for el in niche_pop[:int(len(niche_pop)/2)]]
+                niche_pop = [el for el in niche_pop[:int(niche_capacity/2)]]
             if "F" in self.selection_type:
                 niche_pop = self.order_agents(niche_pop)
 
@@ -166,29 +166,18 @@ class Population:
                     #new_niche_agents.append(new_agent)
 
                     if len(new_niche_agents) < niche_capacity:
-                        if pair[0].reproduced <2 and pair[1].reproduced < 2:
-                            #print(pair[0].reproduced, pair[1].reproduced)
+                        if self.reproduce_once and pair[0].reproduced <2 and pair[1].reproduced < 2:
                             # if there is still room, fill till maximum population
                             new_niche_agents.append(new_agent)
                             pair[0].reproduced +=1
-                            #pair[1].reproduced +=1
-
+                        elif not self.reproduce_once:
+                            new_niche_agents.append(new_agent)
+                            pair[0].reproduced += 1
                     else:
                         break
-                for idx,agent in enumerate(niche_pop):
-                    if agent.reproduced==1:
-                        total_reproduced_once += 1
-                    elif agent.reproduced==2:
-                        total_reproduced_twice += 1
-                    elif agent.reproduced==0:
-                        total_reproduced_zero += 1
-                    else:
-                        total_wrong += 1
-                        print("wrong",idx)
-            new_agents.extend(new_niche_agents)
-            #print("new niche", len(new_niche_agents), len(niche_pop), niche_capacity)
 
-            #print(len(new_agents), total_reproduced_zero, total_reproduced_once, total_reproduced_twice, total_wrong)
+            new_agents.extend(new_niche_agents)
+
         self.agents = new_agents
 
     def order_agents(self, agents):

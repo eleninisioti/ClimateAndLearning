@@ -144,7 +144,7 @@ class Plotter:
             x = self.log["Generation"][::self.interval]
             y = self.log["SD"][::self.interval]
             y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            #y = y.clip(lower=self.y_lower_thres)
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(ylabel="$\\bar{\sigma}$")
@@ -157,7 +157,7 @@ class Plotter:
             x = self.log["Generation"][::self.interval]
             y = self.log["R"][::self.interval]
             y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            #y = y.clip(lower=self.y_lower_thres)
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(ylabel="$\\bar{r}$")

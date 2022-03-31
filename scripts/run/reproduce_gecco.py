@@ -9,7 +9,7 @@ import datetime
 
 def stable_sigma(trial, long_run):
     "Reproduce experiments with stable environment"
-    top_dir = setup_dir() + "_stable_sigma_me0_re1/"
+    top_dir = setup_dir() + "_stable_sigma/"
     experiments = []
 
     param_names = ["--project",
@@ -27,9 +27,9 @@ def stable_sigma(trial, long_run):
     selection_types = ["NF"]
     genome_types = ["evolv"]
     num_niches_values = [1, 5, 10, 50, 100]
-    climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 1.5, 2, 2.5, 4]
+    climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 1.5, 2, 2.5, 4, 8]
     reproduce_once = 0
-    mean_fitness = 1
+    mean_fitness = 0
 
     for N in num_niches_values:
         for climate_mean_init in climate_mean_init_values:
@@ -54,7 +54,7 @@ def stable_sigma(trial, long_run):
 
 def stable_selection(trial, long_run):
     "Reproduce experiments with stable environment"
-    top_dir = setup_dir() + "_stable_selection_me0_re1/"
+    top_dir = setup_dir() + "_stable_selection/"
     experiments = []
 
     param_names = ["--project",
@@ -72,10 +72,9 @@ def stable_selection(trial, long_run):
     selection_types = ["NF", "F", "N"]
     genome_types = ["evolv"]
     num_niches_values = [100]
-    climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 1.5, 2, 2.5, 4]
-    climate_mean_init_values = [4]
-    reproduce_once = 1
-    mean_fitness = 1
+    climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 1.5, 2, 2.5, 4, 8]
+    reproduce_once = 0
+    mean_fitness = 0
 
 
     for N in num_niches_values:
@@ -220,7 +219,7 @@ if __name__ == "__main__":
         mode = sys.argv[2] # this should be server for running jz experiments
 
         for trial in range(1, trials+1):
-            #stable_sigma(trial, long_run=False)
-            #stable_selection(trial, long_run=False)
-            noisy(trial, long_run=False)
-            sin(trial, long_run=False)
+            stable_sigma(trial, long_run=False)
+            stable_selection(trial, long_run=False)
+            #noisy(trial, long_run=False)
+            #sin(trial, long_run=False)

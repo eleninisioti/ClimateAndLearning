@@ -627,8 +627,8 @@ def evolution_compare(include):
 
 if __name__ == "__main__":
     # ------ stable climate function -----
-    results_dir = "../projects/paper/stable/sigma"
-    #sigma()
+    results_dir = "../projects/paper/stable/sigma_old"
+    sigma()
 
     results_dir = "../projects/paper/stable/sigma_selection"
     #sigma_selection( y_variables=["SD", "Dispersal"], label="model")

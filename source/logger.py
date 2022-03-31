@@ -55,7 +55,6 @@ class Logger:
         self.log["running_fitness"].append(mean_fitness)
         self.log["running_mean"].append(mean_mean)
         self.log["running_SD"].append(mean_SD)
-        print("running_Sd", mean_SD)
         self.log["running_mutate"].append(mean_mutate)
         self.log["extinctions"].append(population.num_extinctions)
         self.log["num_agents"].append(len(population.agents))

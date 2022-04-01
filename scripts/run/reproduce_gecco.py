@@ -159,7 +159,7 @@ def sin(trial, long_run):
                    "--period"]
 
     env_type = "sin"
-    num_gens = 1000
+    num_gens = 500
     selection_types = ["NF", "N", "F"]
     genome_types = ["evolv"]
     num_niches_values = [100]
@@ -219,7 +219,7 @@ if __name__ == "__main__":
         mode = sys.argv[2] # this should be server for running jz experiments
 
         for trial in range(1, trials+1):
-            stable_sigma(trial, long_run=False)
-            stable_selection(trial, long_run=False)
+            #stable_sigma(trial, long_run=False)
+            #stable_selection(trial, long_run=False)
             #noisy(trial, long_run=False)
-            #sin(trial, long_run=False)
+            sin(trial, long_run=False)

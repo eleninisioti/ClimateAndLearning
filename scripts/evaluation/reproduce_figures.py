@@ -40,7 +40,10 @@ def sigma():
         trial_dirs = list(next(os.walk(p + "/trials"))[1])
         for trial, trial_dir in enumerate(trial_dirs):
             # load outcome of trial
-            log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+            try:
+                log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+            except IOError:
+                break
             trial_sigma = np.mean(log["SD"][-100:])
             new_row = pd.DataFrame.from_dict({'SD': [trial_sigma],
                                               "Trial": [trial],
@@ -94,7 +97,10 @@ def sigma_selection( y_variables, label="Num_niches"):
             trial_dirs = list(next(os.walk(p + "/trials"))[1])
             for trial, trial_dir in enumerate(trial_dirs):
                 # load outcome of trial
-                log = pickle.load(open(p + "/trials/" + trial_dir + '/log_updated.pickle', 'rb'))
+                try:
+                    log = pickle.load(open(p + "/trials/" + trial_dir + '/log_updated.pickle', 'rb'))
+                except IOError:
+                    break
                 trial_sigma = np.mean(log[y_variable][-100:])
                 if label == "Num_niches":
                     new_row = pd.DataFrame.from_dict({y_variable: [trial_sigma],
@@ -628,9 +634,11 @@ def evolution_compare(include):
 if __name__ == "__main__":
     # ------ stable climate function -----
     results_dir = "../projects/paper/stable/sigma_old"
+    results_dir = "../projects/server/31_3_2022_stable_sigma"
     sigma()
 
-    results_dir = "../projects/paper/stable/sigma_selection"
+    #results_dir = "../projects/paper/stable/sigma_selection"
+    results_dir = "../projects/server/31_3_2022_stable_selection"
     #sigma_selection( y_variables=["SD", "Dispersal"], label="model")
 
     results_dir = "../projects/paper/stable/extinct"

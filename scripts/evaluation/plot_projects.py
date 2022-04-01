@@ -14,6 +14,7 @@ import seaborn as sns
 import numpy as np
 import pickle
 from utils import compute_SoS, compute_dispersal
+import numpy as np
 
 labels = {"climate_mean_init": "$\\bar{e}$, Mean climate",
           "num_niches": "$N$, Number of niches",
@@ -109,7 +110,7 @@ class Plotter:
 
         # ----- plot climate curve -----
         if "climate" in include:
-            log_trial = self.log.loc[(self.log['Trial'] == 1)]
+            log_trial = self.log.loc[(self.log['Trial'] == np.mean(self.log['Trial']))]
 
             # find mean climate across niches:
             climate_avg = []

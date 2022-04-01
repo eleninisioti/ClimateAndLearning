@@ -106,7 +106,7 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
         if long_run:
             time = "100:00:00"
         else:
-            time = "18:00:00"
+            time = "20:00:00"
         name = "temp_" + str(random())
         run_exp(job_name=name,
                 script=script,

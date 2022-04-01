@@ -131,7 +131,7 @@ class Population:
             if self.reproduce_once:
 
                 #niche_pop = [el for el in niche_pop[:int(len(niche_pop)/2)] if el.reproduced < 2]
-                niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)] if el.reproduced < 2]
+                niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)] if el.reproduced < 1]
                 #niche_pop = [el for el in niche_pop if el.reproduced < 2]
                 #niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)] if el.reproduced < 1]
             else:
@@ -166,13 +166,15 @@ class Population:
                     #new_niche_agents.append(new_agent)
 
                     if len(new_niche_agents) < niche_capacity:
-                        if self.reproduce_once and pair[0].reproduced <2 and pair[1].reproduced < 2:
+                        #if self.reproduce_once and pair[0].reproduced <2 and pair[1].reproduced < 2:
                             # if there is still room, fill till maximum population
-                            new_niche_agents.append(new_agent)
-                            pair[0].reproduced +=1
-                        elif not self.reproduce_once:
-                            new_niche_agents.append(new_agent)
-                            pair[0].reproduced += 1
+                            #new_niche_agents.append(new_agent)
+                            #pair[0].reproduced +=1
+                        #elif not self.reproduce_once:
+                        new_niche_agents.append(new_agent)
+                        pair[0].reproduced += 1
+                            #pair[0].reproduced += 1
+
                     else:
                         break
 

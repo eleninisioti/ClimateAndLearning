@@ -218,7 +218,7 @@ def sin(trial, long_run):
                    "--period"]
 
     env_type = "sin"
-    num_gens = 1000
+    num_gens = 750
     selection_types = ["NF", "N", "F"]
     genome_types = ["evolv"]
     num_niches_values = [100]

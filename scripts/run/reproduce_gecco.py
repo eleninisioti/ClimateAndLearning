@@ -279,7 +279,6 @@ if __name__ == "__main__":
 
         for trial in range(1, trials+1):
             stable_sigma(trial, long_run=False)
-            #stable_sigma_100(trial, long_run=False)
             stable_selection(trial, long_run=False)
             #stable_selection_rest(trial, long_run=False)
             noisy(trial, long_run=False)

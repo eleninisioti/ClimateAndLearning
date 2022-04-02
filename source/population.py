@@ -80,6 +80,71 @@ class Population:
         for agent in agents:
             agent.compute_fitness(env_mean)
 
+    def reproduce_v2(self, env):
+        self.agents = self.order_agents(self.agents)
+
+        for agent in self.agents:
+            agent.reproduced = False
+        new_agents = []
+        keep_agents = copy.copy(self.agents)
+        self.agents = []
+
+        # agents reproduce within the niches they belong to
+        for lat in range(-int(env.num_niches / 2), int(env.num_niches / 2 + 0.5)):
+            lat_climate = env.mean + 0.01 * lat
+            current_agents = []
+            for agent in keep_agents:
+                if lat_climate in agent.niches:
+                    if not agent.reproduced:  # ensure that an agent reproduces in at most one niche
+                        current_agents.append(agent)
+                    else:
+                        print("reproduced")
+
+            for agent in current_agents:
+                if agent.reproduced:
+                    print("wrong")
+            lat_capacity = int(lat_climate * env.niche_capacity)
+            if lat_capacity > 1 and len(current_agents) > 2:
+                current_agents = self.order_agents(current_agents)
+
+                self.agents_reproduce = current_agents[:int(lat_capacity / 2)]
+                print("v2: climate", lat_climate, len(self.agents_reproduce))
+
+                weights = [agent.fitness for agent in self.agents_reproduce]
+                self.agents_reproduce = choices(self.agents_reproduce, weights=weights,
+                                                k=len(self.agents_reproduce))
+
+                # find partners
+                weights = [agent.fitness for agent in self.agents_reproduce]
+                partners_a = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
+                partners_b = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
+                for agent in self.agents_reproduce:
+                    if agent.reproduced:
+                        print("wrong")
+
+                for idx, agent in enumerate(self.agents_reproduce):
+                    agent_genome = Genome(genome_type=self.genome_type, env_mean=self.env_mean,
+                                          init_sigma=self.init_sigma,
+                                          init_mutate=self.init_mutate, mutate_mutate_rate=self.mutate_mutate_rate)
+
+                    # first child
+                    agent_genome.cross([agent.genome, partners_a[idx].genome])
+                    new_agent = Agent(genome=agent_genome)
+                    new_agent.mutate()
+                    new_agents.append(new_agent)
+
+
+                    agent.reproduced = True
+
+                    # second child
+                    agent_genome.cross([agent.genome, partners_b[idx].genome])
+                    new_agent = Agent(genome=agent_genome)
+                    new_agent.mutate()
+                    new_agents.append(new_agent)
+                    agent.reproduced = True
+
+        self.agents = new_agents
+
     def reproduce(self, env):
         """ Population reproduction at the end of a generation.
 
@@ -106,79 +171,61 @@ class Population:
             niche_capacity = int(env.current_capacity * env.num_niches)
             for_reproduction = [{"population": self.agents, "capacity": niche_capacity, "climate": env.mean}]
 
-        total_pop = total_cap = 0
-        for niche_data in for_reproduction:
-            niche_pop = niche_data["population"]
-            niche_capacity = niche_data["capacity"]
-            total_pop += len(niche_pop)
-            total_cap += niche_capacity
         # pair agents for reproduction
         random.shuffle(for_reproduction)
         new_agents = []
 
-        total_reproduced_once = 0
-        total_reproduced_twice = 0
-        total_reproduced_zero = 0
-        total_wrong = 0
-
         for niche_data in for_reproduction:
-            new_niche_agents = []
             niche_pop = niche_data["population"]
             niche_capacity = niche_data["capacity"]
             niche_climate = niche_data["climate"]
             random.shuffle(niche_pop)
 
-            if self.reproduce_once:
-
-                #niche_pop = [el for el in niche_pop[:int(len(niche_pop)/2)] if el.reproduced < 2]
-                niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)] if el.reproduced < 1]
-                #niche_pop = [el for el in niche_pop if el.reproduced < 2]
-                #niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)] if el.reproduced < 1]
-            else:
-                niche_pop = [el for el in niche_pop[:int(niche_capacity/2)]]
             if "F" in self.selection_type:
                 niche_pop = self.order_agents(niche_pop)
 
+            if self.reproduce_once:
+                niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)] if el.reproduced < 1]
+            else:
+                niche_pop = [el for el in niche_pop[:int(niche_capacity/2)]]
+
+            if "F" in self.selection_type:
                 if self.mean_fitness:
                     weights = [agent.fitness for agent in niche_pop]
                 else:
                     weights = [agent.fitnesses[niche_climate] for agent in niche_pop]
             else:
                 weights = [1 for agent in niche_pop]
-            if len(niche_pop):
-                partner_0 = choices(niche_pop, weights=weights, k=len(niche_pop))
-                partner_a = choices(niche_pop, weights=weights, k=len(niche_pop))
-                partner_b = choices(niche_pop, weights=weights, k=len(niche_pop))
-                pairs = []
-                for idx in range(len(partner_0)):
-                    pairs.append([partner_0[idx], partner_a[idx]])
-                    pairs.append([partner_0[idx], partner_b[idx]])
 
-                for pair in pairs:
-                    agent_genome = Genome(genome_type=self.genome_type,
-                                          env_mean=self.env_mean,
+
+
+            if len(niche_pop):
+                agents_reproduce = choices(niche_pop, weights=weights,
+                                                k=len(niche_pop))
+
+                # find partners
+                weights = [agent.fitness for agent in agents_reproduce]
+                partners_a = choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
+                partners_b = choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
+
+
+                for idx, agent in enumerate(agents_reproduce):
+                    agent_genome = Genome(genome_type=self.genome_type, env_mean=self.env_mean,
                                           init_sigma=self.init_sigma,
-                                          init_mutate=self.init_mutate,
-                                          mutate_mutate_rate=self.mutate_mutate_rate)
-                    agent_genome.cross([pair[0].genome, pair[1].genome])  # sexual crossing
+                                          init_mutate=self.init_mutate, mutate_mutate_rate=self.mutate_mutate_rate)
+
+                    # first child
+                    agent_genome.cross([agent.genome, partners_a[idx].genome])
                     new_agent = Agent(genome=agent_genome)
                     new_agent.mutate()
-                    #new_niche_agents.append(new_agent)
+                    new_agents.append(new_agent)
+                    agent.reproduced = True
 
-                    if len(new_niche_agents) < niche_capacity:
-                        #if self.reproduce_once and pair[0].reproduced <2 and pair[1].reproduced < 2:
-                            # if there is still room, fill till maximum population
-                            #new_niche_agents.append(new_agent)
-                            #pair[0].reproduced +=1
-                        #elif not self.reproduce_once:
-                        new_niche_agents.append(new_agent)
-                        pair[0].reproduced += 1
-                            #pair[0].reproduced += 1
-
-                    else:
-                        break
-
-            new_agents.extend(new_niche_agents)
+                    # second child
+                    agent_genome.cross([agent.genome, partners_b[idx].genome])
+                    new_agent = Agent(genome=agent_genome)
+                    new_agent.mutate()
+                    new_agents.append(new_agent)
 
         self.agents = new_agents
 

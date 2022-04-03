@@ -43,8 +43,8 @@ def run_exp(job_name, log_dir, script, parameters, gpu=False, time="20:00:00", l
     # ----- prepare submission script in slurmjob file ------
 
     slurmjob_path = os.path.join(log_dir + "slurm", job_name) + ".sh"
-    create_slurmjob_cmd = "touch {}".format(slurmjob_path)
-    os.system(create_slurmjob_cmd)
+    #create_slurmjob_cmd = "touch {}".format(slurmjob_path)
+    #os.system(create_slurmjob_cmd)
     with open(slurmjob_path, "w") as fh:
         fh.writelines("#!/bin/sh\n")
         if gpu:

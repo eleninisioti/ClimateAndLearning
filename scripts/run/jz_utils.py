@@ -42,7 +42,7 @@ def run_exp(job_name, log_dir, script, parameters, gpu=False, time="20:00:00", l
     """
     # ----- prepare submission script in slurmjob file ------
 
-    slurmjob_path = os.path.join(log_dir + "/slurm_dir", job_name) + ".sh"
+    slurmjob_path = os.path.join(log_dir + "slurm_dir", job_name) + ".sh"
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
     with open(slurmjob_path, "w") as fh:
@@ -58,8 +58,8 @@ def run_exp(job_name, log_dir, script, parameters, gpu=False, time="20:00:00", l
             if long_run:
                 fh.writelines("#SBATCH --qos=qos_cpu-t4\n")
         fh.writelines("#SBATCH --job-name={}\n".format(job_name))
-        fh.writelines("#SBATCH -o {}/{}_%j.out\n".format(log_dir + "/jz_logs", job_name))
-        fh.writelines("#SBATCH -e {}/{}_%j.err\n".format(log_dir + "/jz_logs", job_name))
+        fh.writelines("#SBATCH -o {}/{}_%j.out\n".format(log_dir + "jz_logs", job_name))
+        fh.writelines("#SBATCH -e {}/{}_%j.err\n".format(log_dir + "jz_logs", job_name))
         fh.writelines(f"#SBATCH --time={time}\n")
         fh.writelines(f"#SBATCH --ntasks=1\n")
         fh.writelines(f"#SBATCH --cpus-per-task {n_tasks}\n")

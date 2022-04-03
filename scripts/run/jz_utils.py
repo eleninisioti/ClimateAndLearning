@@ -117,7 +117,7 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
         script = "simulate.py"
 
         if long_run:
-            time = "100:00:00"
+            time = "60:00:00"
         else:
             time = "20:00:00"
         run_exp(job_name=name,

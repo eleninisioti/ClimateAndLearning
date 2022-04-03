@@ -187,7 +187,7 @@ class Population:
 
             if self.reproduce_once:
                 niche_pop = [el for el in niche_pop[:int(niche_capacity/2)] if el.reproduced < 1]
-            #else:
+            else:
                 #print(niche_capacity, len(niche_pop))
                 niche_pop = [el for el in niche_pop[:int(niche_capacity/2)]]
 

@@ -18,9 +18,7 @@ def stable_sigma(trial, long_run):
                    "--selection_type",
                    "--genome_type",
                    "--num_niches",
-                   "--climate_mean_init",
-                   "--mean_fitness",
-                    "--reproduce_once"]
+                   "--climate_mean_init"]
     env_type = "stable"
     num_gens = 300
     selection_types = ["NF"]
@@ -28,17 +26,13 @@ def stable_sigma(trial, long_run):
     num_niches_values = [1, 5, 10, 50, 100]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
 
-    reproduce_once = 0
-    mean_fitness = 0
-
     for N in num_niches_values:
         for climate_mean_init in climate_mean_init_values:
             for G in genome_types:
                 for S in selection_types:
                         project = top_dir + "S_" + S + "_G_" + G + "_N_" + \
                                   str(N) + "_climate_" + str(climate_mean_init)
-                        new_exp = [project, env_type, num_gens, trial, S, G, N, climate_mean_init,
-                                   mean_fitness, reproduce_once]
+                        new_exp = [project, env_type, num_gens, trial, S, G, N, climate_mean_init]
                         experiments.append(new_exp)
                         if mode == "local":
                             command = "python simulate.py "
@@ -64,17 +58,14 @@ def stable_selection(trial, long_run):
                    "--selection_type",
                    "--genome_type",
                    "--num_niches",
-                   "--climate_mean_init",
-                   "--mean_fitness",
-                   "--reproduce_once"]
+                   "--climate_mean_init"]
     env_type = "stable"
     num_gens = 300
     selection_types = ["NF", "F", "N"]
     genome_types = ["evolv"]
     num_niches_values = [100]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
-    reproduce_once = 0
-    mean_fitness = 0
+
 
     for N in num_niches_values:
         for climate_mean_init in climate_mean_init_values:
@@ -82,8 +73,7 @@ def stable_selection(trial, long_run):
                 for S in selection_types:
                         project = top_dir + "S_" + S + "_G_" + G + "_N_" + \
                                   str(N) + "_climate_" + str(climate_mean_init)
-                        new_exp = [project, env_type, num_gens, trial, S, G, N, climate_mean_init, mean_fitness,
-                                   reproduce_once]
+                        new_exp = [project, env_type, num_gens, trial, S, G, N, climate_mean_init]
                         experiments.append(new_exp)
                         if mode == "local":
                             command = "python simulate.py "
@@ -122,8 +112,6 @@ def noisy(trial, long_run=False):
     num_niches_values = [40]
     noise_std_values = [0.2]
     climate_mean_init_values = [2]
-    mean_fitness = 0
-    reproduce_once = 0
 
     for noise_std in noise_std_values:
         for N in num_niches_values:
@@ -133,7 +121,7 @@ def noisy(trial, long_run=False):
                             project = top_dir + "selection_" + S + "_G_" + G + "_N_" + str(N) + "_climate_" +\
                                       str(climate_mean_init) + "_noise_" + str(noise_std)
                             new_exp = [project, env_type, num_gens, trial, S,
-                                       G,  N, climate_mean_init, noise_std, mean_fitness, reproduce_once]
+                                       G,  N, climate_mean_init, noise_std]
                             experiments.append(new_exp)
                             if mode == "local":
                                 command = "python simulate.py "
@@ -233,4 +221,4 @@ if __name__ == "__main__":
             #stable_sigma(trial, long_run=False)
             #stable_selection(trial, long_run=False)
             #noisy(trial, long_run=False)
-            sin(trial, long_run=False)
+            sin(trial, long_run=True)

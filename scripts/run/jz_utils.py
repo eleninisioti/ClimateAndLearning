@@ -102,8 +102,9 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
         for i in range(len(experiment)):
             parameters += f" {param_names[i]}={experiment[i]}"
             if param_names[i] == "--project":
-                name = experiment[i]
                 experiment[i] = log_dir + "projects/" + experiment[i]
+                name = experiment[i]
+
 
                 if not os.path.exists(experiment[i]):
                     os.makedirs(experiment[i])

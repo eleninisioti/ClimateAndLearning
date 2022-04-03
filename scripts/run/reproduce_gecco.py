@@ -221,4 +221,4 @@ if __name__ == "__main__":
             #stable_sigma(trial, long_run=False)
             #stable_selection(trial, long_run=False)
             #noisy(trial, long_run=False)
-            sin(trial, long_run=True)
+            sin(trial, long_run=False)

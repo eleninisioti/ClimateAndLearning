@@ -4,6 +4,7 @@ from noisy_environment import NoisyEnv
 import numpy as np
 from population import Population
 from logger import Logger
+import time
 
 
 class Life:
@@ -52,6 +53,7 @@ class Life:
 
         # prepare environment and population
         self.setup()
+        start_time = time.time()
 
         # ----- run generations ------
         for gen in range(self.config.num_gens):
@@ -67,7 +69,9 @@ class Life:
                 # compute metrics for new generation
                 self.logger.log_gen(self.population)
 
-                if self.population.has_mass_extinction():
+                time_out = (time.time() - start_time) > self.time_budget
+
+                if self.population.has_mass_extinction() or time_out:
                     break
 
                 # reproduce population

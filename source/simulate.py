@@ -10,7 +10,6 @@ import random
 import numpy as np
 from pathlib import Path
 
-
 def simulate(args):
     # create project sub-directories
     project = args.project
@@ -41,6 +40,7 @@ def simulate(args):
 
         try:
             log, log_niches = life_simul.run()
+
 
         except KeyboardInterrupt:
             print("Running aborted. Saving intermediate results.")
@@ -171,6 +171,11 @@ def init_parser():
                              'the agent reproduces with a different fitness in each niche.',
                         type=int,
                         default=0)
+
+    parser.add_argument('--time_budget',
+                        help='Maximum seconds for a simulon.',
+                        type=float,
+                        default=(20*60*60-10))
 
     args = parser.parse_args()
     return args

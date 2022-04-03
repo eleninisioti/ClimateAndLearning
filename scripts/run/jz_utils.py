@@ -107,6 +107,12 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
                 if not os.path.exists(experiment[i]):
                     os.makedirs(experiment[i])
 
+                if not os.path.exists( log_dir + "slurm/" + experiment[i]):
+                    os.makedirs(log_dir + "slurm/" + experiment[i])
+
+                if not os.path.exists( log_dir + "jz_logs/" + experiment[i]):
+                    os.makedirs(log_dir + "jz_logs/" + experiment[i])
+
         script = "simulate.py"
 
         if long_run:

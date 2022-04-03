@@ -40,6 +40,7 @@ def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=F
         configure cpus
     """
     # ----- prepare submission script in slurmjob file ------
+
     slurmjob_path = os.path.join(slurm_dir + "/" + job_name + ".sh")
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
@@ -103,7 +104,11 @@ def run_batch(experiments, param_names,  project_dir, long_run=False, gpu=True, 
             parameters += f" {param_names[i]}={experiment[i]}"
             if param_names[i] == "--project":
                 name = log_dir +  "jz_logs/" + experiment[i]
-                experiment[i] =  log_dir + "projects" + experiment[i]
+                experiment[i] =  log_dir + "projects/" + experiment[i]
+                if not os.path.exists(name):
+                    os.makedirs(name)
+                if not os.path.exists(experiment[i]):
+                    os.makedirs(experiment[i])
 
         script = "simulate.py"
 

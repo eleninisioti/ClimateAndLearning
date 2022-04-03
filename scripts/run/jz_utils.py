@@ -95,6 +95,7 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
         processes.
     """
     log_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/"
+    #log_dir = "../"
     # process flags
     parameters = ""
     for experiment in experiments:
@@ -107,11 +108,11 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
                 if not os.path.exists(experiment[i]):
                     os.makedirs(experiment[i])
 
-                if not os.path.exists( log_dir + "slurm/" + experiment[i]):
-                    os.makedirs(log_dir + "slurm/" + experiment[i])
+                if not os.path.exists( log_dir + "slurm/" + name):
+                    os.makedirs(log_dir + "slurm/" + name)
 
-                if not os.path.exists( log_dir + "jz_logs/" + experiment[i]):
-                    os.makedirs(log_dir + "jz_logs/" + experiment[i])
+                if not os.path.exists( log_dir + "jz_logs/" + name):
+                    os.makedirs(log_dir + "jz_logs/" + name)
 
         script = "simulate.py"
 

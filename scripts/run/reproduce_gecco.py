@@ -215,7 +215,7 @@ def setup_dir():
         if not os.path.exists(top_dir):
             os.makedirs(top_dir)
     elif mode == "server":
-        top_dir = project
+        top_dir =  project
 
 
 

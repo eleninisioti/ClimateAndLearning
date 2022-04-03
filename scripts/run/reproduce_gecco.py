@@ -194,7 +194,7 @@ def sin(trial, long_run):
 
     if mode == "server":
 
-        run_batch(experiments, param_names, project_dir = top_dir, long_run=long_run, gpu=True)
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
 
 def setup_dir():
     """ Set up the top directory for this batch of experiments.

@@ -155,7 +155,7 @@ def sin(trial, long_run):
     env_type = "sin"
     num_gens = 750
     selection_types = ["NF", "N", "F"]
-    selection_types = [ "F"]
+    selection_types = [ "NF", "N"]
 
     genome_types = ["evolv"]
     num_niches_values = [100]

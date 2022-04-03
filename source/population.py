@@ -186,7 +186,10 @@ class Population:
                 niche_pop = self.order_agents(niche_pop)
 
             if self.reproduce_once:
-                niche_pop = [el for el in niche_pop if el.reproduced < 1]
+                niche_pop = [el for el in niche_pop[:int(niche_capacity/2)] if el.reproduced < 1]
+            #else:
+                #print(niche_capacity, len(niche_pop))
+                niche_pop = [el for el in niche_pop[:int(niche_capacity/2)]]
 
             if "F" in self.selection_type:
                 if self.mean_fitness:
@@ -195,8 +198,6 @@ class Population:
                     weights = [agent.fitnesses[niche_climate] for agent in niche_pop]
             else:
                 weights = [1 for agent in niche_pop]
-
-
 
             if len(niche_pop):
                 agents_reproduce = choices(niche_pop, weights=weights,
@@ -229,6 +230,8 @@ class Population:
                     if len(niche_new_agents) <= niche_capacity:
                         niche_new_agents.append(new_agent)
             new_agents.extend(niche_new_agents)
+            #print("after reproduce", niche_capacity, len(niche_new_agents))
+
         self.agents = new_agents
 
     def order_agents(self, agents):

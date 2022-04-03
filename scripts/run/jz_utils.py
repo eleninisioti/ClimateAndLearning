@@ -104,8 +104,6 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
                 name = experiment[i]
                 experiment[i] = log_dir + "projects/" + experiment[i]
 
-                parameters += f" {param_names[i]}={experiment[i]}"
-
                 if not os.path.exists(experiment[i]):
                     os.makedirs(experiment[i], exist_ok=True)
 
@@ -114,6 +112,10 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
 
                 if not os.path.exists( log_dir + "jz_logs/" + name):
                     os.makedirs(log_dir + "jz_logs/" + name, exist_ok=True)
+
+            parameters += f" {param_names[i]}={experiment[i]}"
+
+
 
         script = "simulate.py"
 

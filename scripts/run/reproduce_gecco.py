@@ -155,6 +155,8 @@ def sin(trial, long_run):
     env_type = "sin"
     num_gens = 750
     selection_types = ["NF", "N", "F"]
+    selection_types = [ "F"]
+
     genome_types = ["evolv"]
     num_niches_values = [100]
     amplitude_values = [8]
@@ -178,6 +180,7 @@ def sin(trial, long_run):
                                     command += el + " " + str(new_exp[idx]) + " "
                                 # command += "&" # uncomment to run all experiments simultaneously
                                 print(command)
+                                quit()
                                 os.system("bash -c '{}'".format(command))
 
     if mode == "server":

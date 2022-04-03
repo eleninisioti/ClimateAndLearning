@@ -69,7 +69,7 @@ class Life:
                 # compute metrics for new generation
                 self.logger.log_gen(self.population)
 
-                time_out = (time.time() - start_time) > self.time_budget
+                time_out = (time.time() - start_time) > self.config.time_budget
 
                 if self.population.has_mass_extinction() or time_out:
                     break

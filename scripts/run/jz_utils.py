@@ -94,26 +94,26 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
         number of cpus allocated to the task. More cpus gives access to more memory, and more possible parallel
         processes.
     """
-    log_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/"
-    #log_dir = "../"
+    #log_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/"
+    log_dir = "../"
     # process flags
     parameters = ""
     for experiment in experiments:
         for i in range(len(experiment)):
-            parameters += f" {param_names[i]}={experiment[i]}"
             if param_names[i] == "--project":
-                experiment[i] = log_dir + "projects/" + experiment[i]
                 name = experiment[i]
+                experiment[i] = log_dir + "projects/" + experiment[i]
 
+                parameters += f" {param_names[i]}={experiment[i]}"
 
                 if not os.path.exists(experiment[i]):
-                    os.makedirs(experiment[i])
+                    os.makedirs(experiment[i], exist_ok=True)
 
                 if not os.path.exists( log_dir + "slurm/" + name):
-                    os.makedirs(log_dir + "slurm/" + name)
+                    os.makedirs(log_dir + "slurm/" + name, exist_ok=True)
 
                 if not os.path.exists( log_dir + "jz_logs/" + name):
-                    os.makedirs(log_dir + "jz_logs/" + name)
+                    os.makedirs(log_dir + "jz_logs/" + name, exist_ok=True)
 
         script = "simulate.py"
 

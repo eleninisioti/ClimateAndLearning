@@ -94,8 +94,8 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
         number of cpus allocated to the task. More cpus gives access to more memory, and more possible parallel
         processes.
     """
-    #log_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/"
-    log_dir = "../"
+    log_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/"
+    #log_dir = "../"
     # process flags
     parameters = ""
     for experiment in experiments:

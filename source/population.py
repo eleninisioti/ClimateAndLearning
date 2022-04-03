@@ -176,6 +176,7 @@ class Population:
         new_agents = []
 
         for niche_data in for_reproduction:
+            niche_new_agents = []
             niche_pop = niche_data["population"]
             niche_capacity = niche_data["capacity"]
             niche_climate = niche_data["climate"]
@@ -185,9 +186,7 @@ class Population:
                 niche_pop = self.order_agents(niche_pop)
 
             if self.reproduce_once:
-                niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)] if el.reproduced < 1]
-            else:
-                niche_pop = [el for el in niche_pop[:int(niche_capacity/2)]]
+                niche_pop = [el for el in niche_pop if el.reproduced < 1]
 
             if "F" in self.selection_type:
                 if self.mean_fitness:
@@ -218,15 +217,18 @@ class Population:
                     agent_genome.cross([agent.genome, partners_a[idx].genome])
                     new_agent = Agent(genome=agent_genome)
                     new_agent.mutate()
-                    new_agents.append(new_agent)
-                    agent.reproduced = True
+                    if len(niche_new_agents) <= niche_capacity:
+                        niche_new_agents.append(new_agent)
+                        agent.reproduced = True
 
                     # second child
                     agent_genome.cross([agent.genome, partners_b[idx].genome])
                     new_agent = Agent(genome=agent_genome)
                     new_agent.mutate()
-                    new_agents.append(new_agent)
-
+                    new_agent.mutate()
+                    if len(niche_new_agents) <= niche_capacity:
+                        niche_new_agents.append(new_agent)
+            new_agents.extend(niche_new_agents)
         self.agents = new_agents
 
     def order_agents(self, agents):

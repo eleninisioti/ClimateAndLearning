@@ -74,7 +74,7 @@ def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=F
     os.system("sbatch %s" % slurmjob_path)
 
 
-def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
+def run_batch(experiments, param_names,  project_dir, long_run=False, gpu=True, n_tasks=1):
     """
     makes all possible combinations of parameters within the given parameters, and for each combination calls on
     run_exp from looper.py to launch them with SLURM
@@ -95,11 +95,15 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
         number of cpus allocated to the task. More cpus gives access to more memory, and more possible parallel
         processes.
     """
+    log_dir = "/gpfsscratch/rech/imi/utw61ti/ClimateAndLearning_log/"
     # process flags
     parameters = ""
     for experiment in experiments:
         for i in range(len(experiment)):
             parameters += f" {param_names[i]}={experiment[i]}"
+            if param_names[i] == "--project":
+                name = log_dir +  "jz_logs/" + experiment[i]
+                experiment[i] =  log_dir + "projects" + experiment[i]
 
         script = "simulate.py"
 
@@ -107,7 +111,6 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
             time = "100:00:00"
         else:
             time = "20:00:00"
-        name = "temp_" + str(random())
         run_exp(job_name=name,
                 script=script,
                 parameters=parameters,

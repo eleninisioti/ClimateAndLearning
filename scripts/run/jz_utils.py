@@ -41,10 +41,10 @@ def run_exp(job_name, script, parameters, gpu=False, time="20:00:00", long_run=F
     """
     # ----- prepare submission script in slurmjob file ------
 
-    slurmjob_path = os.path.join(slurm_dir + "/" + job_name + ".sh")
+    slurmjob_path = job_name + ".sh"
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
-    slurmjob_path = os.path.join(slurm_dir, "{}.sh".format(job_name))
+    slurmjob_path =  job_name + ".sh"
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
     with open(slurmjob_path, "w") as fh:

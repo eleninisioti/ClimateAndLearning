@@ -108,7 +108,7 @@ def noisy(trial, long_run=False):
                    "--reproduce_once"]
     env_type = "noisy"
     num_gens = 500
-    selection_types = ["NF"]
+    selection_types = ["NF", "N", "F"]
     genome_types = ["evolv"]
     num_niches_values = [40]
     noise_std_values = [0.2]
@@ -188,6 +188,58 @@ def sin(trial, long_run):
 
         run_batch(experiments, param_names, long_run=long_run, gpu=True)
 
+
+
+def sin_evolution_other(trial, long_run):
+    "Reproduce experiments with noisy environment"
+    top_dir = setup_dir() + "_sin_evolution_other/"
+    experiments = []
+
+    param_names = ["--project",
+                   "--env_type",
+                   "--num_gens",
+                   "--trial",
+                   "--selection_type",
+                   "--genome_type",
+                   "--num_niches",
+                   "--climate_mean_init",
+                   "--amplitude",
+                   "--period"]
+
+    env_type = "sin"
+    num_gens = 750
+    selection_types = ["NF", "N", "F"]
+    #selection_types = ["N"]
+
+    genome_types = ["evolv"]
+    num_niches_values = [100]
+    amplitude_values = [0.2]
+    climate_mean_init = 0.2
+    period_values = [46]
+    for period in period_values:
+        for amplitude in amplitude_values:
+            for num_niches in num_niches_values:
+                for genome_type in genome_types:
+                    for selection in selection_types:
+                            project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) +\
+                                      "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
+                                amplitude)
+                            new_exp = [project, env_type, num_gens, trial, selection, genome_type,  num_niches,
+                                       climate_mean_init, amplitude,period]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                # command += "&" # uncomment to run all experiments simultaneously
+                                print(command)
+                                quit()
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
+
 def setup_dir():
     """ Set up the top directory for this batch of experiments.
 
@@ -223,4 +275,4 @@ if __name__ == "__main__":
             #stable_sigma(trial, long_run=False)
             #stable_selection(trial, long_run=False)
             #noisy(trial, long_run=False)
-            sin(trial, long_run=False)
+            sin_evolution_other(trial, long_run=False)

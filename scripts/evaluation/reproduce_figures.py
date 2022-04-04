@@ -634,12 +634,12 @@ def evolution_compare(include):
 if __name__ == "__main__":
     # ------ stable climate function -----
     results_dir = "../projects/paper/stable/sigma_old"
-    results_dir = "../projects/server/31_3_2022_stable_sigma"
+    results_dir = "../projects/server/2_4_2022_stable_sigma"
     sigma()
 
     #results_dir = "../projects/paper/stable/sigma_selection"
-    results_dir = "../projects/server/31_3_2022_stable_selection"
-    #sigma_selection( y_variables=["SD", "Dispersal"], label="model")
+    results_dir = "../projects/server/2_4_2022_stable_selection"
+    sigma_selection( y_variables=["SD", "Dispersal"], label="model")
 
     results_dir = "../projects/paper/stable/extinct"
     extinct()

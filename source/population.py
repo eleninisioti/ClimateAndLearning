@@ -183,13 +183,13 @@ class Population:
             random.shuffle(niche_pop)
 
             if "F" in self.selection_type:
-                niche_pop = self.order_agents(niche_pop)
+                niche_pop = self.order_agents(niche_pop, niche_climate)
 
             if self.reproduce_once:
-                niche_pop = [el for el in niche_pop[:int(niche_capacity/2)] if el.reproduced < 1]
+                niche_pop = [el for el in niche_pop if el.reproduced < 1]
             else:
                 #print(niche_capacity, len(niche_pop))
-                niche_pop = [el for el in niche_pop[:int(niche_capacity/2)]]
+                niche_pop = [el for el in niche_pop]
 
             if "F" in self.selection_type:
                 if self.mean_fitness:
@@ -207,7 +207,6 @@ class Population:
                 weights = [agent.fitness for agent in agents_reproduce]
                 partners_a = choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
                 partners_b = choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
-
 
                 for idx, agent in enumerate(agents_reproduce):
                     agent_genome = Genome(genome_type=self.genome_type, env_mean=self.env_mean,
@@ -231,12 +230,17 @@ class Population:
                         niche_new_agents.append(new_agent)
             new_agents.extend(niche_new_agents)
             #print("after reproduce", niche_capacity, len(niche_new_agents))
-
+        if len(new_agents) > sum([niche_data["capacity"] for niche_data in for_reproduction]):
+            print("new agents", len(new_agents), sum([niche_data["capacity"] for niche_data in for_reproduction]))
+            quit()
         self.agents = new_agents
 
-    def order_agents(self, agents):
+    def order_agents(self, agents, niche_climate=0):
         # order agents based on fitness
-        fitness_values = [agent.fitness for agent in agents]
+        if self.mean_fitness:
+            fitness_values = [agent.fitness for agent in agents]
+        else:
+            fitness_values = [agent.fitnesses[niche_climate] for agent in agents]
         keydict = dict(zip(agents, fitness_values))
         agents.sort(key=keydict.get, reverse=True)
         return agents

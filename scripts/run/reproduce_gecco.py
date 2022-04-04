@@ -61,7 +61,8 @@ def stable_selection(trial, long_run):
                    "--climate_mean_init"]
     env_type = "stable"
     num_gens = 300
-    selection_types = ["NF", "F", "N"]
+    #selection_types = ["NF", "F", "N"]
+    selection_types = ["N"]
     genome_types = ["evolv"]
     num_niches_values = [100]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
@@ -219,7 +220,7 @@ if __name__ == "__main__":
         mode = sys.argv[2] # this should be server for running jz experiments
 
         for trial in range( trials):
-            stable_sigma(trial, long_run=False)
-            #stable_selection(trial, long_run=False)
+            #stable_sigma(trial, long_run=False)
+            stable_selection(trial, long_run=False)
             #noisy(trial, long_run=False)
-            #sin(trial, long_run=False)
+            sin(trial, long_run=False)

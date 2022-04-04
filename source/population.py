@@ -217,7 +217,7 @@ class Population:
                     agent_genome.cross([agent.genome, partners_a[idx].genome])
                     new_agent = Agent(genome=agent_genome)
                     new_agent.mutate()
-                    if len(niche_new_agents) <= niche_capacity:
+                    if len(niche_new_agents) < niche_capacity:
                         niche_new_agents.append(new_agent)
                         agent.reproduced = True
 
@@ -225,11 +225,16 @@ class Population:
                     agent_genome.cross([agent.genome, partners_b[idx].genome])
                     new_agent = Agent(genome=agent_genome)
                     new_agent.mutate()
-                    new_agent.mutate()
-                    if len(niche_new_agents) <= niche_capacity:
+                    if len(niche_new_agents) < niche_capacity:
                         niche_new_agents.append(new_agent)
+
+                    if len(new_agents) > sum([niche_data["capacity"] for niche_data in for_reproduction]):
+                        print("new agents", len(new_agents),
+                              sum([niche_data["capacity"] for niche_data in for_reproduction]))
+
             new_agents.extend(niche_new_agents)
             #print("after reproduce", niche_capacity, len(niche_new_agents))
+        print("current_capacity", sum([niche_data["capacity"] for niche_data in for_reproduction]))
         if len(new_agents) > sum([niche_data["capacity"] for niche_data in for_reproduction]):
             print("new agents", len(new_agents), sum([niche_data["capacity"] for niche_data in for_reproduction]))
             quit()

@@ -122,7 +122,7 @@ def run_batch(experiments, param_names, long_run=False, gpu=True, n_tasks=1):
         if long_run:
             time = "60:00:00"
         else:
-            time = "15:00:00"
+            time = "14:00:00"
         run_exp(job_name=name,
                 log_dir = log_dir,
                 script=script,

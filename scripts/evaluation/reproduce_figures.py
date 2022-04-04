@@ -229,7 +229,10 @@ def diversity():
         trial_dirs = list(next(os.walk(p + "/trials"))[1])
         for trial, trial_dir in enumerate(trial_dirs):
             # load outcome of trial
-            log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+            try:
+                log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+            except IOError:
+                break
             trial_diversity = np.mean(log["diversity"][100:])
             new_row = pd.DataFrame.from_dict({"Diversity": [trial_diversity],
                                               "Trial": [trial],
@@ -633,19 +636,19 @@ def evolution_compare(include):
 
 if __name__ == "__main__":
     # ------ stable climate function -----
-    results_dir = "../projects/paper/stable/sigma_old"
+    results_dir = "../projects/paper/stable/sigma"
     results_dir = "../projects/server/2_4_2022_stable_sigma"
-    sigma()
+    #sigma()
 
     #results_dir = "../projects/paper/stable/sigma_selection"
     results_dir = "../projects/server/2_4_2022_stable_selection"
     sigma_selection( y_variables=["SD", "Dispersal"], label="model")
 
     results_dir = "../projects/paper/stable/extinct"
-    extinct()
+    #extinct()
 
-    results_dir = "../projects/paper/diversity"
-    #diversity()
+    results_dir = "../projects/paper/stable/diversity"
+    diversity()
     # ---------------------------------------
     # ------ sinusoid climate function -----
     results_dir = "../projects/paper/sinusoid/survival/s2_g2_100"

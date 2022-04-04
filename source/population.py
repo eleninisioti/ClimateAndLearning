@@ -203,8 +203,6 @@ class Population:
                 agents_reproduce = choices(niche_pop, weights=weights,
                                                 k=len(niche_pop))
 
-                # find partners
-                weights = [agent.fitness for agent in agents_reproduce]
                 partners_a = choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
                 partners_b = choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
 

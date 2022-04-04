@@ -220,7 +220,7 @@ if __name__ == "__main__":
         mode = sys.argv[2] # this should be server for running jz experiments
 
         for trial in range( trials):
-            #stable_sigma(trial, long_run=False)
-            stable_selection(trial, long_run=False)
+            stable_sigma(trial, long_run=False)
+            #stable_selection(trial, long_run=False)
             #noisy(trial, long_run=False)
-            sin(trial, long_run=False)
+            #sin(trial, long_run=False)

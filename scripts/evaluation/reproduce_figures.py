@@ -175,16 +175,18 @@ def extinct():
         trial_dirs = list(next(os.walk(p + "/trials"))[1])
         for trial, trial_dir in enumerate(trial_dirs):
             # load outcome of trial
-            log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+            try:
+                log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+            except IOError:
+                break
             total_pop = config.capacity * config.climate_mean_init
-            print(total_pop, find_label(config), config.climate_mean_init)
-            total_pop = 1
+            #total_pop = 1
             trial_extinctions = np.mean(log["extinctions"]) / total_pop
             new_row = pd.DataFrame.from_dict({"extinctions": [trial_extinctions],
                                               "Trial": [trial],
                                               "Selection": [find_label(config)],
                                               "Climate": [config.climate_mean_init],
-                                              "Genome": [find_label(config)]}
+                                              "Genome": [find_label(config,parameter="genome")]}
                                              )
             if not count:
                 results = new_row
@@ -276,11 +278,12 @@ def survival(label="$A_e$"):
         trial_dirs = list(next(os.walk(p + "/trials"))[1])
         for trial, trial_dir in enumerate(trial_dirs):
             # load outcome of trial
-            log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+            try:
+                log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+            except IOError:
+                break
             trial_diversity = np.mean(log["diversity"][100:])
-            print(len(log["Climate"]), config.num_gens)
             trial_duration = len(log["Climate"]) / config.num_gens
-            print(config.num_gens)
             if label == "$A_e$":
                 label_value = config.amplitude
             elif label == "N":
@@ -333,11 +336,12 @@ def survival_noisy(label="$A_e$"):
         trial_dirs = list(next(os.walk(p + "/trials"))[1])
         for trial, trial_dir in enumerate(trial_dirs):
             # load outcome of trial
-            log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+            try:
+                log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+            except IOError:
+                break
             trial_diversity = np.mean(log["diversity"][100:])
-            print(len(log["Climate"]), config.num_gens)
             trial_duration = len(log["Climate"]) / config.num_gens
-            print(config.num_gens)
             if label == "$A_e$":
                 label_value = config.amplitude
             elif label == "N":
@@ -637,34 +641,32 @@ def evolution_compare(include):
 if __name__ == "__main__":
     # ------ stable climate function -----
     results_dir = "../projects/paper/stable/sigma"
-    results_dir = "../projects/server/2_4_2022_stable_sigma"
     #sigma()
 
-    #results_dir = "../projects/paper/stable/sigma_selection"
-    results_dir = "../projects/server/2_4_2022_stable_selection"
-    sigma_selection( y_variables=["SD", "Dispersal"], label="model")
+    results_dir = "../projects/paper/stable/selection"
+    #sigma_selection( y_variables=["SD", "Dispersal"], label="model")
 
     results_dir = "../projects/paper/stable/extinct"
     #extinct()
 
     results_dir = "../projects/paper/stable/diversity"
-    diversity()
+    #diversity()
     # ---------------------------------------
     # ------ sinusoid climate function -----
-    results_dir = "../projects/paper/sinusoid/survival/s2_g2_100"
+    results_dir = "../projects/paper/sin/survival/N100"
     #survival()
 
-    results_dir = "../projects/paper/sinusoid/survival/s2_g2_A4"
+    results_dir = "../projects/paper/sin/survival/A4"
     #survival(label="N")
 
-    results_dir = "../projects/paper/sinusoid/evolution"
+    results_dir = "../projects/paper/sin/evolution"
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]
     #evolution_compare(include)
 
     results_dir = "../projects/paper/noisy/survival"
-    survival_noisy()
+    #survival_noisy()
 
     results_dir = "../projects/paper/noisy/evolution"
     include = ["climate", "mean",

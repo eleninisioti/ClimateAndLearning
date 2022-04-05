@@ -8,7 +8,7 @@ import numpy as np
 
 def stable_sigma(trial, long_run):
     "Reproduce experiments with stable environment"
-    top_dir = setup_dir() + "_stable_sigma/"
+    top_dir = setup_dir() + "_sigma_0.2/"
     experiments = []
 
     param_names = ["--project",
@@ -21,10 +21,10 @@ def stable_sigma(trial, long_run):
                    "--climate_mean_init"]
     env_type = "stable"
     num_gens = 300
-    selection_types = ["NF"]
+    selection_types = ["NF", "N"]
     genome_types = ["evolv"]
-    num_niches_values = [1, 5, 10, 50, 100]
-    climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
+    num_niches_values = [100]
+    climate_mean_init_values = [0.2]
 
     for N in num_niches_values:
         for climate_mean_init in climate_mean_init_values:
@@ -40,6 +40,7 @@ def stable_sigma(trial, long_run):
                                 command += el + " " + str(new_exp[idx]) + " "
                             # command += "&" # uncomment to run all experiments simultaneously
                             print(command)
+                            quit()
                             os.system("bash -c '{}'".format(command))
 
     if mode == "server":
@@ -48,7 +49,7 @@ def stable_sigma(trial, long_run):
 
 def stable_selection(trial, long_run):
     "Reproduce experiments with stable environment"
-    top_dir = setup_dir() + "_stable_selection/"
+    top_dir = setup_dir() + "_selection/"
     experiments = []
 
     param_names = ["--project",
@@ -62,7 +63,7 @@ def stable_selection(trial, long_run):
     env_type = "stable"
     num_gens = 300
     #selection_types = ["NF", "F", "N"]
-    selection_types = ["N"]
+    selection_types = ["N", "F"]
     genome_types = ["evolv"]
     num_niches_values = [100]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
@@ -88,11 +89,9 @@ def stable_selection(trial, long_run):
     if mode == "server":
         run_batch(experiments, param_names, long_run=long_run, gpu=True)
 
-
-
-def stable_extinct_constant(trial, long_run):
+def stable_extinct(trial, long_run):
     "Reproduce experiments with stable environment"
-    top_dir = setup_dir() + "_stable_selection/"
+    top_dir = setup_dir() + "_extinct/"
     experiments = []
 
     param_names = ["--project",
@@ -108,8 +107,13 @@ def stable_extinct_constant(trial, long_run):
     #selection_types = ["NF", "F", "N"]
     selection_types = ["NF", "F"]
     genome_types = ["evolv", "no-evolv"]
+    selection_types = ["NF"]
+    genome_types = [ "no-evolv"]
     num_niches_values = [100]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
+    climate_mean_init_values = [2]
+
+
 
 
     for N in num_niches_values:
@@ -126,12 +130,295 @@ def stable_extinct_constant(trial, long_run):
                                 command += el + " " + str(new_exp[idx]) + " "
                             # command += "&" # uncomment to run all experiments simultaneously
                             print(command)
-                            os.system("bash -c '{}'".format(command))
                             quit()
+
+                            os.system("bash -c '{}'".format(command))
 
     if mode == "server":
         run_batch(experiments, param_names, long_run=long_run, gpu=True)
 
+
+def stable_diversity(trial, long_run):
+    "Reproduce experiments with stable environment"
+    top_dir = setup_dir() + "_diversity/"
+    experiments = []
+
+    param_names = ["--project",
+                   "--env_type",
+                   "--num_gens",
+                   "--trial",
+                   "--selection_type",
+                   "--genome_type",
+                   "--num_niches",
+                   "--climate_mean_init"]
+    env_type = "stable"
+    num_gens = 300
+    selection_types = ["NF", "F", "N"]
+    genome_types = ["evolv"]
+    num_niches_values = [100]
+    climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
+
+    for N in num_niches_values:
+        for climate_mean_init in climate_mean_init_values:
+            for G in genome_types:
+                for S in selection_types:
+                        project = top_dir + "S_" + S + "_G_" + G + "_N_" + \
+                                  str(N) + "_climate_" + str(climate_mean_init)
+                        new_exp = [project, env_type, num_gens, trial, S, G, N, climate_mean_init]
+                        experiments.append(new_exp)
+                        if mode == "local":
+                            command = "python simulate.py "
+                            for idx, el in enumerate(param_names):
+                                command += el + " " + str(new_exp[idx]) + " "
+                            # command += "&" # uncomment to run all experiments simultaneously
+                            print(command)
+
+                            os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
+
+
+def stable_diversity_N(trial, long_run):
+    "Reproduce experiments with stable environment"
+    top_dir = setup_dir() + "_diversity_N/"
+    experiments = []
+
+    param_names = ["--project",
+                   "--env_type",
+                   "--num_gens",
+                   "--trial",
+                   "--selection_type",
+                   "--genome_type",
+                   "--num_niches",
+                   "--climate_mean_init"]
+    env_type = "stable"
+    num_gens = 300
+    #selection_types = ["NF", "F", "N"]
+    selection_types = ["N"]
+    genome_types = ["evolv", "no-evolv"]
+    num_niches_values = [100]
+    climate_mean_init_values = [0.2, 2, 4, 8]
+
+    for N in num_niches_values:
+        for climate_mean_init in climate_mean_init_values:
+            for G in genome_types:
+                for S in selection_types:
+                        project = top_dir + "S_" + S + "_G_" + G + "_N_" + \
+                                  str(N) + "_climate_" + str(climate_mean_init)
+                        new_exp = [project, env_type, num_gens, trial, S, G, N, climate_mean_init]
+                        experiments.append(new_exp)
+                        if mode == "local":
+                            command = "python simulate.py "
+                            for idx, el in enumerate(param_names):
+                                command += el + " " + str(new_exp[idx]) + " "
+                            # command += "&" # uncomment to run all experiments simultaneously
+                            print(command)
+
+                            os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
+
+def sin_survival_N100(trial, long_run):
+    "Reproduce experiments with noisy environment"
+    top_dir = setup_dir() + "_sin_/"
+    experiments = []
+
+    param_names = ["--project",
+                   "--env_type",
+                   "--num_gens",
+                   "--trial",
+                   "--selection_type",
+                   "--genome_type",
+                   "--num_niches",
+                   "--climate_mean_init",
+                   "--amplitude",
+                   "--period"]
+
+    env_type = "sin"
+    num_gens = 1500
+    selection_types = ["NF"]
+
+    genome_types = ["evolv"]
+    num_niches_values = [100]
+    amplitude_values = [0.2,1,8]
+    climate_mean_init = 0.2
+    period_values = [int(num_gens), int(num_gens / 2), int(num_gens / 8), int(num_gens / 16), int(num_gens / 32)]
+    for period in period_values:
+        for amplitude in amplitude_values:
+            for num_niches in num_niches_values:
+                for genome_type in genome_types:
+                    for selection in selection_types:
+                            project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) +\
+                                      "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
+                                amplitude)
+                            new_exp = [project, env_type, num_gens, trial, selection, genome_type,  num_niches,
+                                       climate_mean_init, amplitude,period]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                # command += "&" # uncomment to run all experiments simultaneously
+                                print(command)
+                                quit()
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
+
+
+def sin_survival_A4(trial, long_run):
+    "Reproduce experiments with noisy environment"
+    top_dir = setup_dir() + "_sin_/"
+    experiments = []
+
+    param_names = ["--project",
+                   "--env_type",
+                   "--num_gens",
+                   "--trial",
+                   "--selection_type",
+                   "--genome_type",
+                   "--num_niches",
+                   "--climate_mean_init",
+                   "--amplitude",
+                   "--period"]
+
+    env_type = "sin"
+    num_gens = 1500
+    selection_types = ["NF"]
+    genome_types = ["evolv"]
+    num_niches_values = [1,10,100]
+    amplitude_values = [4]
+    climate_mean_init = 0.2
+    period_values = [int(num_gens), int(num_gens / 2), int(num_gens / 8), int(num_gens / 16), int(num_gens / 32)]
+    #period_values = [750]
+    for period in period_values:
+        for amplitude in amplitude_values:
+            for num_niches in num_niches_values:
+                for genome_type in genome_types:
+                    for selection in selection_types:
+                            project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) +\
+                                      "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
+                                amplitude)
+                            new_exp = [project, env_type, num_gens, trial, selection, genome_type,  num_niches,
+                                       climate_mean_init, amplitude,period]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                # command += "&" # uncomment to run all experiments simultaneously
+                                print(command)
+                                quit()
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
+
+
+
+def sin_evolution_quick(trial, long_run):
+    "Reproduce experiments with noisy environment"
+    top_dir = setup_dir() + "_sin_evolution_quick/"
+    experiments = []
+
+    param_names = ["--project",
+                   "--env_type",
+                   "--num_gens",
+                   "--trial",
+                   "--selection_type",
+                   "--genome_type",
+                   "--num_niches",
+                   "--climate_mean_init",
+                   "--amplitude",
+                   "--period"]
+
+    env_type = "sin"
+    num_gens = 1500
+    selection_types = ["NF", "N", "F"]
+
+    genome_types = ["evolv"]
+    num_niches_values = [100]
+    amplitude_values = [0.2]
+    climate_mean_init = 0.2
+    period_values = [46]
+    for period in period_values:
+        for amplitude in amplitude_values:
+            for num_niches in num_niches_values:
+                for genome_type in genome_types:
+                    for selection in selection_types:
+                            project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) +\
+                                      "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
+                                amplitude)
+                            new_exp = [project, env_type, num_gens, trial, selection, genome_type,  num_niches,
+                                       climate_mean_init, amplitude,period]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                # command += "&" # uncomment to run all experiments simultaneously
+                                print(command)
+                                quit()
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
+
+
+def sin_evolution_slow(trial, long_run):
+    "Reproduce experiments with noisy environment"
+    top_dir = setup_dir() + "_sin_evolution_slow/"
+    experiments = []
+
+    param_names = ["--project",
+                   "--env_type",
+                   "--num_gens",
+                   "--trial",
+                   "--selection_type",
+                   "--genome_type",
+                   "--num_niches",
+                   "--climate_mean_init",
+                   "--amplitude",
+                   "--period"]
+
+    env_type = "sin"
+    num_gens = 1500
+    selection_types = ["NF", "N", "F"]
+
+    genome_types = ["evolv"]
+    num_niches_values = [100]
+    amplitude_values = [8]
+    climate_mean_init = 0.2
+    period_values = [750]
+    for period in period_values:
+        for amplitude in amplitude_values:
+            for num_niches in num_niches_values:
+                for genome_type in genome_types:
+                    for selection in selection_types:
+                            project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) +\
+                                      "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
+                                amplitude)
+                            new_exp = [project, env_type, num_gens, trial, selection, genome_type,  num_niches,
+                                       climate_mean_init, amplitude,period]
+                            experiments.append(new_exp)
+                            if mode == "local":
+                                command = "python simulate.py "
+                                for idx, el in enumerate(param_names):
+                                    command += el + " " + str(new_exp[idx]) + " "
+                                # command += "&" # uncomment to run all experiments simultaneously
+                                print(command)
+                                quit()
+                                os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
 
 def noisy(trial, long_run=False):
     """Reproduce experiments with noisy environment
@@ -230,211 +517,6 @@ def noisy_survival(trial, long_run=False):
     if mode == "server":
         run_batch(experiments, param_names, long_run=long_run, gpu=True)
 
-def sin(trial, long_run):
-    "Reproduce experiments with noisy environment"
-    top_dir = setup_dir() + "_sin_/"
-    experiments = []
-
-    param_names = ["--project",
-                   "--env_type",
-                   "--num_gens",
-                   "--trial",
-                   "--selection_type",
-                   "--genome_type",
-                   "--num_niches",
-                   "--climate_mean_init",
-                   "--amplitude",
-                   "--period"]
-
-    env_type = "sin"
-    num_gens = 750
-    selection_types = ["NF", "N", "F"]
-    #selection_types = ["N"]
-
-    genome_types = ["evolv"]
-    num_niches_values = [100]
-    amplitude_values = [8]
-    climate_mean_init = 0.2
-    period_values = [int(num_gens), int(num_gens / 2), int(num_gens / 8), int(num_gens / 16), int(num_gens / 32)]
-    period_values = [750]
-    for period in period_values:
-        for amplitude in amplitude_values:
-            for num_niches in num_niches_values:
-                for genome_type in genome_types:
-                    for selection in selection_types:
-                            project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) +\
-                                      "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
-                                amplitude)
-                            new_exp = [project, env_type, num_gens, trial, selection, genome_type,  num_niches,
-                                       climate_mean_init, amplitude,period]
-                            experiments.append(new_exp)
-                            if mode == "local":
-                                command = "python simulate.py "
-                                for idx, el in enumerate(param_names):
-                                    command += el + " " + str(new_exp[idx]) + " "
-                                # command += "&" # uncomment to run all experiments simultaneously
-                                print(command)
-                                quit()
-                                os.system("bash -c '{}'".format(command))
-
-    if mode == "server":
-
-        run_batch(experiments, param_names, long_run=long_run, gpu=True)
-
-
-
-def sin_survival_N100(trial, long_run):
-    "Reproduce experiments with noisy environment"
-    top_dir = setup_dir() + "_sin_/"
-    experiments = []
-
-    param_names = ["--project",
-                   "--env_type",
-                   "--num_gens",
-                   "--trial",
-                   "--selection_type",
-                   "--genome_type",
-                   "--num_niches",
-                   "--climate_mean_init",
-                   "--amplitude",
-                   "--period"]
-
-    env_type = "sin"
-    num_gens = 750
-    selection_types = ["NF", "N", "F"]
-
-    genome_types = ["evolv"]
-    num_niches_values = [100]
-    amplitude_values = [0.2,1,8]
-    climate_mean_init = 0.2
-    period_values = [int(num_gens), int(num_gens / 2), int(num_gens / 8), int(num_gens / 16), int(num_gens / 32)]
-    #period_values = [750]
-    for period in period_values:
-        for amplitude in amplitude_values:
-            for num_niches in num_niches_values:
-                for genome_type in genome_types:
-                    for selection in selection_types:
-                            project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) +\
-                                      "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
-                                amplitude)
-                            new_exp = [project, env_type, num_gens, trial, selection, genome_type,  num_niches,
-                                       climate_mean_init, amplitude,period]
-                            experiments.append(new_exp)
-                            if mode == "local":
-                                command = "python simulate.py "
-                                for idx, el in enumerate(param_names):
-                                    command += el + " " + str(new_exp[idx]) + " "
-                                # command += "&" # uncomment to run all experiments simultaneously
-                                print(command)
-                                quit()
-                                os.system("bash -c '{}'".format(command))
-
-    if mode == "server":
-
-        run_batch(experiments, param_names, long_run=long_run, gpu=True)
-
-
-def sin_survival_A4(trial, long_run):
-    "Reproduce experiments with noisy environment"
-    top_dir = setup_dir() + "_sin_/"
-    experiments = []
-
-    param_names = ["--project",
-                   "--env_type",
-                   "--num_gens",
-                   "--trial",
-                   "--selection_type",
-                   "--genome_type",
-                   "--num_niches",
-                   "--climate_mean_init",
-                   "--amplitude",
-                   "--period"]
-
-    env_type = "sin"
-    num_gens = 750
-    selection_types = ["NF", "N", "F"]
-
-    genome_types = ["evolv"]
-    num_niches_values = [1,10,100]
-    amplitude_values = [4]
-    climate_mean_init = 0.2
-    period_values = [int(num_gens), int(num_gens / 2), int(num_gens / 8), int(num_gens / 16), int(num_gens / 32)]
-    #period_values = [750]
-    for period in period_values:
-        for amplitude in amplitude_values:
-            for num_niches in num_niches_values:
-                for genome_type in genome_types:
-                    for selection in selection_types:
-                            project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) +\
-                                      "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
-                                amplitude)
-                            new_exp = [project, env_type, num_gens, trial, selection, genome_type,  num_niches,
-                                       climate_mean_init, amplitude,period]
-                            experiments.append(new_exp)
-                            if mode == "local":
-                                command = "python simulate.py "
-                                for idx, el in enumerate(param_names):
-                                    command += el + " " + str(new_exp[idx]) + " "
-                                # command += "&" # uncomment to run all experiments simultaneously
-                                print(command)
-                                quit()
-                                os.system("bash -c '{}'".format(command))
-
-    if mode == "server":
-
-        run_batch(experiments, param_names, long_run=long_run, gpu=True)
-
-
-
-def sin_evolution_other(trial, long_run):
-    "Reproduce experiments with noisy environment"
-    top_dir = setup_dir() + "_sin_evolution_other/"
-    experiments = []
-
-    param_names = ["--project",
-                   "--env_type",
-                   "--num_gens",
-                   "--trial",
-                   "--selection_type",
-                   "--genome_type",
-                   "--num_niches",
-                   "--climate_mean_init",
-                   "--amplitude",
-                   "--period"]
-
-    env_type = "sin"
-    num_gens = 750
-    selection_types = ["NF", "N", "F"]
-    #selection_types = ["N"]
-
-    genome_types = ["evolv"]
-    num_niches_values = [100]
-    amplitude_values = [0.2]
-    climate_mean_init = 0.2
-    period_values = [46]
-    for period in period_values:
-        for amplitude in amplitude_values:
-            for num_niches in num_niches_values:
-                for genome_type in genome_types:
-                    for selection in selection_types:
-                            project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) +\
-                                      "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
-                                amplitude)
-                            new_exp = [project, env_type, num_gens, trial, selection, genome_type,  num_niches,
-                                       climate_mean_init, amplitude,period]
-                            experiments.append(new_exp)
-                            if mode == "local":
-                                command = "python simulate.py "
-                                for idx, el in enumerate(param_names):
-                                    command += el + " " + str(new_exp[idx]) + " "
-                                # command += "&" # uncomment to run all experiments simultaneously
-                                print(command)
-                                quit()
-                                os.system("bash -c '{}'".format(command))
-
-    if mode == "server":
-
-        run_batch(experiments, param_names, long_run=long_run, gpu=True)
 
 def setup_dir():
     """ Set up the top directory for this batch of experiments.
@@ -467,13 +549,31 @@ if __name__ == "__main__":
         trials = int(sys.argv[1]) # number of independent trials
         mode = sys.argv[2] # this should be server for running jz experiments
 
-        for trial in range( trials):
-            #stable_sigma(trial, long_run=False)
-            #stable_selection(trial, long_run=False)
-            #noisy(trial, long_run=False)
-            #sin_evolution_other(trial, long_run=False)
-            #stable_extinct_constant(trial, long_run=False)
+        for trial in range(10):
+            stable_sigma(trial, long_run=False)
+
+        for trial in range(4,10):
+            stable_selection(trial, long_run=False)
+
+        for trial in range(3):
+            stable_diversity_N(trial, long_run=False)
+
+        for trial in range(3, 10):
+            stable_extinct(trial, long_run=False)
+            stable_diversity(trial, long_run=False)
+
+        for trial in range(10):
             sin_survival_A4(trial, long_run=False)
+            sin_survival_N100(trial, long_run=False)
+            sin_evolution_slow(trial, long_run=False)
+            sin_evolution_quick(trial, long_run=False)
+
+
+
+
+            #noisy(trial, long_run=False)
+            #stable_extinct_constant(trial, long_run=False)
+            #sin_survival_A4(trial, long_run=False)
             sin_survival_N100(trial, long_run=False)
             noisy_survival(trial, long_run=False)
 

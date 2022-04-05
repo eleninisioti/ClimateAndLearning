@@ -174,8 +174,9 @@ class Population:
         # pair agents for reproduction
         random.shuffle(for_reproduction)
         new_agents = []
-
-        for niche_data in for_reproduction:
+        capacity_now = 0
+        added_agents = 0
+        for niche_idx, niche_data in enumerate(for_reproduction):
             niche_new_agents = []
             niche_pop = niche_data["population"]
             niche_capacity = niche_data["capacity"]
@@ -198,6 +199,7 @@ class Population:
                     weights = [agent.fitnesses[niche_climate] for agent in niche_pop]
             else:
                 weights = [1 for agent in niche_pop]
+            capacity_now += niche_data["capacity"]
 
             if len(niche_pop):
                 agents_reproduce = choices(niche_pop, weights=weights,
@@ -218,6 +220,8 @@ class Population:
                     if len(niche_new_agents) < niche_capacity:
                         niche_new_agents.append(new_agent)
                         agent.reproduced = True
+                        added_agents +=1
+
 
                     # second child
                     agent_genome.cross([agent.genome, partners_b[idx].genome])
@@ -225,14 +229,12 @@ class Population:
                     new_agent.mutate()
                     if len(niche_new_agents) < niche_capacity:
                         niche_new_agents.append(new_agent)
+                        added_agents +=1
 
-                    if len(new_agents) > sum([niche_data["capacity"] for niche_data in for_reproduction]):
-                        print("new agents", len(new_agents),
-                              sum([niche_data["capacity"] for niche_data in for_reproduction]))
+
 
             new_agents.extend(niche_new_agents)
-            #print("after reproduce", niche_capacity, len(niche_new_agents))
-        print("current_capacity", sum([niche_data["capacity"] for niche_data in for_reproduction]))
+
         if len(new_agents) > sum([niche_data["capacity"] for niche_data in for_reproduction]):
             print("new agents", len(new_agents), sum([niche_data["capacity"] for niche_data in for_reproduction]))
             quit()

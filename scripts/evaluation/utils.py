@@ -2,14 +2,17 @@ import numpy as np
 import pandas as pd
 
 
-def find_label(config):
+def find_label(config, parameter="selection"):
     label = ""
-    if config.selection_type == "NF":
-        label += "NF-selection"
-    elif config.selection_type == "N":
-        label += "N-selection"
-    elif config.selection_type == "F":
-        label += "F-selection"
+    if parameter == "selection":
+        if config.selection_type == "NF":
+            label += "NF-selection"
+        elif config.selection_type == "N":
+            label += "N-selection"
+        elif config.selection_type == "F":
+            label += "F-selection"
+    elif parameter == "genome":
+        label += config.genome_type
     return label
 
 def compute_SoS(log, log_niches, num_niches):

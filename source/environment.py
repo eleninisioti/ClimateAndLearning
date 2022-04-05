@@ -38,7 +38,7 @@ class Env:
         y= int(self.num_niches / 2 + 0.5)
         for lat in range(x,y):
             lat_climate = self.mean + 0.01 * lat
-            niche_capacity = int(lat_climate * self.niche_capacity)
+            niche_capacity = max(int(lat_climate * self.niche_capacity),0)
             self.niches[lat] = {"climate": lat_climate, "capacity": niche_capacity}
 
     def step(self):

@@ -14,7 +14,7 @@ def simulate(args):
     # create project sub-directories
     project = args.project
     if not os.path.exists(project + "/plots"):
-        os.makedirs(project + "/plots")
+        os.makedirs(project + "/plots", exist_ok=True)
 
     # save project configuration
     with open(project + '/config.yml', 'w') as outfile:

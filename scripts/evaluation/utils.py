@@ -73,13 +73,13 @@ def compute_dispersal(log, log_niches, num_niches):
     num_latitudes = num_niches
     window = 10
     trials = len(log_niches)
-    for trial in range(1,trials+1):
+    for trial in range(trials):
         all_dispersals = []
         all_DI = []
         log_trial = log.loc[(log['Trial'] == trial)]
         climate = log_trial["Climate"].to_list()
         # inhabited_niches = [len(el) for el in log["inhabited_niches"].to_list()]
-        inhabited_niches = log_niches[trial-1]["inhabited_niches"]
+        inhabited_niches = log_niches[trial]["inhabited_niches"]
         num_gens = min([len(inhabited_niches), len(climate)])
 
         for lat in range(-int(num_latitudes/2), int(num_latitudes/2 +0.5)):
@@ -111,7 +111,7 @@ def compute_dispersal(log, log_niches, num_niches):
         x = np.mean(np.array(dispersal), axis=0)
         log_trial["Dispersal"] = x
 
-        if trial==1:
+        if not trial:
             new_log = log_trial
         else:
             new_log = new_log.append(log_trial)

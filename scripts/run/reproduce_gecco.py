@@ -270,8 +270,6 @@ def sin_survival_A4(trial, long_run):
 
         run_batch(experiments, param_names, long_run=long_run, gpu=True)
 
-
-
 def sin_evolution_quick(trial, long_run):
     "Reproduce experiments with noisy environment"
     top_dir = setup_dir() + "_sin_evolution_quick/"
@@ -289,8 +287,8 @@ def sin_evolution_quick(trial, long_run):
                    "--period"]
 
     env_type = "sin"
-    num_gens = 1500
-    selection_types = ["NF", "N", "F"]
+    num_gens = 500
+    selection_types = ["N", "F"]
     genome_types = ["evolv"]
     num_niches_values = [100]
     amplitude_values = [0.2]
@@ -311,10 +309,9 @@ def sin_evolution_quick(trial, long_run):
                                 command = "python simulate.py "
                                 for idx, el in enumerate(param_names):
                                     command += el + " " + str(new_exp[idx]) + " "
-                                # command += "&" # uncomment to run all experiments simultaneously
+                                command += "&" # uncomment to run all experiments simultaneously
                                 print(command)
-                                quit()
-                                os.system("bash -c '{}'".format(command))
+                                #os.system("bash -c '{}'".format(command))
 
     if mode == "server":
 
@@ -339,7 +336,7 @@ def sin_evolution_slow(trial, long_run):
 
     env_type = "sin"
     num_gens = 1500
-    selection_types = ["NF", "N", "F"]
+    selection_types = ["NF"]
 
     genome_types = ["evolv"]
     num_niches_values = [100]
@@ -361,10 +358,9 @@ def sin_evolution_slow(trial, long_run):
                                 command = "python simulate.py "
                                 for idx, el in enumerate(param_names):
                                     command += el + " " + str(new_exp[idx]) + " "
-                                # command += "&" # uncomment to run all experiments simultaneously
+                                command += "&" # uncomment to run all experiments simultaneously
                                 print(command)
-                                quit()
-                                os.system("bash -c '{}'".format(command))
+                                #os.system("bash -c '{}'".format(command))
 
     if mode == "server":
 
@@ -407,11 +403,10 @@ def noisy(trial, long_run=False):
                                 command = "python simulate.py "
                                 for idx, el in enumerate(param_names):
                                     command += el + " " + str(new_exp[idx]) + " "
-                                # command += "&" # uncomment to run all experiments simultaneously
+                                command += "&" # uncomment to run all experiments simultaneously
                                 print(command)
-                                quit()
 
-                                os.system("bash -c '{}'".format(command))
+                                #os.system("bash -c '{}'".format(command))
 
     if mode == "server":
         run_batch(experiments, param_names, long_run=long_run, gpu=True)
@@ -460,7 +455,7 @@ def noisy_survival(trial, long_run=False):
                                 print(command)
                                 quit()
 
-                                os.system("bash -c '{}'".format(command))
+                                #os.system("bash -c '{}'".format(command))
 
     if mode == "server":
         run_batch(experiments, param_names, long_run=long_run, gpu=True)
@@ -496,7 +491,6 @@ if __name__ == "__main__":
     else:
         trials = int(sys.argv[1]) # number of independent trials
         mode = sys.argv[2] # this should be server for running jz experiments
-        noisy(0, long_run=False)
 
         for trial in range(trials):
             stable_sigma(trial, long_run=False)
@@ -510,32 +504,4 @@ if __name__ == "__main__":
             noisy(trial, long_run=False)
             noisy_survival(trial, long_run=False)
 
-
-        """for trial in range(10):
-            stable_sigma(trial, long_run=False)
-
-        for trial in range(4,10):
-            stable_selection(trial, long_run=False)
-
-        for trial in range(3):
-            stable_diversity_N(trial, long_run=False)
-
-        for trial in range(3, 10):
-            stable_extinct(trial, long_run=False)
-            stable_diversity(trial, long_run=False)
-
-        for trial in range(10):
-            sin_survival_A4(trial, long_run=False)
-            sin_survival_N100(trial, long_run=False)
-            sin_evolution_slow(trial, long_run=False)
-            sin_evolution_quick(trial, long_run=False)
-
-
-
-
-            #noisy(trial, long_run=False)
-            #stable_extinct_constant(trial, long_run=False)
-            #sin_survival_A4(trial, long_run=False)
-            sin_survival_N100(trial, long_run=False)
-        """
 

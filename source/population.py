@@ -80,6 +80,38 @@ class Population:
         for agent in agents:
             agent.compute_fitness(env_mean)
 
+
+    def reproduce_v3(self, env):
+        self.mean_fitness = 1
+        self.agents = self.order_agents(self.agents)
+        self.agents_reproduce = self.agents[:int(len(self.agents) / 2)]
+        weights = [agent.fitness for agent in self.agents_reproduce]
+        self.agents_reproduce = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
+        weights = [agent.fitness for agent in self.agents_reproduce]
+
+        # find partners
+        partners_a = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
+
+        new_agents = []
+        for idx, agent in enumerate(self.agents_reproduce):
+            agent_genome = Genome(genome_type=self.genome_type,
+                                  env_mean=self.env_mean,
+                                  init_sigma=self.init_sigma,
+                                  init_mutate=self.init_mutate,
+                                  mutate_mutate_rate=self.mutate_mutate_rate)  # could
+            # initialize with any genome here
+            agent_genome.cross([agent.genome, partners_a[idx].genome])  # sexual crossing
+            new_agent = Agent(genome=agent_genome)
+            new_agent.mutate()
+            new_agents.append(new_agent)
+
+            if len(self.agents) < env.current_capacity * env.num_niches:
+                # if there is still room, fill till maximum population
+                self.agents.append(new_agent)
+            else:
+                # replace the worst agents
+                self.agents[idx + int(len(self.agents) / 2)] = new_agent
+
     def reproduce_v2(self, env):
         self.agents = self.order_agents(self.agents)
 
@@ -184,6 +216,7 @@ class Population:
             random.shuffle(niche_pop)
 
             if "F" in self.selection_type:
+                self.mean_fitness = 1
                 niche_pop = self.order_agents(niche_pop, niche_climate)
 
             if self.reproduce_once:

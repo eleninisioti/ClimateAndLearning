@@ -80,6 +80,58 @@ class Population:
         for agent in agents:
             agent.compute_fitness(env_mean)
 
+    def reproduce_v4(self, env):
+        for agent in self.agents:
+            agent.reproduced = False
+        new_agents = []
+        keep_agents = copy.copy(self.agents)
+        self.agents = []
+
+        # agents reproduce within the niches they belong to
+        for lat in range(-int(env.num_niches / 2), int(env.num_niches / 2 + 0.5)):
+            lat_climate = env.mean + 0.01 * lat
+            current_agents = []
+            for agent in keep_agents:
+                if lat_climate in agent.niches:
+                    if not agent.reproduced:  # ensure that an agent reproduces in at most one niche
+                        current_agents.append(agent)
+
+            lat_capacity = int(lat_climate * env.niche_capacity)
+            if lat_capacity > 1 and len(current_agents) > 2:
+
+                self.agents_reproduce = current_agents[:int(lat_capacity / 2)]
+                # weights = [agent.fitness for agent in self.agents_reproduce]
+                weights = [1 for agent in self.agents_reproduce]
+                self.agents_reproduce = choices(self.agents_reproduce, weights=weights,
+                                                k=len(self.agents_reproduce))
+
+                # find partners
+                # weights = [agent.fitness for agent in self.agents_reproduce]
+                weights = [1 for agent in self.agents_reproduce]
+                partners_a = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
+                partners_b = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
+
+                for idx, agent in enumerate(self.agents_reproduce):
+                    agent_genome = Genome(genome_type=self.genome_type,
+                                          env_mean=self.env_mean,
+                                          init_sigma=self.init_sigma,
+                                          init_mutate=self.init_mutate, mutate_mutate_rate=self.mutate_mutate_rate)
+
+                    # first child
+                    agent_genome.cross([agent.genome, partners_a[idx].genome])
+                    new_agent = Agent(genome=agent_genome)
+                    new_agent.mutate()
+                    new_agents.append(new_agent)
+                    agent.reproduced = True
+
+                    # second child
+                    agent_genome.cross([agent.genome, partners_b[idx].genome])
+                    new_agent = Agent(genome=agent_genome)
+                    new_agent.mutate()
+                    new_agents.append(new_agent)
+                    agent.reproduced = True
+
+        self.agents = new_agents
 
     def reproduce_v3(self, env):
         self.mean_fitness = 1

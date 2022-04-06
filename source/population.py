@@ -187,10 +187,10 @@ class Population:
                 niche_pop = self.order_agents(niche_pop, niche_climate)
 
             if self.reproduce_once:
-                niche_pop = [el for el in niche_pop if el.reproduced < 1]
+                niche_pop = [el for el in niche_pop[:int(niche_capacity/2)] if el.reproduced < 1]
             else:
                 #print(niche_capacity, len(niche_pop))
-                niche_pop = [el for el in niche_pop]
+                niche_pop = [el for el in niche_pop[:int(niche_capacity/2)]]
 
             if "F" in self.selection_type:
                 if self.mean_fitness:

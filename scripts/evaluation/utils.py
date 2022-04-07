@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+label_colors = {"F-selection": "blue", "N-selection": "orange", "NF-selection": "green"}
 
 def find_label(config, parameter="selection"):
     label = ""
@@ -12,7 +13,10 @@ def find_label(config, parameter="selection"):
         elif config.selection_type == "F":
             label += "F-selection"
     elif parameter == "genome":
-        label += config.genome_type
+        if config.genome_type == "evolv":
+            label += "$R_{evolve}$"
+        elif config.genome_type == "no-evolv":
+            label += "$R_{no-evolve}$"
     return label
 
 def compute_SoS(log, log_niches, num_niches):
@@ -76,7 +80,7 @@ def compute_dispersal(log, log_niches, num_niches):
     for trial in range(trials):
         all_dispersals = []
         all_DI = []
-        log_trial = log.loc[(log['Trial'] == 7)]
+        log_trial = log.loc[(log['Trial'] == trial)]
         climate = log_trial["Climate"].to_list()
         # inhabited_niches = [len(el) for el in log["inhabited_niches"].to_list()]
         inhabited_niches = log_niches[trial]["inhabited_niches"]

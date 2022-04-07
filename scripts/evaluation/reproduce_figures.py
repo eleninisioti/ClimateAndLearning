@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from types import SimpleNamespace
-from utils import find_label
+from utils import find_label, label_colors
 
 # ----- configuration for figures -----
 params = {'legend.fontsize': 5,
@@ -65,7 +65,8 @@ def sigma():
     plt.yscale('log')
     plt.xlabel("$e_{0}^0$, Reference Environmental State")
     plt.ylabel("$\\bar{\sigma}^*$, Plasticity")
-    plt.legend(loc="best")
+    plt.legend(loc="upper right")
+    plt.ylim([10^(-16), 10])
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -203,6 +204,7 @@ def extinct():
 
     plt.xlabel("$e_{0}^0$, Reference Environmental State")
     plt.ylabel("$X^*$, Number of extinctions")
+    plt.yscale('log')
     plt.legend(loc="best")
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
@@ -244,6 +246,7 @@ def diversity():
                 results = results.append(new_row)
             count = 1
     selections = list(set(results["Selection"].to_list()))
+    selections = ["F-selection",  "N-selection","NF-selection"]
     plt.figure(figsize=figsize)
     for selection in selections:
         results_niche = results.loc[results['Selection'] == selection]
@@ -322,6 +325,15 @@ def survival_noisy(label="$A_e$"):
     # find all projects
     projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
     projects = [el for el in projects if "plots" not in el]
+    ordered_projects = []
+    order = ["F_G", "N_G", "NF_G"]
+    for o in order:
+
+        for p in projects:
+            if o in p:
+                ordered_projects.append(p)
+
+    projects = ordered_projects
 
     count = 0
     for p in projects:
@@ -365,6 +377,7 @@ def survival_noisy(label="$A_e$"):
             count = 1
     amplitudes = list(set(results[label].to_list()))
     methods = list(set(results["Method"].to_list()))
+    methods = ["F-selection", "N-selection", "NF-selection"]
     cm = 1 / 2.54
     plt.figure(figsize=(8.48 * cm, 6 * cm))
     for amplitude in amplitudes:
@@ -409,6 +422,16 @@ def evolution_compare(include):
     # load and config files for both projects
     results = {}
     projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
+    ordered_projects = []
+    order = ["F_G", "N_G", "NF_G"]
+    for o in order:
+
+        for p in projects:
+            if o in p:
+                ordered_projects.append(p)
+
+    projects = ordered_projects
+
     for p in projects:
         if "plots" not in p:
             trial_dirs = list(next(os.walk(p + "/trials"))[1])
@@ -674,9 +697,9 @@ if __name__ == "__main__":
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]
-   # evolution_compare(include)
+    #evolution_compare(include)
 
-    results_dir = "../projects/paper/noisy/survival_debug"
+    results_dir = "../projects/paper/noisy/survival"
     survival_noisy()
 
     results_dir = "../projects/paper/noisy/evolution"

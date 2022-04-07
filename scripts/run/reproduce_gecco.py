@@ -92,7 +92,7 @@ def stable_sigma_temp(trial, long_run):
 
 def stable_selection(trial, long_run):
     "Reproduce experiments with stable environment"
-    top_dir = setup_dir() + "_selection/"
+    top_dir = setup_dir() + "_selection_NF/"
     experiments = []
 
     param_names = ["--project",
@@ -104,8 +104,8 @@ def stable_selection(trial, long_run):
                    "--num_niches",
                    "--climate_mean_init"]
     env_type = "stable"
-    num_gens = 300
-    selection_types = ["NF", "F", "N"]
+    num_gens = 1500
+    selection_types = ["N"]
     genome_types = ["evolv"]
     num_niches_values = [100]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
@@ -448,6 +448,7 @@ def noisy(trial, long_run=False):
                                     command += el + " " + str(new_exp[idx]) + " "
                                 command += "&" # uncomment to run all experiments simultaneously
                                 print(command)
+                                quit()
 
                                 #os.system("bash -c '{}'".format(command))
 
@@ -472,11 +473,11 @@ def noisy_survival(trial, long_run=False):
                    "--noise_std"]
     env_type = "noisy"
     num_gens = 500
-    selection_types = ["NF", "N"]
+    selection_types = ["NF"]
     genome_types = ["evolv"]
-    num_niches_values = [100]
+    num_niches_values = [40]
     noise_std_values = np.arange(0.05,0.82, 0.05)
-    noise_std_values = [0.2, 0.4, 0.6, 0.8]
+    noise_std_values = [0.2, 0.4]
     climate_mean_init_values = [2]
 
     for noise_std in noise_std_values:
@@ -497,7 +498,7 @@ def noisy_survival(trial, long_run=False):
                                 print(command)
                                 #quit()
 
-                                os.system("bash -c '{}'".format(command))
+                                #os.system("bash -c '{}'".format(command))
 
     if mode == "server":
         run_batch(experiments, param_names, long_run=long_run, gpu=True)
@@ -535,12 +536,12 @@ if __name__ == "__main__":
         mode = sys.argv[2] # this should be server for running jz experiments
 
         for trial in range(trials):
-            #stable_sigma(trial, long_run=False)
+            stable_sigma(trial, long_run=False)
             #stable_sigma_temp(trial, long_run=False)
 
-            #stable_selection(trial, long_run=False)
+            stable_selection(trial, long_run=False)
             #stable_diversity(trial, long_run=False)
-            stable_extinct(trial, long_run=False)
+            #stable_extinct(trial, long_run=False)
             #sin_survival_A4(trial, long_run=False)
             #sin_survival_N100(trial, long_run=False)
             #sin_evolution_slow(trial, long_run=False)

@@ -110,7 +110,7 @@ class Plotter:
 
         # ----- plot climate curve -----
         if "climate" in include:
-            log_trial = self.log.loc[(self.log['Trial'] == np.mean(self.log['Trial']))]
+            log_trial = self.log.loc[(self.log['Trial'] == 0)]
 
             # find mean climate across niches:
             climate_avg = []
@@ -302,6 +302,11 @@ def run(project):
     """
     trial_dirs = [os.path.join(project + "/trials",o) for o in os.listdir(project + "/trials")]
     for trial, trial_dir in enumerate(trial_dirs):
+        file_exists = os.path.exists(trial_dir + '/log_updated.pickle')
+        if file_exists:
+            # the project has already been plotted
+            return
+
         # ----- load outcome of trial -----
         try:
             log = pickle.load(open(trial_dir + '/log.pickle', 'rb'))

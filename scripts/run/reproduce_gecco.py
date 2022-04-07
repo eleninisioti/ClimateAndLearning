@@ -23,7 +23,7 @@ def stable_sigma(trial, long_run):
     num_gens = 300
     selection_types = ["NF", "no-evolv"]
     genome_types = ["evolv"]
-    num_niches_values = [100]
+    num_niches_values = [1,10,50]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
 
     for N in num_niches_values:
@@ -494,14 +494,14 @@ if __name__ == "__main__":
 
         for trial in range(trials):
             stable_sigma(trial, long_run=False)
-            stable_selection(trial, long_run=False)
-            stable_diversity(trial, long_run=False)
-            stable_extinct(trial, long_run=False)
-            sin_survival_A4(trial, long_run=False)
-            sin_survival_N100(trial, long_run=False)
-            sin_evolution_slow(trial, long_run=False)
-            sin_evolution_quick(trial, long_run=False)
-            noisy(trial, long_run=False)
-            noisy_survival(trial, long_run=False)
+            #stable_selection(trial, long_run=False)
+            #stable_diversity(trial, long_run=False)
+            #stable_extinct(trial, long_run=False)
+            #sin_survival_A4(trial, long_run=False)
+            #sin_survival_N100(trial, long_run=False)
+            #sin_evolution_slow(trial, long_run=False)
+            #sin_evolution_quick(trial, long_run=False)
+            #noisy(trial, long_run=False)
+            #noisy_survival(trial, long_run=False)
 
 

@@ -110,7 +110,7 @@ class Plotter:
 
         # ----- plot climate curve -----
         if "climate" in include:
-            log_trial = self.log.loc[(self.log['Trial'] == 0)]
+            log_trial = self.log.loc[(self.log['Trial'] == 0) ]
 
             # find mean climate across niches:
             climate_avg = []
@@ -157,8 +157,8 @@ class Plotter:
         if "mutate" in include:
             x = self.log["Generation"][::self.interval]
             y = self.log["R"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            #y = y.clip(upper=self.y_upper_thres)
+            #y = y.clip(lower=self.y_lower_thres)
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(ylabel="$\\bar{r}$")

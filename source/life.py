@@ -75,7 +75,7 @@ class Life:
                     break
 
                 # reproduce population
-                self.population.reproduce(self.env)
+                self.population.reproduce_v4(self.env)
 
                 if gen % 1 == 0:
                     # print progress

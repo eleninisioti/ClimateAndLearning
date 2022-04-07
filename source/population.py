@@ -100,20 +100,17 @@ class Population:
             if lat_capacity > 1 and len(current_agents) > 2:
 
                 self.agents_reproduce = current_agents[:int(lat_capacity / 2)]
-                # weights = [agent.fitness for agent in self.agents_reproduce]
                 weights = [1 for agent in self.agents_reproduce]
                 self.agents_reproduce = choices(self.agents_reproduce, weights=weights,
                                                 k=len(self.agents_reproduce))
 
                 # find partners
-                # weights = [agent.fitness for agent in self.agents_reproduce]
                 weights = [1 for agent in self.agents_reproduce]
                 partners_a = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
                 partners_b = choices(self.agents_reproduce, weights=weights, k=len(self.agents_reproduce))
 
                 for idx, agent in enumerate(self.agents_reproduce):
-                    agent_genome = Genome(genome_type=self.genome_type,
-                                          env_mean=self.env_mean,
+                    agent_genome = Genome(genome_type=self.genome_type, env_mean=self.env_mean,
                                           init_sigma=self.init_sigma,
                                           init_mutate=self.init_mutate, mutate_mutate_rate=self.mutate_mutate_rate)
 

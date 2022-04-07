@@ -178,7 +178,7 @@ def extinct():
             except IOError:
                 break
             total_pop = config.capacity * config.climate_mean_init
-            #total_pop = 1
+            total_pop = 1
             trial_extinctions = np.mean(log["extinctions"]) / total_pop
             new_row = pd.DataFrame.from_dict({"extinctions": [trial_extinctions],
                                               "Trial": [trial],
@@ -309,7 +309,7 @@ def survival(label="$A_e$"):
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/sin_survival.pdf", dpi=300)
+    plt.savefig(save_dir + "/survival.pdf", dpi=300)
     plt.clf()
 
 
@@ -339,7 +339,14 @@ def survival_noisy(label="$A_e$"):
             except IOError:
                 break
             trial_diversity = np.mean(log["diversity"][100:])
-            trial_duration = len(log["Climate"]) / config.num_gens
+            if len(log["Climate"])  == 500:
+                print("change length")
+                length = 1500
+            else:
+
+                length = len(log["Climate"])
+            config.num_gens = 1500
+            trial_duration = length / config.num_gens
             if label == "$A_e$":
                 label_value = config.amplitude
             elif label == "N":
@@ -645,30 +652,36 @@ if __name__ == "__main__":
     #sigma_selection( y_variables=["SD", "Dispersal"], label="model")
 
     results_dir = "../projects/paper/stable/extinct"
-    extinct()
+    #extinct()
 
     results_dir = "../projects/paper/stable/diversity"
-    diversity()
+    #diversity()
     # ---------------------------------------
     # ------ sinusoid climate function -----
-    results_dir = "../projects/paper/sin/survival/N100"
+    results_dir = "../projects/paper/sin/survival_N"
     #survival()
 
-    results_dir = "../projects/paper/sin/survival/A4"
+    results_dir = "../projects/paper/sin/survival_A"
     #survival(label="N")
 
-    results_dir = "../projects/paper/sin/evolution"
+    results_dir = "../projects/paper/sin/evolution_slow"
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]
     #evolution_compare(include)
 
-    results_dir = "../projects/paper/noisy/survival"
-    #survival_noisy()
+    results_dir = "../projects/paper/sin/evolution_quick"
+    include = ["climate", "mean",
+               "sigma", "mutate",
+               "dispersal", "diversity"]
+   # evolution_compare(include)
+
+    results_dir = "../projects/paper/noisy/survival_debug"
+    survival_noisy()
 
     results_dir = "../projects/paper/noisy/evolution"
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]
-    evolution_compare(include)
+    #evolution_compare(include)
 

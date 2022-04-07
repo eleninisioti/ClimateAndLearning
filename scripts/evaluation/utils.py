@@ -76,7 +76,7 @@ def compute_dispersal(log, log_niches, num_niches):
     for trial in range(trials):
         all_dispersals = []
         all_DI = []
-        log_trial = log.loc[(log['Trial'] == trial)]
+        log_trial = log.loc[(log['Trial'] == 7)]
         climate = log_trial["Climate"].to_list()
         # inhabited_niches = [len(el) for el in log["inhabited_niches"].to_list()]
         inhabited_niches = log_niches[trial]["inhabited_niches"]

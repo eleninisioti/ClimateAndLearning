@@ -21,9 +21,52 @@ def stable_sigma(trial, long_run):
                    "--climate_mean_init"]
     env_type = "stable"
     num_gens = 300
-    selection_types = ["NF", "no-evolv"]
-    genome_types = ["evolv"]
+    selection_types = ["NF"]
+    genome_types = ["evolv", "no-evolv"]
     num_niches_values = [1,10,50]
+    climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
+
+    for N in num_niches_values:
+        for climate_mean_init in climate_mean_init_values:
+            for G in genome_types:
+                for S in selection_types:
+                        project = top_dir + "S_" + S + "_G_" + G + "_N_" + \
+                                  str(N) + "_climate_" + str(climate_mean_init)
+                        new_exp = [project, env_type, num_gens, trial, S, G, N, climate_mean_init]
+                        experiments.append(new_exp)
+                        if mode == "local":
+                            command = "python simulate.py "
+                            for idx, el in enumerate(param_names):
+                                command += el + " " + str(new_exp[idx]) + " "
+                            # command += "&" # uncomment to run all experiments simultaneously
+                            print(command)
+                            quit()
+                            os.system("bash -c '{}'".format(command))
+
+    if mode == "server":
+        run_batch(experiments, param_names, long_run=long_run, gpu=True)
+
+
+
+
+def stable_sigma_temp(trial, long_run):
+    "Reproduce experiments with stable environment"
+    top_dir = setup_dir() + "_sigma_0.2/"
+    experiments = []
+
+    param_names = ["--project",
+                   "--env_type",
+                   "--num_gens",
+                   "--trial",
+                   "--selection_type",
+                   "--genome_type",
+                   "--num_niches",
+                   "--climate_mean_init"]
+    env_type = "stable"
+    num_gens = 300
+    selection_types = ["NF"]
+    genome_types = ["no-evolv"]
+    num_niches_values = [100]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
 
     for N in num_niches_values:

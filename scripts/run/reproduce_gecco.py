@@ -534,7 +534,7 @@ if __name__ == "__main__":
         trials = int(sys.argv[1]) # number of independent trials
         mode = sys.argv[2] # this should be server for running jz experiments
 
-        for trial in range(trials):
+        for trial in range(10,trials):
             #stable_sigma(trial, long_run=False)
             #stable_sigma_temp(trial, long_run=False)
 
@@ -545,7 +545,7 @@ if __name__ == "__main__":
             #sin_survival_N100(trial, long_run=False)
             #sin_evolution_slow(trial, long_run=False)
             #sin_evolution_quick(trial, long_run=False)
-            #noisy(trial, long_run=False)
-            noisy_survival(trial, long_run=False)
+            noisy(trial, long_run=False)
+            #noisy_survival(trial, long_run=False)
 
 

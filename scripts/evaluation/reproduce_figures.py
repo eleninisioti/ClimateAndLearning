@@ -255,7 +255,7 @@ def diversity():
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/diversity_stable.pdf", dpi=300)
+    plt.savefig(save_dir + "/stable_diversity.pdf", dpi=300)
     plt.clf()
 
 
@@ -309,7 +309,7 @@ def survival(label="$A_e$"):
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/survival_stable.pdf", dpi=300)
+    plt.savefig(save_dir + "/sin_survival.pdf", dpi=300)
     plt.clf()
 
 
@@ -642,13 +642,13 @@ if __name__ == "__main__":
     #sigma()
 
     results_dir = "../projects/paper/stable/selection"
-    sigma_selection( y_variables=["SD", "Dispersal"], label="model")
+    #sigma_selection( y_variables=["SD", "Dispersal"], label="model")
 
     results_dir = "../projects/paper/stable/extinct"
-    #extinct()
+    extinct()
 
     results_dir = "../projects/paper/stable/diversity"
-    #diversity()
+    diversity()
     # ---------------------------------------
     # ------ sinusoid climate function -----
     results_dir = "../projects/paper/sin/survival/N100"

@@ -147,7 +147,7 @@ def stable_extinct(trial, long_run):
     env_type = "stable"
     num_gens = 300
     selection_types = ["F"]
-    genome_types = ["evolv"]
+    genome_types = ["no-evolv"]
     num_niches_values = [100]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
 
@@ -541,7 +541,7 @@ if __name__ == "__main__":
 
             #stable_selection(trial, long_run=False)
             #stable_diversity(trial, long_run=False)
-            #stable_extinct(trial, long_run=False)
+            stable_extinct(trial, long_run=False)
             #sin_survival_A4(trial, long_run=False)
             #sin_survival_N100(trial, long_run=False)
             #sin_evolution_slow(trial, long_run=False)

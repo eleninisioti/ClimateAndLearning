@@ -537,6 +537,8 @@ if __name__ == "__main__":
 
         for trial in range(trials):
             stable_sigma(trial, long_run=False)
+            stable_sigma_temp(trial, long_run=False)
+
             #stable_selection(trial, long_run=False)
             #stable_diversity(trial, long_run=False)
             #stable_extinct(trial, long_run=False)

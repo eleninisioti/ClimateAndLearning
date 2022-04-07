@@ -151,15 +151,13 @@ def sigma_selection( y_variables, label="Num_niches"):
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/sigma_selection_stable.pdf", dpi=300)
+    plt.savefig(save_dir + "/stable_selection.pdf", dpi=300)
     plt.clf()
 
 
 def extinct():
     """ Plot with sigma in the vertical axis, climate value in the horizontal and different lines for number of niches"
     """
-    labels = {"FP-Grove": "F-selection",
-              "capacity-fitness": "NF-selection"}
     # find all projects
     projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
     projects = [el for el in projects if "plots" not in el]
@@ -209,7 +207,7 @@ def extinct():
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/extinct_stable.pdf", dpi=300)
+    plt.savefig(save_dir + "/stable_extinct.pdf", dpi=300)
     plt.clf()
 
 
@@ -641,10 +639,10 @@ def evolution_compare(include):
 if __name__ == "__main__":
     # ------ stable climate function -----
     results_dir = "../projects/paper/stable/sigma"
-    sigma()
+    #sigma()
 
     results_dir = "../projects/paper/stable/selection"
-    #sigma_selection( y_variables=["SD", "Dispersal"], label="model")
+    sigma_selection( y_variables=["SD", "Dispersal"], label="model")
 
     results_dir = "../projects/paper/stable/extinct"
     #extinct()

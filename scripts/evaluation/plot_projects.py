@@ -334,7 +334,7 @@ def run(project):
     if config["only_climate"]:
         include = ["climate"]
     else:
-        include = ["climate", "mean", "sigma", "mutate", "dispersal", "diversity","num_agents"]
+        include = ["climate", "mean", "sigma", "mutate", "dispersal", "diversity","num_agents","extinct"]
     plotter = Plotter(project=project,
                       num_niches=config["num_niches"],
                       log=log_df,

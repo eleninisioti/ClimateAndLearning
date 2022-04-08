@@ -694,11 +694,11 @@ if __name__ == "__main__":
     #evolution_compare(include)
 
     results_dir = "../projects/paper/noisy/survival"
-    survival_noisy()
+    #survival_noisy()
 
     results_dir = "../projects/paper/noisy/evolution"
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]
-    #evolution_compare(include)
+    evolution_compare(include)
 

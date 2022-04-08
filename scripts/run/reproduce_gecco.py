@@ -145,11 +145,11 @@ def stable_extinct(trial, long_run):
                    "--num_niches",
                    "--climate_mean_init"]
     env_type = "stable"
-    num_gens = 300
+    num_gens = 1500
     selection_types = ["NF"]
-    genome_types = ["no-evolv"]
+    genome_types = ["evolv"]
     num_niches_values = [100]
-    climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
+    climate_mean_init_values = [8,16]
 
     for N in num_niches_values:
         for climate_mean_init in climate_mean_init_values:
@@ -540,12 +540,12 @@ if __name__ == "__main__":
 
             #stable_selection(trial, long_run=False)
             #stable_diversity(trial, long_run=False)
-            #stable_extinct(trial, long_run=False)
+            stable_extinct(trial, long_run=True)
             #sin_survival_A4(trial, long_run=False)
             #sin_survival_N100(trial, long_run=False)
             #sin_evolution_slow(trial, long_run=False)
             #sin_evolution_quick(trial, long_run=False)
             #noisy(trial, long_run=False)
-            noisy_survival(trial, long_run=True)
+            #noisy_survival(trial, long_run=True)
 
 

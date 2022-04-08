@@ -351,14 +351,8 @@ def survival_noisy(label="$A_e$"):
             except IOError:
                 break
             trial_diversity = np.mean(log["diversity"][100:])
-            if len(log["Climate"])  == 500:
-                print("change length")
-                length = 1500
-            else:
 
-                length = len(log["Climate"])
-            config.num_gens = 1500
-            trial_duration = length / config.num_gens
+            trial_duration = len(log["Climate"]) / config.num_gens
             if label == "$A_e$":
                 label_value = config.amplitude
             elif label == "N":
@@ -423,7 +417,7 @@ def evolution_compare(include):
     results = {}
     projects = [os.path.join(results_dir, o) for o in os.listdir(results_dir)]
     ordered_projects = []
-    order = ["F_G", "N_G", "NF_G"]
+    order = ["_F_G", "_N_G", "_NF_G"]
     for o in order:
 
         for p in projects:
@@ -661,7 +655,7 @@ def evolution_compare(include):
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/evolution_other.pdf", dpi=300)
+    plt.savefig(save_dir + "/evolution.pdf", dpi=300)
     plt.clf()
     return
 

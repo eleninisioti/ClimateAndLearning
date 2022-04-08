@@ -472,12 +472,11 @@ def noisy_survival(trial, long_run=False):
                    "--climate_mean_init",
                    "--noise_std"]
     env_type = "noisy"
-    num_gens = 500
-    selection_types = ["NF"]
+    num_gens = 1500
+    selection_types = ["NF","N", "F"]
     genome_types = ["evolv"]
     num_niches_values = [40]
     noise_std_values = np.arange(0.05,0.82, 0.05)
-    noise_std_values = [0.2, 0.4]
     climate_mean_init_values = [2]
 
     for noise_std in noise_std_values:
@@ -539,7 +538,7 @@ if __name__ == "__main__":
             stable_sigma(trial, long_run=False)
             #stable_sigma_temp(trial, long_run=False)
 
-            stable_selection(trial, long_run=False)
+            #stable_selection(trial, long_run=False)
             #stable_diversity(trial, long_run=False)
             #stable_extinct(trial, long_run=False)
             #sin_survival_A4(trial, long_run=False)
@@ -547,6 +546,6 @@ if __name__ == "__main__":
             #sin_evolution_slow(trial, long_run=False)
             #sin_evolution_quick(trial, long_run=False)
             #noisy(trial, long_run=False)
-            #noisy_survival(trial, long_run=False)
+            noisy_survival(trial, long_run=True)
 
 

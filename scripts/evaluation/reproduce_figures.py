@@ -139,6 +139,9 @@ def sigma_selection( y_variables, label="Num_niches"):
             axs[y_idx].set(ylabel="$\\bar{r}^*$, Evolvability")
         elif y_variable == "Dispersal":
             axs[y_idx].set(ylabel="$D^*$, Dispersal")
+
+        elif y_variable == "diversity":
+            axs[y_idx].set(ylabel="$V^*$, Diversity")
         axs[y_idx].set_yscale('log')
         axs[y_idx].set(xlabel="$e_{0}^0$, Reference Environmental State")
 
@@ -666,7 +669,7 @@ if __name__ == "__main__":
     #sigma()
 
     results_dir = "../projects/paper/stable/selection"
-    #sigma_selection( y_variables=["SD", "Dispersal"], label="model")
+    #sigma_selection( y_variables=["SD", "Dispersal", "diversity"], label="model")
 
     results_dir = "../projects/paper/stable/extinct"
     #extinct()
@@ -694,7 +697,8 @@ if __name__ == "__main__":
     #evolution_compare(include)
 
     results_dir = "../projects/paper/noisy/survival"
-    #survival_noisy()
+    results_dir = "../projects/debug/8_4_2022_noisy_"
+    survival_noisy()
 
     results_dir = "../projects/paper/noisy/evolution"
     include = ["climate", "mean",

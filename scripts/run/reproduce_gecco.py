@@ -472,11 +472,11 @@ def noisy_survival(trial, long_run=False):
                    "--climate_mean_init",
                    "--noise_std"]
     env_type = "noisy"
-    num_gens = 1500
-    selection_types = ["NF","N", "F"]
+    num_gens = 500
+    selection_types = ["NF", "N", "F"]
     genome_types = ["evolv"]
-    num_niches_values = [40]
-    noise_std_values = np.arange(0.05,0.82, 0.05)
+    num_niches_values = [100]
+    noise_std_values = np.arange(0.05,0.82, 0.1)
     climate_mean_init_values = [2]
 
     for noise_std in noise_std_values:
@@ -493,11 +493,11 @@ def noisy_survival(trial, long_run=False):
                                 command = "python simulate.py "
                                 for idx, el in enumerate(param_names):
                                     command += el + " " + str(new_exp[idx]) + " "
-                                # command += "&" # uncomment to run all experiments simultaneously
+                                command += "&" # uncomment to run all experiments simultaneously
                                 print(command)
                                 #quit()
 
-                                #os.system("bash -c '{}'".format(command))
+                                os.system("bash -c '{}'".format(command))
 
     if mode == "server":
         run_batch(experiments, param_names, long_run=long_run, gpu=True)
@@ -540,12 +540,12 @@ if __name__ == "__main__":
 
             #stable_selection(trial, long_run=False)
             #stable_diversity(trial, long_run=False)
-            stable_extinct(trial, long_run=True)
+            #stable_extinct(trial, long_run=True)
             #sin_survival_A4(trial, long_run=False)
             #sin_survival_N100(trial, long_run=False)
             #sin_evolution_slow(trial, long_run=False)
             #sin_evolution_quick(trial, long_run=False)
             #noisy(trial, long_run=False)
-            #noisy_survival(trial, long_run=True)
+            noisy_survival(trial, long_run=True)
 
 

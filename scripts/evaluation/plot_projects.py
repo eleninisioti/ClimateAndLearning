@@ -2,10 +2,11 @@
 
 For each project it plots:
 * the evolution of climate and population dynamics
-* the SoS, Strengh of Selection plot
 """
+
 import sys
 import os
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 import matplotlib.pyplot as plt
 import pickle5 as pickle
@@ -13,20 +14,16 @@ import yaml
 import seaborn as sns
 import numpy as np
 import pickle
-from utils import compute_SoS, compute_dispersal
+from utils import compute_dispersal, find_index
 import numpy as np
 import pandas as pd
-
-labels = {"climate_mean_init": "$\\bar{e}$, Mean climate",
-          "num_niches": "$N$, Number of niches",
-          "period": "$T$, Period of sinusoid",
-          "amplitude": "$A$, Amplitude of sinusoid"}
 
 
 class Plotter:
 
     def __init__(self, project, num_niches, log, log_niches):
-        """ Class constructor
+        """ Class constructor.
+
         Parameters
         ----------
         project: str
@@ -45,82 +42,39 @@ class Plotter:
                   "figure.autolayout": True,
                   'font.size': 8}
         plt.rcParams.update(params)
-        include = ["climate", "mean",
-                   "sigma", "mutate", "extinct",
-                   "dispersal", "diversity"]
-        cm = 1 / 2.54  # convert inches to cm
-        scale = 1
-        self.fig_size = (8.48 * cm / scale, 6 * cm / scale)  # these dimensions chosen to fit in latex column
-        fig, self.axs = plt.subplots(len(include), figsize=(self.fig_size[0], self.fig_size[1] / 2 * len(include)))
-        if include == ["climate"]:
-            self.axs = [self.axs]  # the simulations don't include a population
-        self.ci = 95
-        self.y_upper_thres = 10 ** 10
-        self.y_lower_thres = 1 / (10 ** 10)
 
-        if not self.log.empty:
-            # plot has at most 2000 points
-            self.interval = int(len(self.log["Climate"]) / 2000)
-            if self.interval < 2:
-                self.interval = 1
-        else:
-            print("cjeck")
+        cm = 1 / 2.54  # for converting inches to cm
+        self.fig_size = (8.48 * cm, 6 * cm)  # these dimensions chosen to fit in latex column
+
+        self.ci = 95 # for confidence intervals
+
         # ------------------------------------------
-
-    def plot_SoS(self):
-        """ Plot the evolution of the strength of selection (SoS).
-
-        We also plot the evolution of genes (SD and mutation) to detect patterns in how they interact with SoS
-        """
-        fig, axs = plt.subplots(1, figsize=self.fig_size)
-
-        log = compute_SoS(self.log, self.log_niches, self.num_niches)
-        x = log["Generation"][::self.interval]
-        y = log["Selection"][::self.interval]
-        y = y.clip(upper=self.y_upper_thres)
-        y = y.clip(lower=self.y_lower_thres)
-        sns.lineplot(data=log, x=x, y=y, label="SoS", ci=self.ci)
-
-        y = log["SD"][::self.interval]
-        y = y.clip(upper=self.y_upper_thres)
-        y = y.clip(lower=self.y_lower_thres)
-        sns.lineplot(data=log, x=x, y=y, label="$\sigma$", ci=self.ci)
-
-        y = log["R"][::self.interval]
-        y = y.clip(upper=self.y_upper_thres)
-        y = y.clip(lower=self.y_lower_thres)
-        sns.lineplot(data=log, x=x, y=y, label="$r$", ci=self.ci)
-
-        axs.set(xlabel="Time (in generations)")
-        axs.set_yscale('log')
-
-        plt.savefig("../projects/" + self.project + "/plots/SoS.png")
-        plt.clf()
+        self.labels = {"climate_mean_init": "$\\bar{e}$, Mean climate",
+                       "num_niches": "$N$, Number of niches",
+                       "period": "$T$, Period of sinusoid",
+                       "amplitude": "$A$, Amplitude of sinusoid"}
+        self.label_colors = {"F-selection": "blue", "N-selection": "orange", "NF-selection": "green"}
 
     def plot_evolution(self, include):
         """ Plot the evolution of climate and population dynamics.
 
         Parameters
         ----------
-
-
-        include: list of str
-            which parameters to include in the plot. options are ["climate", "mean", "sigma", "mutate",
+        include: list of string
+            which evaluation metrics to include. options are ["climate", "mean", "sigma", "mutate",
             "n_agents", "n_extinctions", "fitness"]
+
         """
         fig, axs = plt.subplots(len(include), figsize=(self.fig_size[0], self.fig_size[1] / 3 * len(include)))
         count = 0
+        first_trial = np.min(self.log['Trial'])
+        unique_trials = list(set(self.log['Trial']))
 
         # ----- plot climate curve -----
         if "climate" in include:
-            if 'Trial' not in self.log:
-                print("error")
+            log_trial = self.log.loc[(self.log['Trial'] == first_trial)] # only plot the first trial of climate
 
-            first_trial = np.min(self.log['Trial'])
-            unique_trials = list(set(self.log['Trial']))
-            log_trial = self.log.loc[(self.log['Trial'] == first_trial) ]
-
-            # find mean climate across niches:
+            # find mean climate across niches
             climate_avg = []
             for el in list(log_trial["Climate"]):
                 niches_states = [el + 0.01 * idx for idx in range(-int(self.num_niches / 2),
@@ -128,45 +82,45 @@ class Plotter:
                 climate_avg.append(np.mean(niches_states))
 
             log_trial["Climate_avg"] = climate_avg
-            x = log_trial["Generation"][::self.interval]
-            y = log_trial["Climate_avg"][::self.interval]
+            x = log_trial["Generation"]
+            y = log_trial["Climate_avg"]
             sns.lineplot(ax=axs[count], x=x, y=y, ci=None)
 
             axs[count].set(ylabel="$e_0$")
             axs[count].set(xlabel=None)
+
             count += 1
         # ----------------------------------------
         # ----- plot average preferred niche -----
         if "mean" in include:
-            x = self.log["Generation"][::self.interval]
-            y = self.log["Mean"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["Mean"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(ylabel="$\\bar{\mu}$ ")
             axs[count].set(xlabel=None)
+
             count += 1
         # -----------------------------------
         # ----- plot average plasticity -----
         if "sigma" in include:
-            x = self.log["Generation"][::self.interval]
-            y = self.log["SD"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            #y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["SD"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(ylabel="$\\bar{\sigma}$")
             axs[count].set(xlabel=None)
             axs[count].set_yscale('log')
+
             count += 1
         # ------------------------------------
         # ----- plot average evolvability -----
         if "mutate" in include:
-            x = self.log["Generation"][::self.interval]
-            y = self.log["R"][::self.interval]
-            #y = y.clip(upper=self.y_upper_thres)
-            #y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["R"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(ylabel="$\\bar{r}$")
@@ -177,10 +131,9 @@ class Plotter:
         # ----- plot average fitness -----
 
         if "fitness" in include:
-            x = self.log["Generation"][::self.interval]
-            y = self.log["Fitness"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["Fitness"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(xlabel="Time (in generations)")
@@ -190,10 +143,9 @@ class Plotter:
         # ----- plot average extinctions -----
 
         if "extinct" in include:
-            x = self.log["Generation"][::self.interval]
-            y = self.log["extinctions"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["extinctions"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(xlabel="Time (in generations)")
@@ -202,24 +154,20 @@ class Plotter:
         # ----------------------------------
         # ----- plot number of agents  -----
         if "num_agents" in include:
-            x = self.log["Generation"][::self.interval]
-            y = self.log["num_agents"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["num_agents"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$N$, number of agents")
             count += 1
-
         # --------------------------
         # ----- plot genomic diversity -----
-
         if "diversity" in include:
-            x = self.log["Generation"][::self.interval]
-            y = self.log["diversity"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["diversity"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(xlabel="Time (in generations)")
@@ -229,10 +177,9 @@ class Plotter:
         # ------------------------------------------
         # ----- plot genomic diversity of preferred state -----
         if "diversity_mean" in include:
-            x = self.log["Generation"][::self.interval]
-            y = self.log["diversity_mean"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["diversity_mean"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(xlabel="Time (in generations)")
@@ -240,57 +187,50 @@ class Plotter:
             count += 1
         # ------------------------------------------
         # ----- plot genomic diversity of plasticity -----
-
         if "diversity_sigma" in include:
-            x = self.log["Generation"][::self.interval]
-            y = self.log["diversity_sigma"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["diversity_sigma"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$V_{\sigma}$")
             count += 1
-
         # ------------------------------------------
         # ----- plot genomic diversity of evolvability  -----
         if "diversity_mutate" in include:
-            x = self.log["Generation"][::self.interval]
-            y = self.log["diversity_mutate"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["diversity_mutate"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$V_{r}$")
             count += 1
-
         # ------------------------------------------
         # ----- plot fixation index  -----
         if "fixation_index" in include:
-            x = self.log["Generation"][::self.interval]
-            y = self.log["fixation_index"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["fixation_index"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$F_{st}$, fixation_index")
             count += 1
-
         # ------------------------------------------
         # ----- plot dispersal  -----
         if "dispersal" in include:
             self.log = compute_dispersal(self.log, self.log_niches, self.num_niches)
-            x = self.log["Generation"][::self.interval]
-            y = self.log["Dispersal"][::self.interval]
-            y = y.clip(upper=self.y_upper_thres)
-            y = y.clip(lower=self.y_lower_thres)
+            x = self.log["Generation"]
+            y = self.log["Dispersal"]
+
             sns.lineplot(ax=axs[count], x=x, y=y, ci=self.ci)
 
             axs[count].set(xlabel="Time (in generations)")
             axs[count].set(ylabel="$D$")
             count += 1
+
         # all sub-plots share the same horizontal axis
         for ax in axs.flat:
             ax.label_outer()
@@ -302,70 +242,71 @@ class Plotter:
         return self.log
 
 
-def run(project, total=True):
+def run(project, total):
     """ Produce plots for a single project.
 
-    Args:
+    Parameters
+    ----------
+    project: str
+        name of project directory (absolute path)
+
+    total: int
+        if 1 only plot average across trials, if 0 only plot independently for each trial
 
     """
+    # ----- collect data from each trial -----
     log_df = pd.DataFrame()
-
     log_niches_total = {}
-    trial_dirs = [os.path.join(project + "/trials",o) for o in os.listdir(project + "/trials")]
-    for trial_idx,trial_dir in enumerate(trial_dirs):
-        file_exists = os.path.exists(trial_dir + '/log_updated.pickle')
 
+    trial_dirs = [os.path.join(project + "/trials", o) for o in os.listdir(project + "/trials")]
 
-        # ----- load outcome of trial -----
+    for trial_idx, trial_dir in enumerate(trial_dirs):
         try:
             log = pickle.load(open(trial_dir + '/log.pickle', 'rb'))
             log_niches = pickle.load(open(trial_dir + '/log_niches.pickle', 'rb'))
 
-        except IOError:
-            print("No log file for project. ", trial_dir)
-            #return 0
-        trial = trial_dir.find("trial_")
-        trial= int(trial_dir[(trial+6):])
-        if log_df.empty:
-            log_df = log
-        else:
-            log_df = log_df.append(log)
-        log_niches_total[trial] = log_niches
-        # ---------------------------------
+            trial = find_index(trial_dir)
+            if log_df.empty:
+                log_df = log
+            else:
+                log_df = log_df.append(log)
+            log_niches_total[trial] = log_niches
 
+        except IOError:
+            print("No log file for trial: ", trial_dir)
+
+    # ---------------------------------
     # load  project configuration
     skip_lines = 1
     with open(project + "/config.yml") as f:
         for i in range(skip_lines):
             _ = f.readline()
         config = yaml.load(f)
-    # choose which metrics to plot
+
+    # choose which evaluation metrics to plot
     if config["only_climate"]:
         include = ["climate"]
     else:
-        include = ["climate", "mean", "sigma", "mutate", "dispersal", "diversity","num_agents","extinct"]
-    plotter = Plotter(project=project,
-                      num_niches=config["num_niches"],
-                      log=log_df,
-                      log_niches=log_niches_total)
+        include = ["climate", "mean", "sigma", "mutate", "dispersal", "diversity", "num_agents", "extinct"]
 
     if total:
+        plotter = Plotter(project=project,
+                          num_niches=config["num_niches"],
+                          log=log_df,
+                          log_niches=log_niches_total)
+
         log = plotter.plot_evolution(include=include)
-        # save new log data produced by plotter
-        for trial, trial_dir in enumerate(trial_dirs):
-            log_trial = log.loc[(log['Trial'] == trial)]
-            pickle.dump(log_trial, open(trial_dir + '/log_updated.pickle', 'wb'))
-    else:
-        # save new log data produced by plotter
-        for trial_dir in trial_dirs:
-            trial = trial_dir.find("trial_")
-            trial= int(trial_dir[(trial+6):])
-            log_trial = log_df.loc[(log_df['Trial'] == trial)]
 
+    for trial_dir in trial_dirs:
+        trial = find_index(trial_dir)
+        log_trial = log.loc[(log['Trial'] == trial)]
+        if total:
+            # save new log data produced by plotter (includes dispersal)
             pickle.dump(log_trial, open(trial_dir + '/log_updated.pickle', 'wb'))
-
+        else:
+            # plot only for this trial and don't save
             log_niches_trial = {}
-            log_niches_trial[trial]= log_niches_total[trial]
+            log_niches_trial[trial] = log_niches_total[trial]
             if not log_trial.empty:
                 plotter = Plotter(project=project,
                                   num_niches=config["num_niches"],
@@ -374,14 +315,13 @@ def run(project, total=True):
                 log = plotter.plot_evolution(include=include)
 
 
-
-
 if __name__ == "__main__":
-    top_dir = sys.argv[1]  # choose the top directory containing the projects you want to plot
-    total = sys.argv[2]
+
+    top_dir = sys.argv[1]  # choose the top directory containing the projects you want to plot (relative path to
+    # "../projects")
+    total = sys.argv[2]  # if 1 only plot average across trials, if 0 only plot independently for each trial
+
     projects = [os.path.join("../projects/", top_dir, o) for o in os.listdir("../projects/" + top_dir)]
     for project in projects:
         if "plots" not in project:
-            if not run(project, total):
-                print("abort")
-                #break
+            run(project, total)

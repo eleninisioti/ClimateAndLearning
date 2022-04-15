@@ -1,7 +1,11 @@
 import numpy as np
-import pandas as pd
 
-label_colors = {"F-selection": "blue", "N-selection": "orange", "NF-selection": "green"}
+
+def find_index(trial_dir):
+    # find the index of current trial
+    trial = trial_dir.find("trial_")
+    trial = int(trial_dir[(trial + 6):])
+    return trial
 
 def find_label(config, parameter="selection"):
     label = ""
@@ -18,49 +22,6 @@ def find_label(config, parameter="selection"):
         elif config.genome_type == "no-evolv":
             label += "$R_{no-evolve}$"
     return label
-
-def compute_SoS(log, log_niches, num_niches):
-    """ Compute Strength of Selection.
-
-    Parameters
-    ---------
-    log_niches: Dataframe
-        information about niches
-
-    num_niches: int
-        number of niches
-    """
-    trials = len(log_niches)
-    for trial in range(1,trials+1):
-        all_strengths = []
-        log_trial = log.loc[(log['Trial'] == trial)]
-        climate_mean = []
-        num_gens = min([len(log_niches[trial]["inhabited_niches"]), len(list(log_trial["Climate"]))])
-        log_trial = log_trial.loc[log_trial['Generation'] < num_gens]
-
-        for gen in range(num_gens):
-            climate_values = []
-            for lat in range(-int(num_niches/2), int(num_niches/2 +0.5)):
-                lat_climate = list(log_trial["Climate"])[gen] + 0.01 *lat
-                if lat_climate in log_niches[trial]["inhabited_niches"][gen]:
-                    climate_values.append(lat_climate)
-            if not len(climate_values):
-                climate_values = [0]
-            climate_mean.append(np.mean(climate_values))
-
-        pop_mean = log_trial["Mean"]
-        if type(pop_mean) is not list:
-            pop_mean = pop_mean.to_list()
-        strength = [0 if el==0 else np.abs(el - pop_mean[idx]) for idx, el in enumerate(climate_mean)]
-        all_strengths.append(strength)
-        log_trial["Selection"] = np.mean(np.array(all_strengths), axis=0)
-        if trial==1:
-            new_log = log_trial
-        else:
-            new_log = new_log.append(log_trial)
-
-    return new_log
-
 
 
 def compute_dispersal(log, log_niches, num_niches):
@@ -93,14 +54,12 @@ def compute_dispersal(log, log_niches, num_niches):
 
             for gen in range(num_gens):
                 lat_climate = climate[gen] + 0.01 * lat
-                print(len(inhabited_niches[gen]), len(set(inhabited_niches[gen])))
                 survival=0
                 for el in inhabited_niches[gen]:
                     if (np.abs(el-lat_climate)) < 0.01:
                         survival = 1
 
-                if survival == 0 and len(inhabited_niches[gen])==100:
-                    print("chheck")
+
 
                 survivals.append(survival)
             if not len(survivals):

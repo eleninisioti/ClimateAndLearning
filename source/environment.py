@@ -32,7 +32,15 @@ class Env:
         self.niches = {}
         self.update_niches()
 
-    def step(self, gen):
+    def update_niches(self):
+        southest_lat = -int(self.num_niches / 2)
+        northest_lat = int(self.num_niches / 2 + 0.5)
+        for lat in range(southest_lat, northest_lat):
+            lat_climate = self.mean + 0.01 * lat
+            niche_capacity = max(int(lat_climate * self.niche_capacity), 0)
+            self.niches[lat] = {"climate": lat_climate, "capacity": niche_capacity}
+
+    def step(self):
         """ Move the environment to the next generation. Updates the climate and capacity of niches based on the reference environmental state.
 
         Parameters
@@ -42,10 +50,6 @@ class Env:
         """
         self.current_capacity = self.mean * self.niche_capacity
         self.climate_values.append(self.mean)
+        self.update_niches()
 
-        southest_lat = -int(self.num_niches / 2)
-        northest_lat = int(self.num_niches / 2 + 0.5)
-        for lat in range(southest_lat, northest_lat):
-            lat_climate = self.mean + 0.01 * lat
-            niche_capacity = max(int(lat_climate * self.niche_capacity),0)
-            self.niches[lat] = {"climate": lat_climate, "capacity": niche_capacity}
+

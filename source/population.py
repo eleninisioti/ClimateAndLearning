@@ -104,18 +104,19 @@ class Population:
             niche_climate = niche_data["climate"]
             random.shuffle(niche_pop)
 
-            if "F" in self.selection_type:
-                niche_pop = self.order_agents(niche_pop, niche_climate)
             if "N" in self.selection_type:
                 self.mean_fitness = 0
             else:
                 self.mean_fitness = 1
 
+            if "F" in self.selection_type:
+                niche_pop = self.order_agents(niche_pop, niche_climate)
+
             niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)]]
 
             if "F" in self.selection_type:
                 if self.mean_fitness:
-                    weights = [np.mean(agent.fitness.values()) for agent in niche_pop]
+                    weights = [np.mean(list(agent.fitnesses.values())) for agent in niche_pop]
                 else:
                     weights = [agent.fitnesses[niche_climate] for agent in niche_pop]
             else:
@@ -158,7 +159,7 @@ class Population:
     def order_agents(self, agents, niche_climate=0):
         # order agents based on fitness
         if self.mean_fitness:
-            fitness_values = [np.mean(agent.fitnesses.values()) for agent in agents]
+            fitness_values = [np.mean(list(agent.fitnesses.values())) for agent in agents]
         else:
             fitness_values = [agent.fitnesses[niche_climate] for agent in agents]
         keydict = dict(zip(agents, fitness_values))

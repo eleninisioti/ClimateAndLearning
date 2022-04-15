@@ -473,7 +473,7 @@ def noisy_survival(trial, long_run=False):
                    "--noise_std"]
     env_type = "noisy"
     num_gens = 500
-    selection_types = [ "F"]
+    selection_types = [ "NF"]
     genome_types = ["evolv"]
     num_niches_values = [100]
     noise_std_values = np.arange(0.05,0.82, 0.1)
@@ -493,11 +493,11 @@ def noisy_survival(trial, long_run=False):
                                 command = "python simulate.py "
                                 for idx, el in enumerate(param_names):
                                     command += el + " " + str(new_exp[idx]) + " "
-                                command += "&" # uncomment to run all experiments simultaneously
+                                #command += "&" # uncomment to run all experiments simultaneously
                                 print(command)
-                                #quit()
 
                                 os.system("bash -c '{}'".format(command))
+                                quit()
 
     if mode == "server":
         run_batch(experiments, param_names, long_run=long_run, gpu=True)

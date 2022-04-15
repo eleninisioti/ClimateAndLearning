@@ -47,7 +47,7 @@ class Logger:
         SD_values = []
         mutate_values = []
         for agent in population.agents:
-            fitness_values.append(agent.fitness)
+            fitness_values.append(np.mean(list(agent.fitnesses.values())))
             mean_values.append(agent.genome.genes["mean"])
             SD_values.append(agent.genome.genes["sigma"])
             mutate_values.append(agent.genome.genes["r"])

@@ -473,7 +473,7 @@ def noisy_survival(trial, long_run=False):
                    "--noise_std"]
     env_type = "noisy"
     num_gens = 500
-    selection_types = ["NF", "N", "F"]
+    selection_types = [ "F"]
     genome_types = ["evolv"]
     num_niches_values = [100]
     noise_std_values = np.arange(0.05,0.82, 0.1)

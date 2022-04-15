@@ -76,8 +76,8 @@ def compute_dispersal(log, log_niches, num_niches):
     """
     num_latitudes = num_niches
     window = 10
-    trials = len(log_niches)
-    for trial in range(trials):
+    trials = list(set(log["Trial"]))
+    for trial_idx, trial in enumerate(trials):
         all_dispersals = []
         all_DI = []
         log_trial = log.loc[(log['Trial'] == trial)]
@@ -86,16 +86,23 @@ def compute_dispersal(log, log_niches, num_niches):
         inhabited_niches = log_niches[trial]["inhabited_niches"]
         num_gens = min([len(inhabited_niches), len(climate)])
 
+
+
         for lat in range(-int(num_latitudes/2), int(num_latitudes/2 +0.5)):
             survivals = []
 
             for gen in range(num_gens):
                 lat_climate = climate[gen] + 0.01 * lat
+                print(len(inhabited_niches[gen]), len(set(inhabited_niches[gen])))
+                survival=0
+                for el in inhabited_niches[gen]:
+                    if (np.abs(el-lat_climate)) < 0.01:
+                        survival = 1
 
-                if lat_climate in inhabited_niches[gen]:
-                    survivals.append(1)
-                else:
-                    survivals.append(0)
+                if survival == 0 and len(inhabited_niches[gen])==100:
+                    print("chheck")
+
+                survivals.append(survival)
             if not len(survivals):
                 survivals = [0]*window
             DI = list(np.convolve(survivals, np.ones(window, dtype=int), 'valid'))
@@ -115,7 +122,7 @@ def compute_dispersal(log, log_niches, num_niches):
         x = np.mean(np.array(dispersal), axis=0)
         log_trial["Dispersal"] = x
 
-        if not trial:
+        if not trial_idx:
             new_log = log_trial
         else:
             new_log = new_log.append(log_trial)

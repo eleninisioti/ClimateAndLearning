@@ -135,6 +135,7 @@ def sigma_selection( y_variables, label="Num_niches"):
 
         if y_variable == "SD":
             axs[y_idx].set(ylabel="$\\bar{\sigma}^*$, Plasticity")
+            axs[y_idx].set_yscale('log')
         elif y_variable == "R":
             axs[y_idx].set(ylabel="$\\bar{r}^*$, Evolvability")
         elif y_variable == "Dispersal":
@@ -142,20 +143,21 @@ def sigma_selection( y_variables, label="Num_niches"):
 
         elif y_variable == "diversity":
             axs[y_idx].set(ylabel="$V^*$, Diversity")
-        axs[y_idx].set_yscale('log')
+        #axs[y_idx].set_yscale('log')
         axs[y_idx].set(xlabel="$e_{0}^0$, Reference Environmental State")
+
 
         handles, labels = axs[-1].get_legend_handles_labels()
     fig.legend(handles, labels, loc='lower left')
     for ax in axs.flat:
         ax.label_outer()
-    # plt.legend(loc="best")
-    plt.yscale('log')
+    #plt.legend(loc="best")
+    #plt.yscale('log')
     axs[1].set(xlabel="$e_{0}^0$, Reference Environmental State")
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/stable_selection.pdf", dpi=300)
+    plt.savefig(save_dir + "/stable_selection_mutate.pdf", dpi=300)
     plt.clf()
 
 
@@ -355,7 +357,13 @@ def survival_noisy(label="$A_e$"):
                 break
             trial_diversity = np.mean(log["diversity"][100:])
 
-            trial_duration = len(log["Climate"]) / config.num_gens
+            num_agents = list(log["num_agents"])
+            num_agents = num_agents[-1]
+            if num_agents > 50:
+                trial_duration = 1
+            else:
+
+                trial_duration = len(log["Climate"]) / config.num_gens
             if label == "$A_e$":
                 label_value = config.amplitude
             elif label == "N":
@@ -432,22 +440,24 @@ def evolution_compare(include):
     for p in projects:
         if "plots" not in p:
             trial_dirs = list(next(os.walk(p + "/trials"))[1])
-            for trial, trial_dir in enumerate(trial_dirs):
-                # load outcome of trial
+            log_niches_total = {}
+            log_df = pd.DataFrame()
+            for trial_idx, trial_dir in enumerate(trial_dirs):
                 try:
-                    log = pickle.load(open(p + "/trials/" + trial_dir + '/log_updated.pickle', 'rb'))
-                    log_niches = pickle.load(open(p + "/trials/" + trial_dir + '/log_niches.pickle', 'rb'))
+                    log = pickle.load(open(p+"/trials/" + trial_dir + '/log_updated.pickle', 'rb'))
+                    log_niches = pickle.load(open(p+"/trials/" +trial_dir + '/log_niches.pickle', 'rb'))
+                    trial = trial_dir.find("trial_")
+                    trial = int(trial_dir[(trial + 6):])
+                    if log_df.empty:
+                        log_df = log
+                    else:
+                        log_df = log_df.append(log)
+                    log_niches_total[trial] = log_niches
 
                 except IOError:
-                    print("No log file for project")
-                    return 1
+                    print("No log file for project. ", trial_dir)
+                    #continue
 
-                if trial == 0:
-                    log_df = log
-                    log_niches_total = [log_niches]
-                else:
-                    log_df = log_df.append(log)
-                    log_niches_total.append(log_niches)
 
             skip_lines = 1
             with open(p + "/config.yml") as f:
@@ -456,19 +466,21 @@ def evolution_compare(include):
                 config = yaml.load(f)
                 config = SimpleNamespace(**config)
 
-            log_df = log_df.loc[(log_df['Generation'] < 500)]
+            log_df = log_df.loc[(log_df['Generation'] < 330)]
 
             label = find_label(config)
             results[label] = [log_df, log_niches_total, config]
 
     if "climate" in include:
-
+        counter = 0
         for key, value in results.items():
             label = key
             log = value[0]
             log_niches = value[1]
             config = value[2]
-            log_trial = log.loc[(log['Trial'] == 0)]
+            first_trial = np.min(log['Trial'])
+            unique_trials = list(set(log['Trial']))
+            log_trial = log.loc[(log['Trial'] == first_trial)]
 
             # find mean across niches:
             climate_avg = []
@@ -479,8 +491,9 @@ def evolution_compare(include):
             log_trial["Climate_avg"] = climate_avg
             x = log_trial["Generation"][::interval]
             y = log_trial["Climate_avg"][::interval]
-
+            #if counter ==1:
             sns.lineplot(ax=axs[count], x=x, y=y, ci=ci, label=label, legend=0)
+            counter +=1
             if len(y) > 100:
                 break
         axs[count].set(ylabel="$e_0$")
@@ -512,8 +525,8 @@ def evolution_compare(include):
             config = value[2]
             x = log["Generation"][::interval]
             y = log["SD"][::interval]
-            y = y.clip(upper=y_upper_thres)
-            y = y.clip(lower=y_lower_thres)
+            #y = y.clip(upper=y_upper_thres)
+            #y = y.clip(lower=y_lower_thres)
 
             sns.lineplot(ax=axs[count], x=x, y=y, ci=ci, label=label, legend=0)
 
@@ -521,7 +534,7 @@ def evolution_compare(include):
         axs[count].set(ylabel="$\\bar{\sigma}$")
         axs[count].set(xlabel=None)
         axs[count].set_yscale('log')
-        axs[count].set_ylim([0.0001, 1])
+        axs[count].set_ylim([0.0001, 20])
         count += 1
 
     if "mutate" in include:
@@ -530,8 +543,8 @@ def evolution_compare(include):
             log = value[0]
             x = log["Generation"][::interval]
             y = log["R"][::interval]
-            y = y.clip(upper=y_upper_thres)
-            y = y.clip(lower=y_lower_thres)
+            #y = y.clip(upper=y_upper_thres)
+            #y = y.clip(lower=y_lower_thres)
 
             sns.lineplot(ax=axs[count], x=x, y=y, ci=ci, label=label, legend=0)
 
@@ -539,7 +552,7 @@ def evolution_compare(include):
         axs[count].set(ylabel="$\\bar{r}$")
         axs[count].set(xlabel=None)
         axs[count].set_yscale('log')
-        axs[count].set_yticks(ticks=[1, 10 ** (-5), 10 ** (-10)])
+        axs[count].set_yticks(ticks=[10, 10 ** (-5), 10 ** (-10)])
 
         count += 1
 
@@ -697,10 +710,10 @@ if __name__ == "__main__":
     #evolution_compare(include)
 
     results_dir = "../projects/paper/noisy/survival"
-    results_dir = "../projects/debug/8_4_2022_noisy_"
-    survival_noisy()
+    results_dir = "../projects/server/13_4_2022_noisy_"
+    #survival_noisy()
 
-    results_dir = "../projects/paper/noisy/evolution"
+    results_dir = "../projects/paper/noisy/evolution_100_0.3"
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]

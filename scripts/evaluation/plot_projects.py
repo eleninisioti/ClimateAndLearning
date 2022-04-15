@@ -62,6 +62,8 @@ class Plotter:
             self.interval = int(len(self.log["Climate"]) / 2000)
             if self.interval < 2:
                 self.interval = 1
+        else:
+            print("cjeck")
         # ------------------------------------------
 
     def plot_SoS(self):
@@ -110,7 +112,9 @@ class Plotter:
 
         # ----- plot climate curve -----
         if "climate" in include:
-            log_trial = self.log.loc[(self.log['Trial'] == 0) ]
+            first_trial = np.min(self.log['Trial'])
+            unique_trials = list(set(self.log['Trial']))
+            log_trial = self.log.loc[(self.log['Trial'] == first_trial) ]
 
             # find mean climate across niches:
             climate_avg = []
@@ -289,23 +293,24 @@ class Plotter:
         axs[count - 1].set(xlabel="$G$, Generation")
 
         # -------------------------------------------------------------
-        plt.savefig("../projects/" + self.project + "/plots/evolution.pdf", dpi=300)
+        plt.savefig("../projects/" + self.project + "/plots/evolution_" + str(unique_trials) + ".pdf", dpi=300)
         plt.clf()
         return self.log
 
 
-def run(project):
+def run(project, total=True):
     """ Produce plots for a single project.
 
     Args:
 
     """
+    log_niches_total = {}
     trial_dirs = [os.path.join(project + "/trials",o) for o in os.listdir(project + "/trials")]
-    for trial, trial_dir in enumerate(trial_dirs):
+    for  trial_idx,trial_dir in enumerate(trial_dirs):
         file_exists = os.path.exists(trial_dir + '/log_updated.pickle')
         if file_exists:
             # the project has already been plotted
-            return
+            return 1
 
         # ----- load outcome of trial -----
         try:
@@ -313,15 +318,15 @@ def run(project):
             log_niches = pickle.load(open(trial_dir + '/log_niches.pickle', 'rb'))
 
         except IOError:
-            print("No log file for project. ")
-            return 1
-
-        if trial == 0:
+            print("No log file for project. ", trial_dir)
+            #return 0
+        trial = trial_dir.find("trial_")
+        trial= int(trial_dir[(trial+6):])
+        if trial_idx == 0:
             log_df = log
-            log_niches_total = [log_niches]
         else:
             log_df = log_df.append(log)
-            log_niches_total.append(log_niches)
+        log_niches_total[trial] = log_niches
         # ---------------------------------
 
     # load  project configuration
@@ -339,17 +344,40 @@ def run(project):
                       num_niches=config["num_niches"],
                       log=log_df,
                       log_niches=log_niches_total)
-    log = plotter.plot_evolution(include=include)
 
-    # save new log data produced by plotter
-    for trial, trial_dir in enumerate(trial_dirs):
-        log_trial = log.loc[(log['Trial'] == trial)]
-        pickle.dump(log_trial, open(trial_dir + '/log_updated.pickle', 'wb'))
+    if total:
+        log = plotter.plot_evolution(include=include)
+        # save new log data produced by plotter
+        for trial, trial_dir in enumerate(trial_dirs):
+            log_trial = log.loc[(log['Trial'] == trial)]
+            pickle.dump(log_trial, open(trial_dir + '/log_updated.pickle', 'wb'))
+    else:
+        # save new log data produced by plotter
+        for trial_dir in trial_dirs:
+            trial = trial_dir.find("trial_")
+            trial= int(trial_dir[(trial+6):])
+            log_trial = log_df.loc[(log_df['Trial'] == trial)]
+
+            pickle.dump(log_trial, open(trial_dir + '/log_updated.pickle', 'wb'))
+
+            log_niches_trial = {}
+            log_niches_trial[trial]= log_niches_total[trial]
+            if not log_trial.empty:
+                plotter = Plotter(project=project,
+                                  num_niches=config["num_niches"],
+                                  log=log_trial,
+                                  log_niches=log_niches_trial)
+                log = plotter.plot_evolution(include=include)
+
+
 
 
 if __name__ == "__main__":
     top_dir = sys.argv[1]  # choose the top directory containing the projects you want to plot
+    total = sys.argv[2]
     projects = [os.path.join("../projects/", top_dir, o) for o in os.listdir("../projects/" + top_dir)]
     for project in projects:
         if "plots" not in project:
-            run(project)
+            if not run(project, total):
+                print("abort")
+                #break

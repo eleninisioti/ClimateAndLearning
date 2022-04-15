@@ -72,6 +72,7 @@ class Life:
                 time_out = (time.time() - start_time) > self.config.time_budget
 
                 if self.population.has_mass_extinction() or time_out:
+                    print("Time out")
                     break
 
                 # reproduce population

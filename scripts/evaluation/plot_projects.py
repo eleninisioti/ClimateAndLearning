@@ -15,6 +15,7 @@ import numpy as np
 import pickle
 from utils import compute_SoS, compute_dispersal
 import numpy as np
+import pandas as pd
 
 labels = {"climate_mean_init": "$\\bar{e}$, Mean climate",
           "num_niches": "$N$, Number of niches",
@@ -112,6 +113,9 @@ class Plotter:
 
         # ----- plot climate curve -----
         if "climate" in include:
+            if 'Trial' not in self.log:
+                print("error")
+
             first_trial = np.min(self.log['Trial'])
             unique_trials = list(set(self.log['Trial']))
             log_trial = self.log.loc[(self.log['Trial'] == first_trial) ]
@@ -304,13 +308,13 @@ def run(project, total=True):
     Args:
 
     """
+    log_df = pd.DataFrame()
+
     log_niches_total = {}
     trial_dirs = [os.path.join(project + "/trials",o) for o in os.listdir(project + "/trials")]
-    for  trial_idx,trial_dir in enumerate(trial_dirs):
+    for trial_idx,trial_dir in enumerate(trial_dirs):
         file_exists = os.path.exists(trial_dir + '/log_updated.pickle')
-        if file_exists:
-            # the project has already been plotted
-            return 1
+
 
         # ----- load outcome of trial -----
         try:
@@ -322,7 +326,7 @@ def run(project, total=True):
             #return 0
         trial = trial_dir.find("trial_")
         trial= int(trial_dir[(trial+6):])
-        if trial_idx == 0:
+        if log_df.empty:
             log_df = log
         else:
             log_df = log_df.append(log)

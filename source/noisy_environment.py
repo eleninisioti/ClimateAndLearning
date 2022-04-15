@@ -3,6 +3,8 @@ import numpy as np
 
 
 class NoisyEnv(Env):
+    """ Implements a noisy environment characterized by the standard deviation.
+    """
 
     def __init__(self, mean, ref_capacity, num_niches, std):
         self.type = "noisy"

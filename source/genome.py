@@ -17,7 +17,7 @@ class Genome:
         env_mean: float
             the state of the environment upon initialization of the genoem
 
-        init_sd: float
+        init_sigma: float
             determines the range around env_mean for genome initialization
 
         init_mutate: float
@@ -41,11 +41,7 @@ class Genome:
             # constant mutation rate
             self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
             self.genes["sigma"] = np.abs(self.genes["sigma"] + normal(0, self.genes["r"]))
-        elif self.type == "evolv-fixed":
-            # mutation rate evolves with constant mutation rate
-            self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
-            self.genes["sigma"] = np.abs(self.genes["sigma"] + normal(0, self.genes["r"]))
-            self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.mutate_mutate_rate))
+
         elif self.type == "evolv":
             # all genes evolve with the same (evolving) mutation rate
             self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
@@ -53,7 +49,7 @@ class Genome:
             self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.genes["r"]))
 
     def cross(self, genomes):
-        """ Crossing two genomes (during reproduction)
+        """ Crossing two genomes (during reproduction).
 
         Each gene is inherited from one of the parents, chosen at random.
 

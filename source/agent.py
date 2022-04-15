@@ -3,7 +3,7 @@ import numpy as np
 
 
 class Agent:
-    """ Class implementing an agent, modeling an individual in the population.
+    """ Class implementing an agent/individual in the population.
     """
 
     def __init__(self, genome):
@@ -28,16 +28,17 @@ class Agent:
 
         Parameters
         ----------
-        env_mean: float
+        env_state: float
             the state of the environment
         """
         return stats.norm(self.genome.genes["mean"], self.genome.genes["sigma"]).pdf(env_state)
 
     def is_extinct(self, env):
-        """ Detect whether an agent goes extinct in a given environment.
+        """ Detect whether an agent goes extinct in a given environment. Also compute the fitness of the agent in
+        each niche.
 
-        This happens when an agent's preferred state is more than two standard deviations away from the
-        environment's state. We examine survival in each niche independently mploy a latitudinal model with N/2 
+        An agent goes extinct when its preferred state is more than two standard deviations away from the
+        environment's state. We examine survival in each niche independently employ a latitudinal model with N/2
         northern and N/2 southern niches
 
         Parameters
@@ -47,8 +48,8 @@ class Agent:
         """
         survival = 0
         self.niches = []
-        self.fitness_values = []
         self.fitnesses = {}
+
         for niche_idx, niche_info in env.niches.items():
             niche_climate = niche_info["climate"]
             if ((self.genome.genes["mean"] - 2 * self.genome.genes["sigma"]) < niche_climate) \
@@ -56,20 +57,10 @@ class Agent:
                 survival += 1
                 self.niches.append(niche_climate)
                 fitness = self.compute_fitness(niche_climate)
-                if fitness < 0:
-                    print("Error negative fitness", fitness)
-                    quit()
-                self.fitness_values.append(fitness)
+
                 self.fitnesses[niche_climate] = fitness
             else:
                 self.fitnesses[niche_climate] = 0
-
-
-        # the fitness of an agent is the average over its fitnesses in niches where the agent survives
-        if len(self.fitness_values):
-            self.fitness = np.mean(self.fitness_values)
-        else:
-            self.fitness = 0
 
         return not survival
 

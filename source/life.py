@@ -8,11 +8,12 @@ import time
 
 
 class Life:
+    """ Class responsible for simulating the evolution of a population in a changing environment.
+    """
 
     def __init__(self, args):
-        self.config = args  # contains all configuration necessary for the experiment
+        self.config = args
 
-    def setup(self):
         # ----- set up environment -----
         if self.config.env_type == "sin":
             self.env = SinEnv(mean=self.config.climate_mean_init,
@@ -40,19 +41,14 @@ class Life:
                                      env_mean=self.env.climate,
                                      init_sigma=self.config.init_sigma,
                                      init_mutate=self.config.init_mutate,
-                                     mutate_mutate_rate=self.config.mutate_mutate_rate,
-                                     extinctions=self.config.extinctions,
-                                     mean_fitness = self.config.mean_fitness,
-                                     reproduce_once=self.config.reproduce_once)
+                                     mutate_mutate_rate=self.config.mutate_mutate_rate)
         # -------------------------------------------------------------------------
         self.logger = Logger(trial=self.config.trial, env=self.env)
 
-    def run(self):
-        """ Main routine that simulates the evolution of a population in a varying environment.
-        """
 
-        # prepare environment and population
-        self.setup()
+    def run(self):
+        """ Simulates the evolution of a population in a varying environment.
+        """
         start_time = time.time()
 
         # ----- run generations ------
@@ -72,7 +68,7 @@ class Life:
                 time_out = (time.time() - start_time) > self.config.time_budget
 
                 if self.population.has_mass_extinction() or time_out:
-                    print("Time out")
+                    print("Time out. Exiting simulation")
                     break
 
                 # reproduce population

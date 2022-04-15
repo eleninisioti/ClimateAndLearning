@@ -1,13 +1,15 @@
-""" Contains class responsible for logging information during an experiment
-"""
 import numpy as np
 import pandas as pd
 
 
 class Logger:
+    """ Class responsible for logging information during an experiment.
+    """
 
     def __init__(self, trial, env):
         self.trial = trial
+
+        # log contains information about the population
         self.log = {"running_fitness": [],
                     "running_mean": [],
                     "running_SD": [],
@@ -26,8 +28,9 @@ class Logger:
                                     "diversity_mean": [], "diversity_std": []},
                     "generalists": {"speciations": [], "extinctions": [], "number": [], "diversity": [],
                                     "diversity_mean": [], "diversity_std": []}}
-        self.log_FPindex = False # indicates whether to compute the fixation index (https://en.wikipedia.org/wiki/Fixation_index) of the population
         self.env = env
+
+        # log_niches contains information for niches
         self.log_niches = {"inhabited_niches": []}
 
     def log_gen(self, population):
@@ -55,18 +58,9 @@ class Logger:
         self.log["running_fitness"].append(mean_fitness)
         self.log["running_mean"].append(mean_mean)
         self.log["running_SD"].append(mean_SD)
-        print('sigma', mean_SD, "mutate", mean_mutate)
-
         self.log["running_mutate"].append(mean_mutate)
         self.log["extinctions"].append(population.num_extinctions)
         self.log["num_agents"].append(len(population.agents))
-        #print("from log", len(population.agents))
-
-        inhabited_niches = []
-        for agent in population.agents:
-            inhabited_niches.extend(agent.niches)
-        inhabited_niches = list(set(inhabited_niches))
-        self.log_niches["inhabited_niches"].append(inhabited_niches)
 
         # compute population diversity
         self.log["diversity_mean"].append(np.std(mean_values))
@@ -79,34 +73,20 @@ class Logger:
         self.log["scale_diversity_mutate"].append(max(mutate_values))
         self.log["diversity"].append(np.std(mean_values) + np.std(SD_values) + np.std(mutate_values))
 
-        # compute population FP-index
-        if self.log_FPindex:
-            within_var = 0
-            for niche in inhabited_niches:
-                # find population within niche
-                niche_pop = []
-                for agent in population.agents:
-                    if niche in agent.niches:
-                        niche_pop.append(agent)
-                mean_values = []
-                SD_values = []
-                mutate_values = []
-                for agent in niche_pop:
-                    mean_values.append(agent.genome.genes["mean"])
-                    SD_values.append(agent.genome.genes["sigma"])
-                    mutate_values.append(agent.genome.genes["r"])
-                niche_mean = np.mean(mean_values) + np.mean(SD_values) + np.mean(mutate_values)
-                within_var += len(niche_pop) * niche_mean * (1 - niche_mean)
-
-            pop_mean = mean_mean + mean_SD + mean_mutate
-            pop_var = pop_mean * (1 - pop_mean)
-            self.log["fixation_index"].append((pop_var - within_var) / (pop_var))
+        # which niches are inhabited by at least one agent?
+        inhabited_niches = []
+        for agent in population.agents:
+            inhabited_niches.extend(agent.niches)
+        inhabited_niches = list(set(inhabited_niches))
+        self.log_niches["inhabited_niches"].append(inhabited_niches)
 
     def final_log(self):
+        """ Prepare log for final saving.
+        """
         env = self.env
         self.log["climate_values"] = env.climate_values
 
-        # ----- adapt for  plotting -----
+        # ----- reformat for plotting functions -----
         self.log = {"Generation": [idx for idx in range(len(self.log["climate_values"]))],
                     "Climate": self.log["climate_values"],
                     'Fitness': self.log["running_fitness"],
@@ -134,16 +114,16 @@ class Logger:
                     "Generalists_Diversity_Mean": self.log["generalists"]["diversity_mean"],
                     "Generalists_Diversity_SD": self.log["generalists"]["diversity_std"]}
 
-
-
-        # convert to dataframe and save trial data
+        # convert to dataframe for saving current trial
+        log_df = pd.DataFrame()
         for step in range(len(self.log["Fitness"])):
             trial_log = {'Generation': [step], 'Trial': [self.trial]}
             for key in self.log.keys():
                 if len(self.log[key]):
                     trial_log[key] = self.log[key][step]
-            if step:
-                log_df = log_df.append(pd.DataFrame.from_dict(trial_log))
-            else:
+            if log_df.empty:
                 log_df = pd.DataFrame.from_dict(trial_log)
+            else:
+                log_df = log_df.append(pd.DataFrame.from_dict(trial_log))
+
         self.log = log_df

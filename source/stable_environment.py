@@ -2,6 +2,8 @@ from environment import Env
 
 
 class StableEnv(Env):
+    """ Implements a stable environment where the reference environmental state does not change with generations.
+    """
 
     def __init__(self, mean, ref_capacity, num_niches):
         self.type = "stable"

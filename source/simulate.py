@@ -161,7 +161,7 @@ def init_parser():
     parser.add_argument('--time_budget',
                         help='Maximum seconds allowed for a simulation.',
                         type=float,
-                        default=10000)
+                        default=71900)
 
     args = parser.parse_args()
     return args

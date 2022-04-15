@@ -95,8 +95,7 @@ class Population:
         # -----------------------------------------------
         random.shuffle(for_reproduction)
         new_agents = []
-        capacity_now = 0
-        added_agents = 0
+
         for niche_idx, niche_data in enumerate(for_reproduction):
             niche_new_agents = []
             niche_pop = niche_data["population"]
@@ -107,13 +106,15 @@ class Population:
             if "N" in self.selection_type:
                 self.mean_fitness = 0
             else:
-                self.mean_fitness = 1
+                self.mean_fitness = 1 # agent reproduces based on its mean fitness across niches
 
             if "F" in self.selection_type:
                 niche_pop = self.order_agents(niche_pop, niche_climate)
 
+            # only as many agents as fit in the niche will reproduce
             niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)]]
 
+            # agents chosen for participating in a pair based on their fitness
             if "F" in self.selection_type:
                 if self.mean_fitness:
                     weights = [np.mean(list(agent.fitnesses.values())) for agent in niche_pop]
@@ -121,11 +122,9 @@ class Population:
                     weights = [agent.fitnesses[niche_climate] for agent in niche_pop]
             else:
                 weights = [1 for _ in niche_pop]
-            capacity_now += niche_data["capacity"]
 
             if len(niche_pop):
-                agents_reproduce = random.choices(niche_pop, weights=weights,
-                                           k=len(niche_pop))
+                agents_reproduce = random.choices(niche_pop, weights=weights, k=len(niche_pop))
 
                 partners_a = random.choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
                 partners_b = random.choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
@@ -142,7 +141,6 @@ class Population:
                     if len(niche_new_agents) < niche_capacity:
                         niche_new_agents.append(new_agent)
                         agent.reproduced = True
-                        added_agents += 1
 
                     # second child
                     agent_genome.cross([agent.genome, partners_b[idx].genome])
@@ -150,13 +148,14 @@ class Population:
                     new_agent.mutate()
                     if len(niche_new_agents) < niche_capacity:
                         niche_new_agents.append(new_agent)
-                        added_agents += 1
 
             new_agents.extend(niche_new_agents)
 
         self.agents = new_agents
 
     def order_agents(self, agents, niche_climate=0):
+        """ Sort agents in ascenting order based on their fitness.
+        """
         # order agents based on fitness
         if self.mean_fitness:
             fitness_values = [np.mean(list(agent.fitnesses.values())) for agent in agents]

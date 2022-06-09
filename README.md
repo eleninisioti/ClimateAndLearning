@@ -6,13 +6,13 @@ In this work we have studied the evolution of a population of agents in a world 
 
 The world is divided into niches that correspond to different latitudes and whose state evolves based on a common climate function:
 
-![model_small](/home/elena/Downloads/model_small.png)
+![World model](https://firebasestorage.googleapis.com/v0/b/firescript-577a2.appspot.com/o/imgs%2Fapp%2Feleni%2FJRz9LWAvHU.png?alt=media&token=62d91979-1732-4014-8bef-50858dac979c)
 
-We model the plasticity of an individual using plasticity curves  originally developed in ecology. Plasticity curves have the form of a Gaussian the capture the benefits and costs of plasticity when comparing a specialist (left) with a generalist (right) agent:
-
-![curve_small](/home/elena/Downloads/curve_small.png)
+We model the plasticity of an individual using tolerance curves  originally developed in ecology. Plasticity curves have the form of a Gaussian the capture the benefits and costs of plasticity when comparing a specialist (left) with a generalist (right) agent:
 
 
+
+![tolerance curve](https://firebasestorage.googleapis.com/v0/b/firescript-577a2.appspot.com/o/imgs%2Fapp%2Feleni%2Fog3I7VZYFz.png?alt=media&token=af97defa-4ccc-46e4-bf50-3eb581ff9cf1)
 
 The repo contains the following main elements :
 

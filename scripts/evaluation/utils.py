@@ -48,7 +48,11 @@ def load_results(results_dir, variable, labels):
         for trial, trial_dir in enumerate(trial_dirs):
             # load outcome of trial
             try:
-                log = pickle.load(open(p + "/trials/" + trial_dir + '/log_updated.pickle', 'rb'))
+                if variable == "Dispersal":
+                    log = pickle.load(open(p + "/trials/" + trial_dir + '/log_updated.pickle', 'rb'))
+                else:
+                    log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+
             except IOError:
                 break
 

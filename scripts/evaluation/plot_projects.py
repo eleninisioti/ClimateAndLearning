@@ -42,8 +42,8 @@ class Plotter:
         params = {'legend.fontsize': 6,
                   "figure.autolayout": True,
                   'font.size': 8,
-          'pdf.fonttype':42,
-          'ps.fonttype':42}
+                  'pdf.fonttype':42,
+                  'ps.fonttype':42}
         plt.rcParams.update(params)
 
         cm = 1 / 2.54  # for converting inches to cm
@@ -228,6 +228,8 @@ class Plotter:
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         plt.savefig(save_dir + "/evolution_" + save_name + ".pdf", dpi=300)
+        plt.savefig(save_dir + "/evolution_" + save_name + ".png", dpi=300)
+
         plt.clf()
         return self.log
 
@@ -420,6 +422,8 @@ class Plotter:
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         plt.savefig(save_dir + "/evolution_" + save_name + ".pdf", dpi=300)
+        plt.savefig(save_dir + "/evolution_" + save_name + ".png", dpi=300)
+
         plt.clf()
         return self.log
 

@@ -53,6 +53,8 @@ def fig2():
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     plt.savefig(save_dir + "/fig2.pdf", dpi=300)
+    plt.savefig(save_dir + "/fig2.png", dpi=300)
+
     plt.clf()
 
 
@@ -90,7 +92,9 @@ def fig3():
     save_dir = results_dir + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/fig2.pdf", dpi=300)
+    plt.savefig(save_dir + "/fig3.pdf", dpi=300)
+    plt.savefig(save_dir + "/fig3.png", dpi=300)
+
     plt.clf()
 
 
@@ -120,6 +124,8 @@ def fig4():
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     plt.savefig(save_dir + "/fig4.pdf", dpi=300)
+    plt.savefig(save_dir + "/fig4.png", dpi=300)
+
     plt.clf()
 
 
@@ -146,6 +152,8 @@ def fig5_6(label="amplitude"):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     plt.savefig(save_dir + "/fig5.pdf", dpi=300)
+    plt.savefig(save_dir + "/fig5.png", dpi=300)
+
     plt.clf()
 
 
@@ -227,47 +235,48 @@ def fig9(label):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     plt.savefig(save_dir + "/fig5.pdf", dpi=300)
+    plt.savefig(save_dir + "/fig9.pdf", dpi=300)
+
     plt.clf()
 
 if __name__ == "__main__":
     # ------ stable climate function -----
     results_dir = "../projects/paper/stable/fig2"
-    #fig2()
+    fig2()
 
     results_dir = "../projects/paper/stable/fig3"
-    #fig3()
+    fig3()
 
     results_dir = "../projects/paper/stable/fig4"
-    #fig4()
+    fig4()
     # ---------------------------------------
     # ------ sinusoid climate function -----
     results_dir = "../projects/paper/sin/fig5"
-    #fig5_6_9(label="amplitude")
+    fig5_6(label="amplitude")
 
     results_dir = "../projects/paper/sin/fig6"
-    #fig5_6_9(label="num_niches")
+    fig5_6(label="num_niches")
 
     results_dir = "../projects/paper/sin/fig7"
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]
-    fig_7_8_10(include)
+    #fig_7_8_10(include)
 
     results_dir = "../projects/paper/sin/fig8"
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]
-    fig_7_8_10(include)
+    #fig_7_8_10(include)
     # ---------------------------------------
     # ------ noisy climate function -----
-    results_dir = "../projects/paper/noisy/fig9_cp"
-    #fig9(label="selection")
+    results_dir = "../projects/paper/noisy/fig9"
+    fig9(label="selection")
 
     results_dir = "../projects/paper/noisy/fig10"
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]
-    #fig_7_8_10(include, cut=True)
+    fig_7_8_10(include, cut=True)
     # ---------------------------------------
-
 

@@ -235,7 +235,7 @@ def fig9(label):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     plt.savefig(save_dir + "/fig5.pdf", dpi=300)
-    plt.savefig(save_dir + "/fig9.pdf", dpi=300)
+    plt.savefig(save_dir + "/fig9.png", dpi=300)
 
     plt.clf()
 

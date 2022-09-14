@@ -2,6 +2,8 @@ from agent import Agent
 from genome import Genome
 import random
 import numpy as np
+import copy
+import math
 
 class Population:
     """ A population is a collection of agents that reproduces based on the desired selection mechanism
@@ -44,6 +46,8 @@ class Population:
         self.init_mutate = init_mutate
         self.mutate_mutate_rate = mutate_mutate_rate
         self.env_mean = env_mean
+        self.competition = 0
+        self.not_reproduced = 0
         for _ in range(pop_size):
             agent_genome = Genome(genome_type=genome_type,
                                   env_mean=env_mean,
@@ -66,6 +70,46 @@ class Population:
         for agent in agents:
             agent.compute_fitness(env_mean)
 
+
+    def reproduce_xland(self, env):
+        for agent in self.agents:
+            # get fitness in each niche
+            fitnesses = list(agent.fitnesses.values())
+            # make a cdf
+            # compute first 51 percentiles
+            agent.percentiles = []
+            for percentage in range(51):
+                n = len(fitnesses)
+                p = n * percentage / 100
+                if p.is_integer():
+                    percentile = sorted(fitnesses)[int(p)]
+                else:
+                    percentile = sorted(fitnesses)[int(math.ceil(p)) - 1]
+                agent.percentiles.append(percentile)
+
+
+        for agent_a in copy.copy(self.agents):
+            for agent_b in copy.copy(self.agents):
+                agent_a_dominant = all(map(lambda p, q: p > q, agent_a.percentiles, agent_b.percentiles))
+                agent_b_dominant = all(map(lambda p, q: p > q, agent_b.percentiles, agent_a.percentiles))
+
+                if agent_a_dominant:
+                    # remove agent b
+                    if agent_b in self.agents:
+                        self.agents.remove(agent_b)
+                        # mutate agent_b
+                        agent_a.mutate()
+                        self.agents.append(agent_a)
+
+                elif agent_b_dominant:
+                    # remove agent b
+                    if agent_a in self.agents:
+                        self.agents.remove(agent_a)
+                        # mutate agent_b
+                        agent_b.mutate()
+                        self.agents.append(agent_b)
+
+
     def reproduce(self, env):
         """ Population reproduction at the end of a generation.
 
@@ -74,6 +118,9 @@ class Population:
         env: Env
             the current environment
         """
+        if self.selection_type == "xland":
+            self.reproduce_xland(env)
+            return
         # ------ which agents belong to each niche? -----
         if "N" in self.selection_type:
             # competition is niche-limited
@@ -88,13 +135,17 @@ class Population:
                     if niche_climate in agent.niches:
                         niche_pop.append(agent)
 
-                for_reproduction.append({"population": niche_pop, "capacity": niche_capacity, "climate": niche_climate})
+                for_reproduction.append({"population": niche_pop, "lat": niche_info["lat"], "capacity": niche_capacity,
+                                         "climate": \
+                    niche_climate})
         else:
             niche_capacity = int(env.current_capacity * env.num_niches)
-            for_reproduction = [{"population": self.agents, "capacity": niche_capacity, "climate": env.mean}]
+            for_reproduction = [{"population": self.agents,  "capacity": niche_capacity,
+            "climate": env.mean}]
         # -----------------------------------------------
         random.shuffle(for_reproduction)
         new_agents = []
+        self.competition = 0
 
         for niche_idx, niche_data in enumerate(for_reproduction):
             niche_new_agents = []
@@ -112,6 +163,9 @@ class Population:
                 niche_pop = self.order_agents(niche_pop, niche_climate)
 
             # only as many agents as fit in the niche will reproduce
+            if niche_capacity < len(niche_pop)*2:
+                self.competition += len(niche_pop)*2 - niche_capacity
+
             niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)]]
 
             # agents chosen for participating in a pair based on their fitness
@@ -125,31 +179,45 @@ class Population:
 
             if len(niche_pop):
                 agents_reproduce = random.choices(niche_pop, weights=weights, k=len(niche_pop))
-
                 partners_a = random.choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
                 partners_b = random.choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
-
                 for idx, agent in enumerate(agents_reproduce):
                     agent_genome = Genome(genome_type=self.genome_type, env_mean=self.env_mean,
                                           init_sigma=self.init_sigma,
                                           init_mutate=self.init_mutate, mutate_mutate_rate=self.mutate_mutate_rate)
 
                     # first child
+                    #agent.movement = [agent.movement[1], niche_idx]
+                    #partners_a[idx].movement = [partners_a[idx].movement[1], niche_idx]
+                    #partners_b[idx].movement = [partners_b[idx].movement[1], niche_idx]
+
                     agent_genome.cross([agent.genome, partners_a[idx].genome])
                     new_agent = Agent(genome=agent_genome)
                     new_agent.mutate()
+
+                    if "lat" in niche_data:
+                        new_agent.movement = niche_data["lat"]
+                    else:
+                        new_agent.movement = agent.closest_niche
                     if len(niche_new_agents) < niche_capacity:
                         niche_new_agents.append(new_agent)
                         agent.reproduced = True
+
 
                     # second child
                     agent_genome.cross([agent.genome, partners_b[idx].genome])
                     new_agent = Agent(genome=agent_genome)
                     new_agent.mutate()
+                    if "lat" in niche_data:
+                        new_agent.movement = niche_data["lat"]
+                    else:
+                        new_agent.movement = agent.closest_niche
                     if len(niche_new_agents) < niche_capacity:
                         niche_new_agents.append(new_agent)
 
+
             new_agents.extend(niche_new_agents)
+        self.not_reproduced = len([el for el in self.agents if not agent.reproduced])
 
         self.agents = new_agents
 

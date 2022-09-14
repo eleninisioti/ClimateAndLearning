@@ -43,7 +43,9 @@ class Life:
                                      init_mutate=self.config.init_mutate,
                                      mutate_mutate_rate=self.config.mutate_mutate_rate)
         # -------------------------------------------------------------------------
-        self.logger = Logger(trial=self.config.trial, env=self.env)
+        self.logger = Logger(trial=self.config.trial,
+                             env=self.env,
+                             max_pop=int(self.config.capacity*self.env.max_value))
 
 
     def run(self):

@@ -20,7 +20,13 @@ def exec_command(config):
     for flag, value in config.items():
         command += flag + " " + str(value) + " "
 
-    os.system("bash -c '{}'".format(command))
+    print(command)
+
+
+
+
+
+    #os.system("bash -c '{}'".format(command))
 
 
 def setup_dir():
@@ -45,7 +51,7 @@ def fig2():
     """ Reproduce simulations for Figure 2
     """
 
-    top_dir = setup_dir() + "_fig2/"
+    top_dir = setup_dir() + "/fig2/"
 
     flags = ["--project",
              "--env_type",
@@ -78,7 +84,7 @@ def fig2():
 def fig3():
     """ Reproduce simulations for Figure 3
     """
-    top_dir = setup_dir() + "_fig3/"
+    top_dir = setup_dir() + "/fig3/"
 
     flags = ["--project",
              "--env_type",
@@ -108,7 +114,7 @@ def fig3():
 def fig4():
     """ Reproduce simulations for Figure 4
     """
-    top_dir = setup_dir() + "_fig4/"
+    top_dir = setup_dir() + "/fig4/"
 
     flags = ["--project",
              "--env_type",
@@ -139,7 +145,7 @@ def fig4():
 def fig5():
     """ Reproduce simulations for Figure 5
     """
-    top_dir = setup_dir() + "_fig5/"
+    top_dir = setup_dir() + "/fig5/"
 
     flags = ["--project",
              "--env_type",
@@ -175,7 +181,7 @@ def fig5():
 def fig6():
     """ Reproduce simulations for Figure 6
     """
-    top_dir = setup_dir() + "_fig6/"
+    top_dir = setup_dir() + "/fig6/"
 
     flags = ["--project",
              "--env_type",
@@ -211,7 +217,7 @@ def fig6():
 def fig7():
     """ Reproduce simulations for Figure 7
     """
-    top_dir = setup_dir() + "_fig7/"
+    top_dir = setup_dir() + "/fig7/"
 
     flags = ["--project",
              "--env_type",
@@ -225,7 +231,8 @@ def fig7():
              "--period"]
 
     env_type = "sin"
-    num_gens = 1500
+    #num_gens = 1500
+    num_gens =750
     selection_type = "NF"
     genome_type = "evolv"
     num_niches = 100
@@ -245,7 +252,7 @@ def fig7():
 def fig8():
     """ Reproduce simulations for Figure 8
     """
-    top_dir = setup_dir() + "_fig8/"
+    top_dir = setup_dir() + "/fig8/"
 
     flags = ["--project",
              "--env_type",
@@ -260,7 +267,7 @@ def fig8():
 
     env_type = "sin"
     num_gens = 500
-    selection_types = ["N", "F"]
+    selection_types = ["NF", "N"]
     genome_type = "evolv"
     num_niches = 100
     amplitude = 0.2
@@ -280,7 +287,7 @@ def fig8():
 def fig9():
     """ Reproduce simulations for Figure 9
     """
-    top_dir = setup_dir() + "_fig9/"
+    top_dir = setup_dir() + "/fig9/"
 
     flags = ["--project",
              "--env_type",
@@ -314,7 +321,7 @@ def fig9():
 def fig10():
     """ Reproduce simulations for Figure 10.
     """
-    top_dir = setup_dir() + "_fig10/"
+    top_dir = setup_dir() + "/fig10/"
 
     flags = ["--project",
              "--env_type",
@@ -350,12 +357,12 @@ if __name__ == "__main__":
         trials = int(sys.argv[1])  # number of independent trials
 
         for trial in range(trials):
-            fig2()
-            fig3()
-            fig4()
-            fig5()
-            fig6()
-            fig7()
+            #fig2()
+            #fig3()
+            #fig4()
+            #fig5()
+            #fig6()
+            #fig7()
             fig8()
-            fig9()
-            fig10()
+            #fig9()
+            #fig10()

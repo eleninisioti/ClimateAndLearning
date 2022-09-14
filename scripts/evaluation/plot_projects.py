@@ -82,10 +82,12 @@ class Plotter:
                 log_trial["Climate_avg"] = climate_avg
                 x = log_trial["Generation"]
                 y = log_trial["Climate_avg"]
-                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=None)
+                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=None, label=label)
+
 
             self.axs[count].set(ylabel="$e_0$")
             self.axs[count].set(xlabel=None)
+            self.axs[count].get_legend().remove()
 
             count += 1
         # ----------------------------------------
@@ -99,10 +101,12 @@ class Plotter:
                 x = log["Generation"]
                 y = log["Mean"]
 
-                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(ylabel="$\\bar{\mu}$ ")
             self.axs[count].set(xlabel=None)
+            self.axs[count].get_legend().remove()
+
             count += 1
         # -----------------------------------
         # ----- plot average plasticity -----
@@ -115,11 +119,13 @@ class Plotter:
                 x = log["Generation"]
                 y = log["SD"]
 
-                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(ylabel="$\\bar{\sigma}$")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
+            self.axs[count].get_legend().remove()
+
 
             count += 1
         # ------------------------------------
@@ -130,11 +136,13 @@ class Plotter:
                 log = value[0]
                 x = log["Generation"]
                 y = log["R"]
-                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(ylabel="$\\bar{r}$")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
+            self.axs[count].get_legend().remove()
+
             count += 1
         # --------------------------------
         # ----- plot average fitness -----
@@ -147,10 +155,12 @@ class Plotter:
                 x = log["Generation"]
                 y = log["Fitness"]
 
-                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$\\bar{f}$")
+            self.axs[count].get_legend().remove()
+
             count += 1
         # ------------------------------------
         # ----- plot average extinctions -----
@@ -164,10 +174,12 @@ class Plotter:
                 x = log["Generation"]
                 y = log["extinctions"]
 
-                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$E$")
+            self.axs[count].get_legend().remove()
+
             count += 1
         # ----------------------------------
         # ----- plot number of agents  -----
@@ -180,10 +192,12 @@ class Plotter:
                 x = log["Generation"]
                 y = log["num_agents"]
 
-                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$N$, number of agents")
+            self.axs[count].get_legend().remove()
+
             count += 1
         # --------------------------
         # ----- plot genomic diversity -----
@@ -196,10 +210,12 @@ class Plotter:
                 x = log["Generation"]
                 y = log["diversity"]
 
-                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$V$")
+            self.axs[count].get_legend().remove()
+
             count += 1
         # ----- plot dispersal  -----
         if "dispersal" in self.include:
@@ -211,17 +227,20 @@ class Plotter:
                 x = log["Generation"]
                 y = log["Dispersal"]
 
-
-                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$D$")
+            self.axs[count].get_legend().remove()
+
             count += 1
 
         # all sub-plots share the same horizontal axis
         for ax in self.axs.flat:
             ax.label_outer()
         self.axs[count - 1].set(xlabel="$G$, Generation")
+
+        self.axs[count-2].legend()
 
         # -------------------------------------------------------------
         save_dir = self.project + "/plots"
@@ -399,6 +418,29 @@ class Plotter:
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$F_{st}$, fixation_index")
             count += 1
+
+        # ------------------------------------------
+        # ----- plot fixation index  -----
+        if "competition" in self.include:
+            x = self.log["Generation"]
+            y = self.log["competition"]
+
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+
+            self.axs[count].set(xlabel="Time (in generations)")
+            self.axs[count].set(ylabel="$C$, competition")
+            count += 1
+        # ------------------------------------------
+        # ----- plot fixation index  -----
+        if "not_reproduced" in self.include:
+            x = self.log["Generation"]
+            y = self.log["not_reproduced"]
+
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+
+            self.axs[count].set(xlabel="Time (in generations)")
+            self.axs[count].set(ylabel="$\\bar{R}$, Not reproduced")
+            count += 1
         # ------------------------------------------
         # ----- plot dispersal  -----
         if "dispersal" in self.include:
@@ -473,7 +515,9 @@ def run(project, total):
     if config["only_climate"]:
         include = ["climate"]
     else:
-        include = ["climate", "mean", "sigma", "mutate", "dispersal", "diversity", "num_agents", "extinct"]
+        include = ["not_reproduced","competition", "climate", "mean", "sigma", "mutate", "dispersal", "diversity",
+                   "num_agents",
+                   "extinct"]
 
     if not log_df.empty:
         if total:

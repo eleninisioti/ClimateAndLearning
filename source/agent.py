@@ -17,6 +17,8 @@ class Agent:
         """
         self.genome = genome
         self.reproduced = 0
+        self.movement = 999
+        self.closest_niche = 0
 
     def mutate(self):
         self.genome.mutate()
@@ -50,6 +52,9 @@ class Agent:
         self.niches = []
         self.fitnesses = {}
 
+        closest_niche = 999
+        min_distance = 0.1
+
         for niche_idx, niche_info in env.niches.items():
             niche_climate = niche_info["climate"]
             if ((self.genome.genes["mean"] - 2 * self.genome.genes["sigma"]) < niche_climate) \
@@ -61,6 +66,12 @@ class Agent:
                 self.fitnesses[niche_climate] = fitness
             else:
                 self.fitnesses[niche_climate] = 0
+
+            if np.abs(self.genome.genes["mean"] - niche_climate) < min_distance:
+                closest_niche = niche_idx
+                min_distance = np.abs(self.genome.genes["mean"] - niche_climate)
+
+        self.closest_niche = closest_niche
 
         return not survival
 

@@ -38,7 +38,7 @@ class Env:
         for lat in range(southest_lat, northest_lat):
             lat_climate = self.mean + 0.01 * lat
             niche_capacity = max(int(lat_climate * self.niche_capacity), 0)
-            self.niches[lat] = {"climate": lat_climate, "capacity": niche_capacity}
+            self.niches[lat] = {"climate": lat_climate, "capacity": niche_capacity, "lat": lat}
 
     def step(self):
         """ Move the environment to the next generation. Updates the climate and capacity of niches based on the reference environmental state.

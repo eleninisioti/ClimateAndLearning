@@ -11,6 +11,8 @@ class NoisyEnv(Env):
         self.noise_mean = mean
         self.noise_std = std
         self.low = mean
+        self.max_value = self.noise_mean + self.noise_std*4
+
         super().__init__(mean, ref_capacity, num_niches, self.low)
 
 

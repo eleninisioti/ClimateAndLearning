@@ -242,20 +242,20 @@ def fig9(label):
 if __name__ == "__main__":
     # ------ stable climate function -----
     results_dir = "../projects/paper/stable/fig2"
-    fig2()
+    #fig2()
 
     results_dir = "../projects/paper/stable/fig3"
-    fig3()
+    #fig3()
 
     results_dir = "../projects/paper/stable/fig4"
-    fig4()
+    #fig4()
     # ---------------------------------------
     # ------ sinusoid climate function -----
     results_dir = "../projects/paper/sin/fig5"
-    fig5_6(label="amplitude")
+    #fig5_6(label="amplitude")
 
     results_dir = "../projects/paper/sin/fig6"
-    fig5_6(label="num_niches")
+    #fig5_6(label="num_niches")
 
     results_dir = "../projects/paper/sin/fig7"
     include = ["climate", "mean",
@@ -267,11 +267,11 @@ if __name__ == "__main__":
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]
-    #fig_7_8_10(include)
+    fig_7_8_10(include)
     # ---------------------------------------
     # ------ noisy climate function -----
     results_dir = "../projects/paper/noisy/fig9"
-    fig9(label="selection")
+    #fig9(label="selection")
 
     results_dir = "../projects/paper/noisy/fig10"
     include = ["climate", "mean",

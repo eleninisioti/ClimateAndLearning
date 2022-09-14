@@ -14,6 +14,7 @@ class SinEnv(Env):
         self.omega = 2 * math.pi / period # natural frequency of sinusoid
         self.amplitude = amplitude
         self.low = amplitude + mean  # lowest amplitude the sinusoid will reach
+        self.max_value = self.amplitude + self.low
         super().__init__(mean, ref_capacity, num_niches, self.low)
 
     def step(self, gen):

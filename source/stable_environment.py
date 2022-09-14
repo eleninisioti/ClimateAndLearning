@@ -8,6 +8,8 @@ class StableEnv(Env):
     def __init__(self, mean, ref_capacity, num_niches):
         self.type = "stable"
         self.low = mean
+        self.max_value = self.low
+
         super().__init__(mean, ref_capacity, num_niches, self.low)
 
     def step(self, gen):

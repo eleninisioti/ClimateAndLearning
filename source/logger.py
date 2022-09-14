@@ -1,13 +1,13 @@
 import numpy as np
 import pandas as pd
 
-
 class Logger:
     """ Class responsible for logging information during an experiment.
     """
 
-    def __init__(self, trial, env):
+    def __init__(self, trial, env, max_pop):
         self.trial = trial
+        self.max_population = max_pop
 
         # log contains information about the population
         self.log = {"running_fitness": [],
@@ -23,6 +23,8 @@ class Logger:
                     "scale_diversity_mutate": [],
                     "fixation_index": [],
                     "extinctions": [],
+                    "competition":[],
+                    "not_reproduced":[],
                     "num_agents": [],
                     "specialists": {"speciations": [], "extinctions": [], "number": [], "diversity": [],
                                     "diversity_mean": [], "diversity_std": []},
@@ -31,7 +33,8 @@ class Logger:
         self.env = env
 
         # log_niches contains information for niches
-        self.log_niches = {"inhabited_niches": []}
+        self.log_niches = {"inhabited_niches": [] ,
+                    "movements":[]}
 
     def log_gen(self, population):
         """ Compute metrics characterizing the generation.
@@ -61,6 +64,8 @@ class Logger:
         self.log["running_mutate"].append(mean_mutate)
         self.log["extinctions"].append(population.num_extinctions)
         self.log["num_agents"].append(len(population.agents))
+        self.log["competition"].append(population.competition)
+        self.log["not_reproduced"].append(population.not_reproduced)
 
         # compute population diversity
         self.log["diversity_mean"].append(np.std(mean_values))
@@ -78,7 +83,18 @@ class Logger:
         for agent in population.agents:
             inhabited_niches.extend(agent.niches)
         inhabited_niches = list(set(inhabited_niches))
+
+
         self.log_niches["inhabited_niches"].append(inhabited_niches)
+
+        movements = [agent.movement for agent in population.agents]
+        while len(movements) < self.max_population:
+            movements.append(999)
+
+        print(movements)
+        print(len(inhabited_niches), len(list(set(movements))))
+        self.log_niches["movements"].append(movements)
+
 
     def final_log(self):
         """ Prepare log for final saving.
@@ -94,6 +110,8 @@ class Logger:
                     "SD": self.log["running_SD"],
                     "R": self.log["running_mutate"],
                     "extinctions": self.log["extinctions"],
+                    "competition": self.log["competition"],
+                    "not_reproduced": self.log["not_reproduced"],
                     "num_agents": self.log["num_agents"],
                     "diversity": self.log["diversity"],
                     "diversity_mean": self.log["diversity_mean"],

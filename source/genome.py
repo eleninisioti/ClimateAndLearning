@@ -30,9 +30,21 @@ class Genome:
         self.type = genome_type
         self.mutate_mutate_rate = mutate_mutate_rate
         mu = normal(env_mean, init_sigma)
-        sigma = np.abs(normal(0, init_sigma))
         r = init_mutate
-        self.genes = {"mean": mu, "sigma": sigma, "r": r}
+
+        if self.type == "intrinsic":
+            sigma = np.abs(normal(0, 0.001))
+
+            num_intrinsic_curves = 10
+            intrinsic_curves = [mu for _ in range(num_intrinsic_curves)]
+            self.genes = {"intrinsic_curves": intrinsic_curves, "r": r, "sigma": sigma}
+
+        elif self.type == "niche-construction":
+            sigma = np.abs(normal(0, init_sigma))
+            self.genes = {"mean": mu, "sigma": sigma, "r": r, "c": 0}
+        else:
+            sigma = np.abs(normal(0, init_sigma))
+            self.genes = {"mean": mu, "sigma": sigma, "r": r}
 
     def mutate(self):
         """ Applies mutations to the genome.
@@ -47,6 +59,20 @@ class Genome:
             self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
             self.genes["sigma"] = np.abs(self.genes["sigma"] + normal(0, self.genes["r"]))
             self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.genes["r"]))
+
+        elif self.type == "intrinsic":
+            self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.genes["r"]))
+            self.genes["intrinsic_curves"] = [el + normal(0, self.genes["r"])  for el in self.genes["intrinsic_curves"]]
+
+        elif self.type == "niche-construction":
+            # all genes evolve with the same (evolving) mutation rate
+            self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
+            self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.genes["r"]))
+            self.genes["c"] = self.genes["c"] + normal(0, self.genes["r"])
+            self.genes["sigma"] = np.abs(self.genes["sigma"] + normal(0, self.genes["r"]))
+
+
+
 
     def cross(self, genomes):
         """ Crossing two genomes (during reproduction).

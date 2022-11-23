@@ -20,18 +20,21 @@ class Life:
                               ref_capacity=self.config.capacity,
                               num_niches=self.config.num_niches,
                               period=self.config.period,
-                              amplitude=self.config.amplitude)
+                              amplitude=self.config.amplitude,
+                              decay_construct=self.config.decay_construct)
 
         elif self.config.env_type == "stable":
             self.env = StableEnv(mean=self.config.climate_mean_init,
                                  ref_capacity=self.config.capacity,
-                                 num_niches=self.config.num_niches)
+                                 num_niches=self.config.num_niches,
+                              decay_construct=self.config.decay_construct)
 
         elif self.config.env_type == "noisy":
             self.env = NoisyEnv(mean=self.config.climate_mean_init,
                                 std=self.config.noise_std,
                                 ref_capacity=self.config.capacity,
-                                num_niches=self.config.num_niches)
+                                num_niches=self.config.num_niches,
+                              decay_construct=self.config.decay_construct)
         # -------------------------------------------------------------------------
         # ----- set up population -----
         pop_size = int(np.min([self.config.init_num_agents, self.env.current_capacity * self.config.num_niches]))
@@ -41,7 +44,8 @@ class Life:
                                      env_mean=self.env.climate,
                                      init_sigma=self.config.init_sigma,
                                      init_mutate=self.config.init_mutate,
-                                     mutate_mutate_rate=self.config.mutate_mutate_rate)
+                                     mutate_mutate_rate=self.config.mutate_mutate_rate,
+                                     history_window=self.config.history_window)
         # -------------------------------------------------------------------------
         self.logger = Logger(trial=self.config.trial,
                              env=self.env,
@@ -52,12 +56,14 @@ class Life:
         """ Simulates the evolution of a population in a varying environment.
         """
         start_time = time.time()
+        niche_constructions = self.env.niche_constructions
+
 
         # ----- run generations ------
         for gen in range(self.config.num_gens):
 
             # update environment
-            self.env.step(gen)
+            self.env.step(gen, niche_constructions)
 
             if not self.config.only_climate:
 
@@ -65,7 +71,7 @@ class Life:
                 self.population.survive(self.env)
 
                 # compute metrics for new generation
-                self.logger.log_gen(self.population)
+                self.logger.log_gen(self.population, self.env)
 
                 time_out = (time.time() - start_time) > self.config.time_budget
 
@@ -74,7 +80,7 @@ class Life:
                     break
 
                 # reproduce population
-                self.population.reproduce(self.env)
+                niche_constructions = self.population.reproduce(self.env)
 
                 if gen % 1 == 0:
                     # print progress

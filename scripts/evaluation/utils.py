@@ -129,6 +129,10 @@ def find_label(config, parameter="selection"):
             label += "$R_{evolve}$"
         elif config.genome_type == "no-evolv":
             label += "$R_{no-evolve}$"
+        elif config.genome_type == "niche-construction":
+            label += "$R_{c}$"
+
+
     else:
         label += str(getattr(config,parameter))
     return label
@@ -159,6 +163,8 @@ def compute_dispersal(log, log_niches, num_latitudes):
             survivals = []
             for gen in range(num_gens):
                 lat_climate = climate[gen] + 0.01 * lat
+                if "construct" in log.keys() :
+                    lat_climate += log["construct"].to_list()[gen]
                 # is there at least one individual in this latitude and generation?
                 survival=0
                 for el in inhabited_niches[gen]:

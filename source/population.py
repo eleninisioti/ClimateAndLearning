@@ -10,7 +10,7 @@ class Population:
     """
 
     def __init__(self, pop_size, selection_type, genome_type, env_mean, init_sigma, init_mutate,
-                 mutate_mutate_rate):
+                 mutate_mutate_rate, history_window):
         """ Class constructor.
 
         Parameters
@@ -55,7 +55,7 @@ class Population:
                                   init_mutate=init_mutate,
                                   mutate_mutate_rate=mutate_mutate_rate)
 
-            self.agents.append(Agent(genome=agent_genome))
+            self.agents.append(Agent(genome=agent_genome, history_window=history_window))
 
     def compute_fitness(self, agents, env_mean):
         """ Compute the fitness of agents in a niche.
@@ -147,6 +147,9 @@ class Population:
         new_agents = []
         self.competition = 0
 
+        niche_constructions = {}
+
+
         for niche_idx, niche_data in enumerate(for_reproduction):
             niche_new_agents = []
             niche_pop = niche_data["population"]
@@ -187,39 +190,64 @@ class Population:
                                           init_mutate=self.init_mutate, mutate_mutate_rate=self.mutate_mutate_rate)
 
                     # first child
-                    #agent.movement = [agent.movement[1], niche_idx]
-                    #partners_a[idx].movement = [partners_a[idx].movement[1], niche_idx]
-                    #partners_b[idx].movement = [partners_b[idx].movement[1], niche_idx]
-
                     agent_genome.cross([agent.genome, partners_a[idx].genome])
-                    new_agent = Agent(genome=agent_genome)
+                    new_agent = Agent(genome=agent_genome, history_window=agent.history_window)
                     new_agent.mutate()
 
                     if "lat" in niche_data:
                         new_agent.movement = niche_data["lat"]
                     else:
-                        new_agent.movement = agent.closest_niche
+                        new_agent.movement = agent.realized_niche
+
+                    new_agent.set_history(agent.history + partners_a[idx].history + [niche_climate])
+
                     if len(niche_new_agents) < niche_capacity:
                         niche_new_agents.append(new_agent)
                         agent.reproduced = True
 
-
                     # second child
                     agent_genome.cross([agent.genome, partners_b[idx].genome])
-                    new_agent = Agent(genome=agent_genome)
+                    new_agent = Agent(genome=agent_genome, history_window=agent.history_window)
                     new_agent.mutate()
                     if "lat" in niche_data:
                         new_agent.movement = niche_data["lat"]
                     else:
-                        new_agent.movement = agent.closest_niche
+                        new_agent.movement = agent.realized_niche
+
+                    new_agent.set_history(agent.history + partners_b[idx].history +
+                                        [niche_climate])
+
                     if len(niche_new_agents) < niche_capacity:
                         niche_new_agents.append(new_agent)
+                    # apply niche construction
+                    # remove old data about niche
+                    if "lat" not in niche_data:
+                        niche_index = agent.realized_niche
+                    else:
+                        niche_index = niche_data["lat"]
+                    if agent.genome.type == "niche-construction":
+                        #print("updating niche with index", niche_index)
+                        if niche_index is not None:
 
+                            niche_constructions[niche_index] = agent.genome.genes["c"] + partners_a[idx].genome.genes["c"] +\
+                            partners_b[idx].genome.genes["c"]
+
+                    else:
+                        niche_constructions[niche_index] = env.niches[niche_index]["constructed"]
+
+
+            else:
+                if "lat" not in niche_data:
+                    niche_index = agent.realized_niche
+                else:
+                    niche_index = niche_data["lat"]
+                niche_constructions[niche_index] = env.niches[niche_index]["constructed"]
 
             new_agents.extend(niche_new_agents)
-        self.not_reproduced = len([el for el in self.agents if not agent.reproduced])
 
+        self.not_reproduced = len([el for el in self.agents if not agent.reproduced])
         self.agents = new_agents
+        return niche_constructions
 
     def order_agents(self, agents, niche_climate=0):
         """ Sort agents in ascenting order based on their fitness.

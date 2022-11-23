@@ -101,7 +101,12 @@ def init_parser():
     parser.add_argument('--init_sigma',
                         help='Standard deviation used to initialize genomes',
                         type=float,
-                        default=0.1)
+                        default=0.5)
+
+    parser.add_argument('--decay_construct',
+                        help='Standard deviation used to initialize genomes',
+                        type=float,
+                        default=0.5)
 
     parser.add_argument('--init_mutate',
                         help='Initial value of the mutation rate',
@@ -162,6 +167,11 @@ def init_parser():
                         help='Maximum seconds allowed for a simulation.',
                         type=float,
                         default=60*60*23*3)
+
+    parser.add_argument('--history_window',
+                        help='Window to keep track of ecological history.',
+                        type=int,
+                        default=100)
 
     args = parser.parse_args()
     return args

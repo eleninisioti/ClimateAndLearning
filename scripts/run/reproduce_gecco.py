@@ -21,11 +21,6 @@ def exec_command(config):
         command += flag + " " + str(value) + " "
 
     print(command)
-
-
-
-
-
     #os.system("bash -c '{}'".format(command))
 
 
@@ -267,7 +262,7 @@ def fig8():
 
     env_type = "sin"
     num_gens = 500
-    selection_types = ["NF", "N"]
+    selection_types = ["NF", "N", "F"]
     genome_type = "evolv"
     num_niches = 100
     amplitude = 0.2
@@ -358,11 +353,11 @@ if __name__ == "__main__":
 
         for trial in range(trials):
             #fig2()
-            #fig3()
+            fig3()
             #fig4()
             #fig5()
             #fig6()
             #fig7()
             fig8()
             #fig9()
-            #fig10()
+            fig10()

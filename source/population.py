@@ -196,6 +196,8 @@ class Population:
 
                     if "lat" in niche_data:
                         new_agent.movement = niche_data["lat"]
+                        #new_agent.movement = agent.realized_niche
+
                     else:
                         new_agent.movement = agent.realized_niche
 
@@ -211,6 +213,8 @@ class Population:
                     new_agent.mutate()
                     if "lat" in niche_data:
                         new_agent.movement = niche_data["lat"]
+                        #new_agent.movement = agent.realized_niche
+
                     else:
                         new_agent.movement = agent.realized_niche
 
@@ -225,6 +229,8 @@ class Population:
                         niche_index = agent.realized_niche
                     else:
                         niche_index = niche_data["lat"]
+                        #niche_index= agent.realized_niche
+
                     if agent.genome.type == "niche-construction":
                         #print("updating niche with index", niche_index)
                         if niche_index is not None:

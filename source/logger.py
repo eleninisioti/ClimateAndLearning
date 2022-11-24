@@ -42,7 +42,8 @@ class Logger:
                            "movements": [],
                            "intrinsic_curves": [],
                            "histories": [],
-                           "construct": []}
+                           "construct": [],
+                           "pop_niches": []}
 
     def log_gen(self, population, env):
         """ Compute metrics characterizing the generation.
@@ -110,9 +111,24 @@ class Logger:
         # which niches are inhabited by at least one agent?
         inhabited_niches = []
         for agent in population.agents:
-            inhabited_niches.extend(agent.niches)
-        inhabited_niches = list(set(inhabited_niches))
-        self.log_niches["inhabited_niches"].append(inhabited_niches)
+            inhabited_niches.extend(agent.niches_lat)
+        set_inhabited_niches = list(set(inhabited_niches))
+        self.log_niches["inhabited_niches"].append(set_inhabited_niches)
+
+        pop_niches = {}
+        for niche in set_inhabited_niches:
+            for el in inhabited_niches:
+                if el == niche:
+                    pop_niches[el] = (pop_niches[el] + 1) if (el in pop_niches.keys()) else 0
+
+        for el in list(env.niche_constructions.keys()):
+            if el not in pop_niches.keys():
+                pop_niches[el]= 0
+
+        print("pop_niches", pop_niches)
+
+        self.log_niches["pop_niches"].append(pop_niches)
+
 
         movements = [agent.movement for agent in population.agents]
         while len(movements) < self.max_population:

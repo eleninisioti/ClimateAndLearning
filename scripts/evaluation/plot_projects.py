@@ -707,7 +707,7 @@ def run(project, total):
     else:
         include = ["competition", "climate","mutate", "dispersal", "diversity",
                    "num_agents",
-                   "extinct", "constructed"]
+                   "extinct",]
 
         if config["genome_type"] != "intrinsic":
             include.append("sigma")
@@ -716,6 +716,7 @@ def run(project, total):
         if config["genome_type"] == "niche-construction":
             include.append("construct")
             include.append("construct_sigma")
+            include.append( "constructed")
 
     if not log_df.empty:
         if total:

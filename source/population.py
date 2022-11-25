@@ -167,7 +167,7 @@ class Population:
 
             # only as many agents as fit in the niche will reproduce
             if niche_capacity < len(niche_pop)*2:
-                self.competition += len(niche_pop)*2 - niche_capacity
+                self.competition += (len(niche_pop)*2 - niche_capacity)
 
             niche_pop = [el for el in niche_pop[:int(niche_capacity / 2)]]
 

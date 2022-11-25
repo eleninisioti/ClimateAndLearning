@@ -16,6 +16,8 @@ class Logger:
                     "running_mutate": [],
                     "capacity": [],
                     "constructed": [],
+                    "mean_constructed": [],
+                    "sigma_constructed": [],
 
                     "construct": [],
                     "construct_sigma": [],
@@ -88,6 +90,11 @@ class Logger:
 
         self.log["capacity"].append(np.sum([el["capacity"] for key, el in env.niches.items()]))
         self.log["constructed"].append(np.sum([el["constructed"] for key, el in env.niches.items()]))
+        self.log["mean_constructed"].append(np.mean([el["constructed"] for key, el in env.niches.items()]))
+        self.log["sigma_constructed"].append(np.std([el["constructed"] for key, el in env.niches.items()]))
+
+
+
 
         print("capacity ", self.log["capacity"][-1])
         print("sigma", self.log["running_SD"][-1])
@@ -160,6 +167,8 @@ class Logger:
                     "construct": self.log["construct"],
                     "capacity": self.log["capacity"],
                     "constructed": self.log["constructed"],
+                    "mean_constructed": self.log["mean_constructed"],
+                    "sigma_constructed": self.log["sigma_constructed"],
 
                     "construct_sigma": self.log["construct_sigma"],
                     "extinctions": self.log["extinctions"],

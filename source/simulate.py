@@ -56,6 +56,7 @@ def simulate():
             log_niches = life_simul.logger.log_niches
 
         # save project output
+        print("saving at ", trial_dir)
         with open(trial_dir + '/log.pickle', 'wb') as pfile:
             pickle.dump(log, pfile, protocol=pickle.HIGHEST_PROTOCOL)
 

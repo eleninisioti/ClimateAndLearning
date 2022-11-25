@@ -34,7 +34,8 @@ def create_jzscript(config):
     scripts_dir =  "../jz_scripts/" + str(now.day) + "_" + str(now.month) + "_" + str(now.year)
     if not os.path.exists(scripts_dir):
         os.makedirs(scripts_dir)
-    script_path = scripts_dir + "/climate_" + config["--env_type"] + "_select_" + config["--selection_type"] + ".sh"
+    script_path = scripts_dir + "/climate_" + config["--env_type"] + "_select_" + config["--selection_type"] + \
+                  "_trial_" + str(config["--trial"])  +".sh"
     with open(script_path, "w") as fh:
         fh.writelines("#!/bin/bash\n")
         fh.writelines("#SBATCH -J fully\n")

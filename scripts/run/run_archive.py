@@ -31,7 +31,7 @@ def create_jzscript(config):
     for flag, value in config.items():
         command += flag + " " + str(value) + " "
     now = datetime.datetime.now()
-    scripts_dir =  "jz_scripts/" + str(now.day) + "_" + str(now.month) + "_" + str(now.year)
+    scripts_dir =  "../jz_scripts/" + str(now.day) + "_" + str(now.month) + "_" + str(now.year)
     if not os.path.exists(scripts_dir):
         os.makedirs(scripts_dir)
     script_path = scripts_dir + "/climate_" + config["--env_type"] + "_select_" + config["--selection_type"] + ".sh"

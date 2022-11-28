@@ -686,7 +686,7 @@ def run(project, total):
             log_niches = pickle.load(open(trial_dir + '/log_niches.pickle', 'rb'))
             #log = log.assign(Trial=trial_idx)
 
-            trial = find_index(trial_dir)
+            trial_idx = find_index(trial_dir)
             if log_df.empty:
                 log_df = log
             else:
@@ -737,14 +737,16 @@ def run(project, total):
             else:
                 # plot only for this trial and don't save
                 log_niches_trial = {}
-                log_niches_trial[trial] = log_niches_total[trial]
-                if not log_trial.empty:
-                    plotter = Plotter(project=project,
-                                      num_niches=config["num_niches"],
-                                      log=log_trial,
-                                      log_niches=log_niches_trial,
-                                      include=include)
-                    log = plotter.plot_evolution(save_name="trial_" + str(trial))
+                print(trial_dir, list(log_niches_total.keys()))
+                if trial in list(log_niches_total.keys()):
+                    log_niches_trial[trial] = log_niches_total[trial]
+                    if not log_trial.empty:
+                        plotter = Plotter(project=project,
+                                          num_niches=config["num_niches"],
+                                          log=log_trial,
+                                          log_niches=log_niches_trial,
+                                          include=include)
+                        log = plotter.plot_evolution(save_name="trial_" + str(trial))
 
 
 

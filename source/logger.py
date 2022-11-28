@@ -45,7 +45,8 @@ class Logger:
                            "intrinsic_curves": [],
                            "histories": [],
                            "construct": [],
-                           "pop_niches": []}
+                           "pop_niches": [],
+                           "constructed": {}}
 
     def log_gen(self, population, env):
         """ Compute metrics characterizing the generation.
@@ -149,6 +150,7 @@ class Logger:
             self.log_niches["intrinsic_curves"].append([agent.genome.genes["intrinsic_curves"] for agent in population.agents])
 
         self.log_niches["construct"].append(construct_values)
+        self.log_niches["constructed"].append({(key, el["constructed"]) for key, el in env.niches.items()})
 
 
     def final_log(self):

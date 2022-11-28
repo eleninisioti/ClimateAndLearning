@@ -253,11 +253,11 @@ def niche_construction_periodic(mode):
              "--num_niches",
              "--climate_mean_init"]
 
-    env_type = "stable"
+    env_type = "periodic"
     num_gens = 1000
     genome_type = "niche-construction"
     num_niches = 100
-    selection_types = ["N", "NF"]
+    selection_types = ["N", "NF", "F"]
     #selection_types = ["N"]
     amplitude = 8
     climate_mean_init = 0.2

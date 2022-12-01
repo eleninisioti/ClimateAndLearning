@@ -46,7 +46,7 @@ class Logger:
                            "histories": [],
                            "construct": [],
                            "pop_niches": [],
-                           "constructed": {}}
+                           "constructed": []}
 
     def log_gen(self, population, env):
         """ Compute metrics characterizing the generation.

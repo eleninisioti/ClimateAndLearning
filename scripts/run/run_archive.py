@@ -227,7 +227,7 @@ def niche_construction_stable(mode):
     num_gens = 1000
     genome_type = "niche-construction"
     num_niches = 100
-    selection_types = ["N", "F", "NF"]
+    selection_types = ["N",  "NF"]
     climate_mean_init_values = [0.6]
 
     for climate_mean_init in climate_mean_init_values:
@@ -242,7 +242,7 @@ def niche_construction_stable(mode):
                 create_jzscript(config)
 
 def niche_construction_periodic(mode):
-    top_dir = setup_dir(mode=mode) + "/periodic/"
+    top_dir = setup_dir(project="niche_construction", mode=mode) + "/periodic/"
 
     flags = ["--project",
              "--env_type",
@@ -253,11 +253,11 @@ def niche_construction_periodic(mode):
              "--num_niches",
              "--climate_mean_init"]
 
-    env_type = "periodic"
+    env_type = "sin"
     num_gens = 1000
     genome_type = "niche-construction"
     num_niches = 100
-    selection_types = ["N", "NF", "F"]
+    selection_types = ["N", "NF"]
     #selection_types = ["N"]
     amplitude = 8
     climate_mean_init = 0.2
@@ -351,6 +351,6 @@ if __name__ == "__main__":
         mode = sys.argv[2]
         for trial in range(trials):
             #niche_construction_stable(mode)
-            niche_construction_periodic(mode)
-            niche_construction_noisy(mode)
+            #niche_construction_periodic(mode)
+            #niche_construction_noisy(mode)
             #manim_fig8(mode)

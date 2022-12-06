@@ -318,7 +318,8 @@ def niche_construction_noisy_parametric(mode):
              "--selection_type",
              "--genome_type",
              "--num_niches",
-             "--climate_mean_init"]
+             "--climate_mean_init",
+             "--noise_std"]
 
     env_type = "noisy"
     num_gens = 500

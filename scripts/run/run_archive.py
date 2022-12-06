@@ -44,8 +44,8 @@ def create_jzscript(config):
         fh.writelines("#SBATCH -N 1\n")
         fh.writelines("#SBATCH --ntasks-per-node=1\n")
         scratch_dir = "/scratch/enisioti/climate_log/jz_logs"
-        fh.writelines("#SBATCH --output=" + scratch_dir + "/%j.out\n")
-        fh.writelines("#SBATCH --error=" + scratch_dir + "/%j.err\n")
+        fh.writelines("#SBATCH --output=" + scratch_dir + "_checkfail/%j.out\n")
+        fh.writelines("#SBATCH --error=" + scratch_dir + "_checkfail/%j.err\n")
         #fh.writelines("module load pytorch-gpu/py3/1.7.1\n")
 
         fh.writelines(command)
@@ -227,7 +227,7 @@ def niche_construction_stable(mode):
     num_gens = 1000
     genome_type = "niche-construction"
     num_niches = 100
-    selection_types = ["N",  "NF"]
+    selection_types = ["NF"]
     climate_mean_init_values = [0.6]
 
     for climate_mean_init in climate_mean_init_values:
@@ -351,8 +351,11 @@ if __name__ == "__main__":
     else:
         trials = int(sys.argv[1])  # number of independent trials
         mode = sys.argv[2]
-        for trial in range(trials):
+
+        trial = 4
+        niche_construction_stable(mode)
+        #for trial in range(trials):
             #niche_construction_stable(mode)
-            niche_construction_periodic(mode)
+            #niche_construction_periodic(mode)
             #niche_construction_noisy(mode)
             #manim_fig8(mode)

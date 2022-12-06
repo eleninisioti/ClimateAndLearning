@@ -44,8 +44,8 @@ def create_jzscript(config):
         fh.writelines("#SBATCH -N 1\n")
         fh.writelines("#SBATCH --ntasks-per-node=1\n")
         scratch_dir = "/scratch/enisioti/climate_log/jz_logs"
-        fh.writelines("#SBATCH --output=" + scratch_dir + "_checkfail/%j.out\n")
-        fh.writelines("#SBATCH --error=" + scratch_dir + "_checkfail/%j.err\n")
+        fh.writelines("#SBATCH --output=" + scratch_dir + "/%j.out\n")
+        fh.writelines("#SBATCH --error=" + scratch_dir + "/%j.err\n")
         #fh.writelines("module load pytorch-gpu/py3/1.7.1\n")
 
         fh.writelines(command)
@@ -308,6 +308,38 @@ def niche_construction_noisy(mode):
             create_jzscript(config)
 
 
+def niche_construction_noisy_parametric(mode):
+    top_dir = setup_dir(project="niche_construction", mode=mode) + "/noisy/"
+
+    flags = ["--project",
+             "--env_type",
+             "--num_gens",
+             "--trial",
+             "--selection_type",
+             "--genome_type",
+             "--num_niches",
+             "--climate_mean_init"]
+
+    env_type = "noisy"
+    num_gens = 500
+    genome_type = "niche-construction"
+    num_niches = 100
+    noise_std_values = np.arange(0.05, 1.82, 0.2)
+    climate_mean_init = 2
+    selection_types = ["NF", "N"]
+    #selection_types = ["N"]
+    for noise_std in noise_std_values:
+        for S in selection_types:
+            project = top_dir + "selection_" + S + "_G_" + genome_type + "_N_" + str(num_niches) + "_climate_" + \
+                      str(climate_mean_init) + "_noise_" + str(noise_std)
+            values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init, noise_std]
+            config = dict(zip(flags, values))
+            if mode == "local":
+                exec_command(config)
+            elif mode == "server":
+                create_jzscript(config)
+
+
 def manim_fig8(mode):
     top_dir = setup_dir(mode=mode) + "/manim_fig8/"
 
@@ -353,9 +385,9 @@ if __name__ == "__main__":
         mode = sys.argv[2]
 
         trial = 4
-        niche_construction_stable(mode)
-        #for trial in range(trials):
+        #niche_construction_stable(mode)
+        for trial in range(trials):
             #niche_construction_stable(mode)
             #niche_construction_periodic(mode)
-            #niche_construction_noisy(mode)
+            niche_construction_noisy_parametric(mode)
             #manim_fig8(mode)

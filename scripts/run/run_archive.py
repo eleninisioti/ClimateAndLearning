@@ -40,11 +40,11 @@ def create_jzscript(config):
         fh.writelines("#!/bin/bash\n")
         fh.writelines("#SBATCH -J fully\n")
         # fh.writelines("#SBATCH --nodes=1\n")
-        fh.writelines("#SBATCH -t 40:00:00\n")
+        fh.writelines("#SBATCH -t 02:00:00\n")
         fh.writelines("#SBATCH -N 1\n")
         fh.writelines("#SBATCH --ntasks-per-node=1\n")
         scratch_dir = "/scratch/enisioti/climate_log/jz_logs"
-        fh.writelines("#SBATCH --output=" + scratch_dir + "/%j.out\n")
+        fh.writelines("#SBATCH --output=" + scratch_dir + "/debugparamF_%j.out\n")
         fh.writelines("#SBATCH --error=" + scratch_dir + "/%j.err\n")
         #fh.writelines("module load pytorch-gpu/py3/1.7.1\n")
 
@@ -256,10 +256,10 @@ def niche_construction_periodic(mode):
              "--period"]
 
     env_type = "sin"
-    num_gens = 1000
+    num_gens = 10
     genome_type = "niche-construction"
     num_niches = 100
-    selection_types = ["N", "NF", "F"]
+    selection_types = [ "F"]
     #selection_types = ["N"]
     amplitude = 4
     climate_mean_init = 0.2
@@ -389,6 +389,6 @@ if __name__ == "__main__":
         #niche_construction_stable(mode)
         for trial in range(trials):
             #niche_construction_stable(mode)
-            #niche_construction_periodic(mode)
-            niche_construction_noisy_parametric(mode)
+            niche_construction_periodic(mode)
+            #niche_construction_noisy_parametric(mode)
             #manim_fig8(mode)

@@ -60,6 +60,7 @@ def simulate():
         with open(trial_dir + '/log.pickle', 'wb') as pfile:
             pickle.dump(log, pfile, protocol=pickle.HIGHEST_PROTOCOL)
 
+        print("saving log niches", log_niches.keys())
         with open(trial_dir + '/log_niches.pickle', 'wb') as pfile:
             pickle.dump(log_niches, pfile, protocol=pickle.HIGHEST_PROTOCOL)
 

@@ -304,7 +304,7 @@ class Plotter:
             count += 1
         # ----------------------------------------
         # ----- plot average preferred niche -----
-        if "construct" in self.include:
+        if "construct" in self.include and ("construct" in self.log.keys()):
             x = self.log["Generation"]
             y = self.log["construct"]
 
@@ -316,7 +316,7 @@ class Plotter:
             count += 1
         # -----------------------------------
         # ----- plot average preferred niche -----
-        if "construct_sigma" in self.include:
+        if ("construct_sigma" in self.include) and ("construct_sigma" in self.log.keys()):
             x = self.log["Generation"]
             y = self.log["construct_sigma"]
 
@@ -679,8 +679,9 @@ def run(project, total):
             _ = f.readline()
         config = yaml.load(f)
 
-
     for trial_idx, trial_dir in enumerate(trial_dirs):
+        print(trial_dir)
+
         try:
             log = pickle.load(open(trial_dir + '/log.pickle', 'rb'))
             log_niches = pickle.load(open(trial_dir + '/log_niches.pickle', 'rb'))
@@ -697,7 +698,7 @@ def run(project, total):
             if config["genome_type"] == "intrinsic":
                 plot_intrinsic(log["Climate"].tolist(), log_niches, trial_dir)
 
-        except IOError:
+        except (IOError, EOFError) as e:
             print("No log file for trial: ", trial_dir)
 
 

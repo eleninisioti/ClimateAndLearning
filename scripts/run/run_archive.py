@@ -248,8 +248,7 @@ def niche_construction_periodic(mode):
              "--env_type",
              "--num_gens",
              "--trial",
-             "--selection_type"
-             
+             "--selection_type",
              "--genome_type",
              "--num_niches",
              "--climate_mean_init",

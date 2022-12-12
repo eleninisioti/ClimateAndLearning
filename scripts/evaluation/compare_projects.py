@@ -110,16 +110,13 @@ class Plotter:
                 log_trial = log.loc[(log['Trial'] == first_trial)]
 
                 # find mean climate across niches
-                climate_avg = []
-                for el in list(log_trial["Climate"]):
-                    niches_states = [el + 0.01 * idx for idx in range(-int(self.num_niches / 2),
-                                                                      int(self.num_niches / 2 + 0.5))]
-                    climate_avg.append(np.mean(niches_states))
 
-                log_trial["Climate_avg"] = climate_avg
-                x = log_trial["Generation"][::step]
-                y = log_trial["Climate_avg"][::step]
-                sns.lineplot(ax=self.axs[count], data=log_trial, x="Generation", y="Climate_avg", ci=None, label=label)
+
+
+                #log_trial= log_trial["Climate"]
+                print(log_trial[log_trial.index.duplicated()])
+
+                sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="Climate", ci=None, label=label)
 
 
             self.axs[count].set(ylabel="$e_0$")
@@ -371,7 +368,7 @@ if __name__ == "__main__":
     projects = ordered_projects
 
     for p in projects:
-        if "plots" not in p:
+        if "plots" not in p and ".DS" not in p:
             trial_dirs = list(next(os.walk(p + "/trials"))[1])
             log_niches_total = {}
             log_df = pd.DataFrame()

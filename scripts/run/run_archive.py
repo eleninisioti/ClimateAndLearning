@@ -389,7 +389,7 @@ if __name__ == "__main__":
         #niche_construction_stable(mode)
         for trial in range(trials):
             #niche_construction_stable(mode)
-            #niche_construction_periodic(mode)
-            niche_construction_noisy(mode)
+             niche_construction_periodic(mode)
+            #niche_construction_noisy(mode)
             #niche_construction_noisy_parametric(mode)
             #manim_fig8(mode)

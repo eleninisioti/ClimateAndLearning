@@ -16,7 +16,6 @@ import numpy as np
 from utils import compute_dispersal, find_index
 import numpy as np
 import pandas as pd
-from findpeaks import findpeaks
 from scipy import stats
 
 class Plotter:
@@ -670,14 +669,14 @@ def run(project, total):
     log_niches_total = {}
 
     trial_dirs = [os.path.join(project + "/trials", o) for o in os.listdir(project + "/trials")]
-
+    trial_dirs = [el for el in trial_dirs if ".DS" not in el]
     # ---------------------------------
     # load  project configuration
     skip_lines = 1
     with open(project + "/config.yml") as f:
         for i in range(skip_lines):
             _ = f.readline()
-        config = yaml.load(f)
+        config = yaml.safe_load(f)
 
     for trial_idx, trial_dir in enumerate(trial_dirs):
         print(trial_dir)
@@ -761,5 +760,5 @@ if __name__ == "__main__":
 
     projects = [os.path.join("../projects/", top_dir, o) for o in os.listdir("../projects/" + top_dir)]
     for project in projects:
-        if "plots" not in project:
+        if "plots" not in project and ".DS" not in project:
             run(project, total)

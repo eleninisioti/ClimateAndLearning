@@ -291,11 +291,11 @@ def niche_construction_noisy(mode):
 
     env_type = "noisy"
     num_gens = 500
-    genome_type = "niche-construction"
+    genome_type = "evolv"
     num_niches = 100
     noise_std = 0.2
     climate_mean_init = 2
-    selection_types = ["NF", "N"]
+    selection_types = ["NF", "N", "F"]
     #selection_types = ["N"]
     for S in selection_types:
         project = top_dir + "selection_" + S + "_G_" + genome_type + "_N_" + str(num_niches) + "_climate_" + \
@@ -388,7 +388,8 @@ if __name__ == "__main__":
         trial = 4
         #niche_construction_stable(mode)
         for trial in range(trials):
-            niche_construction_stable(mode)
+            #niche_construction_stable(mode)
             #niche_construction_periodic(mode)
+            niche_construction_noisy(mode)
             #niche_construction_noisy_parametric(mode)
             #manim_fig8(mode)

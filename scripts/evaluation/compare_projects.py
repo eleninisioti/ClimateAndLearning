@@ -155,12 +155,13 @@ class Plotter:
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                if ("construct" in log.keys()):
+                print("keys for contstruct", list(log.keys()))
+                if ("construct" in list(log.keys())):
                     x = log["Generation"][::step]
                     y = log["construct"][::step]
 
                     sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="construct", ci=self.ci, label=label)
-            if ("construct" in log.keys()):
+            if ("construct" in list(log.keys())):
 
                 self.axs[count].set(xlabel="Time (in generations)")
                 self.axs[count].set(ylabel="$c$,")
@@ -174,7 +175,7 @@ class Plotter:
             count +=1
         # -----------------------------------
         # ----- plot average preferred niche -----
-        if "construct_sigma" in self.include and ("construct_sigma" in self.log.keys()):
+        if "construct_sigma" in self.include and ("construct_sigma" in list(self.log.keys())):
             x = self.log["Generation"][::step]
             y = self.log["construct_sigma"][::step]
 

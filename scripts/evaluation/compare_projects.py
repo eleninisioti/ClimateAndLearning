@@ -17,7 +17,6 @@ import numpy as np
 from utils import compute_dispersal, find_index
 import numpy as np
 import pandas as pd
-from findpeaks import findpeaks
 import pandas as pd
 import seaborn as sns
 from types import SimpleNamespace
@@ -150,19 +149,21 @@ class Plotter:
             count += 1
         # ----------------------------------------
         # ----- plot average preferred niche -----
-        if "construct" in self.include and ("construct" in self.log.keys()):
+        if ("construct" in self.include) :
             for key, value in results.items():
                 label = key
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                x = log["Generation"][::step]
-                y = log["construct"][::step]
+                if ("construct" in log.keys()):
+                    x = log["Generation"][::step]
+                    y = log["construct"][::step]
 
-                sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="construct", ci=self.ci, label=label)
+                    sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="construct", ci=self.ci, label=label)
+            if ("construct" in log.keys()):
 
-            self.axs[count].set(xlabel="Time (in generations)")
-            self.axs[count].set(ylabel="$c$,")
+                self.axs[count].set(xlabel="Time (in generations)")
+                self.axs[count].set(ylabel="$c$,")
             #self.axs[count].set_yscale('log')
             #self.axs[count].set(ylim=(math.pow(10,-10), math.pow(10,5)))
 
@@ -393,7 +394,7 @@ if __name__ == "__main__":
             with open(p + "/config.yml") as f:
                 for i in range(skip_lines):
                     _ = f.readline()
-                config = yaml.load(f)
+                config = yaml.safe_load(f)
                 #config = SimpleNamespace(**config)
 
             label = find_label(SimpleNamespace(**config), parameter)
@@ -414,7 +415,7 @@ if __name__ == "__main__":
             include.append("construct_sigma")
             #include.append( "constructed")
 
-
+    print("plotting")
     plotter = Plotter(project=results_dir,
                       num_niches=config["num_niches"],
                       log={},

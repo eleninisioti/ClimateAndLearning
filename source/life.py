@@ -61,6 +61,7 @@ class Life:
 
         # ----- run generations ------
         for gen in range(self.config.num_gens):
+            start_time_gen = time.time()
 
             # update environment
             self.env.step(gen, niche_constructions)
@@ -72,6 +73,8 @@ class Life:
 
                 # compute metrics for new generation
                 self.logger.log_gen(self.population, self.env)
+
+                print("this gen took ", (time.time() - start_time_gen))
 
                 time_out = (time.time() - start_time) > self.config.time_budget
 

@@ -31,7 +31,7 @@ class Env:
         self.climate = init
         self.climate_values = []
         self.niches = {}
-        self.max_climate = 15
+        self.max_climate = 10
 
         southest_lat = -int(self.num_niches / 2)
         northest_lat = int(self.num_niches / 2 + 0.5)

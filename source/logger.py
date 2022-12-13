@@ -95,14 +95,11 @@ class Logger:
         self.log["sigma_constructed"].append(np.std([el["constructed"] for key, el in env.niches.items()]))
 
 
-
-
         print("capacity ", self.log["capacity"][-1])
         print("sigma", self.log["running_SD"][-1])
         print("constructed ", self.log["constructed"][-1])
         print("construct ", self.log["construct"][-1])
-
-
+        print("extinctions", self.log["extinctions"][-1])
 
 
         # compute population diversity

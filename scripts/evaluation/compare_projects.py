@@ -99,22 +99,24 @@ class Plotter:
         """ Compare the evolution of climate and population dynamics for different methods.
         """
         count = 0
-        step =10
+        step = 100
+        num_yticks= 5
+        import matplotlib.ticker as plticker
+
+
+        for key, value in results.items():
+            new_value = value[0][value[0].Generation % step == 0]
+            new_value = new_value.reset_index()
+            #new_value = value[0].loc[((value[0]["Trial"]) % step)==0]
+            results[key][0] = new_value
+            print("processed", key)
         # ----- plot climate curve -----
         if "climate" in self.include:
             for key, value in results.items():
                 label = key
                 log = value[0]
                 config = value[2]
-                first_trial = np.min(log['Trial'])
-                log_trial = log.loc[(log['Trial'] == first_trial)]
 
-                # find mean climate across niches
-
-
-
-                #log_trial= log_trial["Climate"]
-                print(log_trial[log_trial.index.duplicated()])
 
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="Climate", ci=None, label=label)
 
@@ -124,6 +126,7 @@ class Plotter:
             self.axs[count].get_legend().remove()
 
             count += 1
+            print("plotted climate")
         # ----------------------------------------
         # ----- plot average preferred niche -----
         if "mean" in self.include:
@@ -132,18 +135,22 @@ class Plotter:
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                x = log["Generation"][::step]
-                y = log["Mean"][::step]
+                x = log["Generation"]
+                y = log["Mean"]
 
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="Mean", ci=self.ci, label=label)
 
             self.axs[count].set(ylabel="$\\bar{\mu}$ ")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
+            loc = plticker.LogLocator(base=10.0, numticks=num_yticks)  # this locator puts ticks at regular intervals
+            self.axs[count].yaxis.set_major_locator(loc)
 
             self.axs[count].get_legend().remove()
 
             count += 1
+            print("plotted mean")
+
         # ----------------------------------------
         # ----- plot average preferred niche -----
         if ("construct" in self.include) :
@@ -154,14 +161,17 @@ class Plotter:
                 config = value[2]
                 print("keys for contstruct", list(log.keys()))
                 if ("construct" in list(log.keys())):
-                    x = log["Generation"][::step]
-                    y = log["construct"][::step]
+                    x = log["Generation"]
+                    y = log["construct"]
 
                     sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="construct", ci=self.ci, label=label)
+
             if ("construct" in list(log.keys())):
 
                 self.axs[count].set(xlabel="Time (in generations)")
                 self.axs[count].set(ylabel="$c$,")
+            loc = plticker.LinearLocator(numticks=num_yticks)  # this locator puts ticks at regular intervals
+            self.axs[count].yaxis.set_major_locator(loc)
             #self.axs[count].set_yscale('log')
             #self.axs[count].set(ylim=(math.pow(10,-10), math.pow(10,5)))
 
@@ -170,16 +180,37 @@ class Plotter:
             self.axs[count].get_legend().remove()
 
             count +=1
+            print("plotted construct")
+
         # -----------------------------------
         # ----- plot average preferred niche -----
-        if "construct_sigma" in self.include and ("construct_sigma" in list(self.log.keys())):
-            x = self.log["Generation"][::step]
-            y = self.log["construct_sigma"][::step]
+        print(self.include)
+        if "construct_sigma" in self.include:
+            max_construct_sigma = 0
 
-            sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="construct_sigma", ci=self.ci)
+            for key, value in results.items():
+                label = key
+                log = value[0]
+                log_niches = value[1]
+                config = value[2]
+                if ("construct_sigma" in list(log.keys())):
+                    x = log["Generation"]
+                    y = log["construct_sigma"]
+                    if max(y) > max_construct_sigma:
+                        max_construct_sigma = max(y)
+                    print("min of sigma", min(y), "for ", key)
 
-            self.axs[count].set(ylabel="$c_{\sigma}$, variance  \n of construct ")
-            self.axs[count].set(xlabel=None)
+                    sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="construct_sigma", ci=self.ci, label=label)
+
+            if ("construct_sigma" in list(log.keys())):
+                self.axs[count].set(xlabel="Time (in generations)")
+                self.axs[count].set(ylabel="$c_{\sigma}$,")
+            self.axs[count].set_ylim((0, max_construct_sigma))
+            loc = plticker.LinearLocator(numticks=num_yticks)  # this locator puts ticks at regular intervals
+            self.axs[count].yaxis.set_major_locator(loc)
+            self.axs[count].get_legend().remove()
+            print("plotted consrtuct_sigma")
+
 
             count += 1
             # -----------------------------------
@@ -190,14 +221,17 @@ class Plotter:
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                x = log["Generation"][::step]
-                y = log["SD"][::step]
+                x = log["Generation"]
+                y = log["SD"]
 
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="SD", ci=self.ci, label=label)
+
 
             self.axs[count].set(ylabel="$\\bar{\sigma}$")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
+            loc = plticker.LogLocator(base=10, numticks=num_yticks)  # this locator puts ticks at regular intervals
+            self.axs[count].yaxis.set_major_locator(loc)
             self.axs[count].get_legend().remove()
 
 
@@ -208,13 +242,16 @@ class Plotter:
             for key, value in results.items():
                 label = key
                 log = value[0]
-                x = log["Generation"][::step]
-                y = log["R"][::step]
+                x = log["Generation"]
+                y = log["R"]
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="R", ci=self.ci, label=label)
+
 
             self.axs[count].set(ylabel="$\\bar{r}$")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
+            loc = plticker.LogLocator(base=10, numticks=num_yticks)  # this locator puts ticks at regular intervals
+            self.axs[count].yaxis.set_major_locator(loc)
             self.axs[count].get_legend().remove()
 
             count += 1
@@ -226,10 +263,11 @@ class Plotter:
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                x = log["Generation"][::step]
-                y = log["Fitness"][::step]
+                x = log["Generation"]
+                y = log["Fitness"]
 
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="Fitness", ci=self.ci, label=label)
+
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$\\bar{f}$")
@@ -245,10 +283,11 @@ class Plotter:
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                x = log["Generation"][::step]
-                y = log["extinctions"][::step]
+                x = log["Generation"]
+                y = log["extinctions"]
 
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="extinctions", ci=self.ci, label=label)
+
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$E$")
@@ -263,15 +302,18 @@ class Plotter:
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                x = log["Generation"][::step]
-                y = log["num_agents"][::step]
+                x = log["Generation"]
+                y = log["num_agents"]
 
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="num_agents", ci=self.ci, label=label)
 
+
             self.axs[count].set(xlabel="Time (in generations)")
-            self.axs[count].set(ylabel="$K$, \n number of agents")
+            self.axs[count].set(ylabel="$K$, ")
             self.axs[count].set_yscale('log')
-            self.axs[count].set_ylim((0, 10000000))
+            self.axs[count].set_ylim((1, 10000000))
+            loc = plticker.LogLocator(base=10, numticks=num_yticks)  # this locator puts ticks at regular intervals
+            self.axs[count].yaxis.set_major_locator(loc)
 
             self.axs[count].get_legend().remove()
 
@@ -284,10 +326,11 @@ class Plotter:
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                x = log["Generation"][::step]
-                y = log["competition"][::step]
+                x = log["Generation"]
+                y = log["competition"]
 
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="competition", ci=self.ci, label=label)
+
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="competition")
@@ -301,10 +344,11 @@ class Plotter:
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                x = log["Generation"][::step]
-                y = log["diversity"][::step]
+                x = log["Generation"]
+                y = log["diversity"]
 
                 sns.lineplot(ax=self.axs[count],data=log, x="Generation", y="diversity", ci=self.ci, label=label)
+
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$V$")
@@ -318,10 +362,11 @@ class Plotter:
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                x = log["Generation"][::step]
-                y = log["Dispersal"][::step]
+                x = log["Generation"]
+                y = log["Dispersal"]
 
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="Dispersal",ci=self.ci, label=label)
+
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$D$")
@@ -382,7 +427,7 @@ if __name__ == "__main__":
                     if log_df.empty:
                         log_df = log
                     else:
-                        log_df = log_df.append(log)
+                        log_df = log_df.append(log, ignore_index=True)
                     log_niches_total[trial] = log_niches
 
                 except (IOError,EOFError) as e  :

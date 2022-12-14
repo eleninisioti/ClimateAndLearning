@@ -273,7 +273,7 @@ def niche_construction_periodic(mode):
     for genome_type in genome_types:
 
         for selection in selection_types:
-            if not (genome_type == "evolv" and S == "F"):
+            if not (genome_type == "evolv" and selection == "F"):
                 project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) + \
                           "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
                     amplitude)

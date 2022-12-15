@@ -41,7 +41,7 @@ def create_jzscript(config):
         fh.writelines("#SBATCH -J fully\n")
         # fh.writelines("#SBATCH --nodes=1\n")
         fh.writelines("#SBATCH -t 15:00:00\n")
-        fh.writelines("#SBATCH -N 10\n")
+        fh.writelines("#SBATCH -N 3\n")
         fh.writelines("#SBATCH --ntasks-per-node=15\n")
         scratch_dir = "/scratch/enisioti/climate_log/jz_logs"
         fh.writelines("#SBATCH --output=" + scratch_dir + "/%j.out\n")

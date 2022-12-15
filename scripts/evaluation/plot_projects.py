@@ -268,6 +268,12 @@ class Plotter:
         count = 0
         first_trial = np.min(self.log['Trial'])
         unique_trials = list(set(self.log['Trial']))
+        step = 10
+
+        new_value = self.log[self.log.Generation % step == 0]
+        new_value = new_value.reset_index()
+        # new_value = value[0].loc[((value[0]["Trial"]) % step)==0]
+        self.log = new_value
 
         # ----- plot climate curve -----
         if "climate" in self.include:

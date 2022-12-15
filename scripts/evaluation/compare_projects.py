@@ -99,7 +99,7 @@ class Plotter:
         """ Compare the evolution of climate and population dynamics for different methods.
         """
         count = 0
-        step = 100
+        step = 10
         num_yticks= 5
         import matplotlib.ticker as plticker
 

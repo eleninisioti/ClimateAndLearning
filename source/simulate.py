@@ -168,7 +168,7 @@ def init_parser():
     parser.add_argument('--time_budget',
                         help='Maximum seconds allowed for a simulation.',
                         type=float,
-                        default=60*60*38)
+                        default=60*60*29)
 
     parser.add_argument('--history_window',
                         help='Window to keep track of ecological history.',

@@ -40,7 +40,7 @@ def create_jzscript(config):
         fh.writelines("#!/bin/bash\n")
         fh.writelines("#SBATCH -J fully\n")
         # fh.writelines("#SBATCH --nodes=1\n")
-        fh.writelines("#SBATCH -t 15:00:00\n")
+        fh.writelines("#SBATCH -t 30:00:00\n")
         fh.writelines("#SBATCH -N 1\n")
         fh.writelines("#SBATCH --ntasks-per-node=15\n")
         scratch_dir = "/scratch/enisioti/climate_log/jz_logs"
@@ -225,9 +225,9 @@ def niche_construction_stable(mode):
 
     env_type = "stable"
     num_gens = 1000
-    genome_types = ["niche-construction"]
+    genome_types = ["evolv"]
     num_niches = 100
-    selection_types = ["N", "NF", "F"]
+    selection_types = ["N"]
     climate_mean_init_values = [0.6]
 
     for genome_type in genome_types:
@@ -262,9 +262,9 @@ def niche_construction_periodic(mode):
     env_type = "sin"
     num_gens = 1000
     num_niches = 100
-    genome_types = ["niche-construction"]
+    genome_types = ["evolv"]
 
-    selection_types = [ "NF", "F", "N"]
+    selection_types = [  "N"]
     #selection_types = ["N"]
     amplitude = 4
     climate_mean_init = 0.2
@@ -303,8 +303,8 @@ def niche_construction_noisy(mode):
     num_niches = 100
     noise_std = 0.2
     climate_mean_init = 2
-    selection_types = ["NF", "N", "F"]
-    genome_types = ["niche-construction"]
+    selection_types = [ "N"]
+    genome_types = ["evolv]
 
     #selection_types = ["N"]
 

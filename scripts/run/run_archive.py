@@ -304,7 +304,7 @@ def niche_construction_noisy(mode):
     noise_std = 0.2
     climate_mean_init = 2
     selection_types = [ "N"]
-    genome_types = ["evolv]
+    genome_types = ["evolv"]
 
     #selection_types = ["N"]
 

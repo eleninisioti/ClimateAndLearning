@@ -269,6 +269,8 @@ class Plotter:
         first_trial = np.min(self.log['Trial'])
         unique_trials = list(set(self.log['Trial']))
         step = 10
+        if "dispersal" in self.include:
+            self.log = compute_dispersal(self.log, self.log_niches, self.num_niches)
 
         new_value = self.log[self.log.Generation % step == 0]
         new_value = new_value.reset_index()
@@ -488,7 +490,6 @@ class Plotter:
         # ------------------------------------------
         # ----- plot dispersal  -----
         if "dispersal" in self.include:
-            self.log = compute_dispersal(self.log, self.log_niches, self.num_niches)
             x = self.log["Generation"]
             y = self.log["Dispersal"]
 

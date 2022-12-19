@@ -447,6 +447,8 @@ if __name__ == "__main__":
         include = ["climate"]
     else:
         include = ["climate","mutate",  "num_agents"]
+        include.append("construct")
+        include.append("construct_sigma")
 
         if config["genome_type"] != "intrinsic":
             include.append("sigma")

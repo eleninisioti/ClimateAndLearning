@@ -162,14 +162,11 @@ def compute_dispersal(log, log_niches, num_latitudes):
             # for each latitude
             survivals = []
             for gen in range(num_gens):
-                lat_climate = climate[gen] + 0.01 * lat
-                if "construct" in log.keys() :
-                    lat_climate += log["construct"].to_list()[gen]
-                # is there at least one individual in this latitude and generation?
-                survival=0
-                for el in inhabited_niches[gen]:
-                    if (np.abs(el-lat_climate)) < 0.01:
-                        survival = 1
+                if el in inhabited_niches[gen]:
+                    survival = 1
+                else:
+                    survival = 0
+
                 survivals.append(survival)
 
             if not len(survivals):

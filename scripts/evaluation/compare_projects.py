@@ -105,6 +105,8 @@ class Plotter:
 
 
         for key, value in results.items():
+            if "dispersal" in self.include:
+                value[0] = compute_dispersal(value[0], value[1], self.num_niches)
             new_value = value[0][value[0].Generation % step == 0]
             new_value = new_value.reset_index()
             #new_value = value[0].loc[((value[0]["Trial"]) % step)==0]
@@ -446,9 +448,8 @@ if __name__ == "__main__":
     if config["only_climate"]:
         include = ["climate"]
     else:
-        include = ["climate","mutate",  "num_agents"]
-        include.append("construct")
-        include.append("construct_sigma")
+        include = ["climate","mutate",  "num_agents", "dispersal"]
+
 
         if config["genome_type"] != "intrinsic":
             include.append("sigma")

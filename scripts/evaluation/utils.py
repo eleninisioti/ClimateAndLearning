@@ -162,7 +162,7 @@ def compute_dispersal(log, log_niches, num_latitudes):
             # for each latitude
             survivals = []
             for gen in range(num_gens):
-                if el in inhabited_niches[gen]:
+                if lat in inhabited_niches[gen]:
                     survival = 1
                 else:
                     survival = 0

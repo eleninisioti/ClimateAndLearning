@@ -212,7 +212,7 @@ def xland():
 
 
 def niche_construction_stable(mode):
-    top_dir = setup_dir(project="niche_construction", mode=mode) + "/stable/"
+    top_dir = setup_dir(project="niche_construction", mode=mode) + "/stable_droppop/"
 
     flags = ["--project",
              "--env_type",

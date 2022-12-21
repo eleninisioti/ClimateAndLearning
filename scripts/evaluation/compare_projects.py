@@ -430,7 +430,7 @@ if __name__ == "__main__":
                         log_df = log
                     else:
                         log_df = log_df.append(log, ignore_index=True)
-                    log_niches_total[trial] = log_niches
+                    log_niches_total[trial_idx] = log_niches
 
                 except (IOError,EOFError) as e  :
                     print("No log file for project. ", trial_dir)

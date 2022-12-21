@@ -79,7 +79,9 @@ class Life:
                 time_out = (time.time() - start_time) > self.config.time_budget
 
                 if self.population.has_mass_extinction() or time_out:
-                    print("Time out. Exiting simulation")
+                    self.logger.log_gen(self.population, self.env)
+                    if time_out:
+                        print("Time out. Exiting simulation")
                     break
 
                 # reproduce population

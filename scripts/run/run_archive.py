@@ -227,7 +227,7 @@ def niche_construction_stable(mode):
     num_gens = 1000
     genome_types = ["niche-construction"]
     num_niches = 100
-    selection_types = ["N", "NF"]
+    selection_types = [ "NF"]
     climate_mean_init_values = [0.6]
 
     for genome_type in genome_types:
@@ -266,7 +266,7 @@ def niche_construction_periodic(mode):
 
     selection_types = [ "NF"]
     #selection_types = ["N"]
-    amplitude_values = [2, 6]
+    amplitude_values = [4]
     climate_mean_init = 0.2
     period = 500
 
@@ -401,8 +401,8 @@ if __name__ == "__main__":
         mode = sys.argv[2]
 
         for trial in range(trials):
-            #niche_construction_stable(mode)
-            niche_construction_periodic(mode)
+            niche_construction_stable(mode)
+            #niche_construction_periodic(mode)
             #niche_construction_noisy(mode)
             #niche_construction_noisy_parametric(mode)
             #manim_fig8(mode)

@@ -100,6 +100,7 @@ class Logger:
         print("constructed ", self.log["constructed"][-1])
         print("construct ", self.log["construct"][-1])
         print("extinctions", self.log["extinctions"][-1])
+        print("number of agents", self.log["num_agents"][-1])
 
 
         # compute population diversity

@@ -34,8 +34,16 @@ def create_jzscript(config):
     scripts_dir =  "../jz_scripts/" + str(now.day) + "_" + str(now.month) + "_" + str(now.year)
     if not os.path.exists(scripts_dir):
         os.makedirs(scripts_dir)
+    if config["--env_type"] == "stable":
+        climate_string = "_climate_mean_init_" + str(config["--climate_mean_init"])
+    elif config["--env_type"] == "sin":
+        climate_string = "_amplitude_" + str(config["--amplitude"]) + "_periodi_" + str(config["--period"])
+
+    elif config["--env_type"] == "noisy":
+        climate_string = "_nosie_" + str(config["--noise-std"])
+
     script_path = scripts_dir + "/climate_" + config["--env_type"] + "_select_" + config["--selection_type"] +\
-                  "_genome_" + config["--genome_type"] + "_trial_" + str(config["--trial"])   +".sh"
+                  "_genome_" + config["--genome_type"] + climate_string + "_trial_" + str(config["--trial"])   +".sh"
     with open(script_path, "w") as fh:
         fh.writelines("#!/bin/bash\n")
         fh.writelines("#SBATCH -J fully\n")
@@ -212,7 +220,7 @@ def xland():
 
 
 def niche_construction_stable(mode):
-    top_dir = setup_dir(project="niche_construction", mode=mode) + "/stable_droppop/"
+    top_dir = setup_dir(project="niche_construction", mode=mode) + "/stable/"
 
     flags = ["--project",
              "--env_type",
@@ -225,10 +233,10 @@ def niche_construction_stable(mode):
 
     env_type = "stable"
     num_gens = 1000
-    genome_types = ["niche-construction"]
+    genome_types = ["niche-construction", "evolv"]
     num_niches = 100
-    selection_types = [ "NF"]
-    climate_mean_init_values = [0.6]
+    selection_types = [ "NF", "F", "N"]
+    climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
 
     for genome_type in genome_types:
 
@@ -262,30 +270,30 @@ def niche_construction_periodic(mode):
     env_type = "sin"
     num_gens = 1000
     num_niches = 100
-    genome_types = ["niche-construction"]
+    genome_types = ["niche-construction", "evolv"]
 
-    selection_types = [ "NF"]
-    #selection_types = ["N"]
-    amplitude_values = [4]
+    selection_types = [ "NF", "N", "F"]
     climate_mean_init = 0.2
-    period = 500
+    amplitude_values = [0.2, 1, 4, 8]
+    period_values = [int(num_gens), int(num_gens / 2), int(num_gens / 8), int(num_gens / 16), int(num_gens / 32)]
 
-    for amplitude in amplitude_values:
+    for period in period_values:
+        for amplitude in amplitude_values:
 
-        for genome_type in genome_types:
+            for genome_type in genome_types:
 
-            for selection in selection_types:
-                if not (genome_type == "evolv" and selection == "F"):
-                    project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) + \
-                              "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
-                        amplitude)
-                    values = [project, env_type, num_gens, trial, selection, genome_type, num_niches,
-                              climate_mean_init, amplitude, period]
-                    config = dict(zip(flags, values))
-                    if mode == "local":
-                        exec_command(config)
-                    elif mode == "server":
-                        create_jzscript(config)
+                for selection in selection_types:
+                    if not (genome_type == "evolv" and selection == "F"):
+                        project = top_dir + "S_" + selection + "_G_" + genome_type + "_N_" + str(num_niches) + \
+                                  "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
+                            amplitude)
+                        values = [project, env_type, num_gens, trial, selection, genome_type, num_niches,
+                                  climate_mean_init, amplitude, period]
+                        config = dict(zip(flags, values))
+                        if mode == "local":
+                            exec_command(config)
+                        elif mode == "server":
+                            create_jzscript(config)
 
 def niche_construction_noisy(mode):
     top_dir = setup_dir(project="niche_construction", mode=mode) + "/noisy/"
@@ -297,30 +305,31 @@ def niche_construction_noisy(mode):
              "--selection_type",
              "--genome_type",
              "--num_niches",
-             "--climate_mean_init"]
+             "--climate_mean_init",
+             "--noise_std"]
 
     env_type = "noisy"
     num_gens = 500
     genome_type = "evolv"
     num_niches = 100
-    noise_std = 0.2
-    climate_mean_init = 2
     selection_types = ["F"]
-    genome_types = ["niche-construction"]
+    genome_types = ["niche-construction", "evolv"]
+    climate_mean_init = 2
+    noise_std_values = np.arange(0.05, 0.82, 0.1)
 
-    #selection_types = ["N"]
+    for noise_std in noise_std_values:
 
-    for genome_type in genome_types:
-        for S in selection_types:
-            if not (genome_type == "evolv" and S == "F"):
-                project = top_dir + "selection_" + S + "_G_" + genome_type + "_N_" + str(num_niches) + "_climate_" + \
-                          str(climate_mean_init) + "_noise_" + str(noise_std)
-                values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init, noise_std]
-                config = dict(zip(flags, values))
-                if mode == "local":
-                    exec_command(config)
-                elif mode == "server":
-                    create_jzscript(config)
+        for genome_type in genome_types:
+            for S in selection_types:
+                if not (genome_type == "evolv" and S == "F"):
+                    project = top_dir + "selection_" + S + "_G_" + genome_type + "_N_" + str(num_niches) + "_climate_" + \
+                              str(climate_mean_init) + "_noise_" + str(noise_std)
+                    values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init, noise_std]
+                    config = dict(zip(flags, values))
+                    if mode == "local":
+                        exec_command(config)
+                    elif mode == "server":
+                        create_jzscript(config)
 
 
 def niche_construction_noisy_parametric(mode):

@@ -268,7 +268,7 @@ class Plotter:
         count = 0
         first_trial = np.min(self.log['Trial'])
         unique_trials = list(set(self.log['Trial']))
-        step = 1
+        step = 10
         if "dispersal" in self.include:
             self.log = compute_dispersal(self.log, self.log_niches, self.num_niches)
 

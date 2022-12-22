@@ -312,7 +312,7 @@ def niche_construction_noisy(mode):
     num_gens = 500
     genome_type = "evolv"
     num_niches = 100
-    selection_types = ["F"]
+    selection_types = ["NF", "N", "F"]
     genome_types = ["niche-construction"]
     climate_mean_init = 2
     noise_std_values = np.arange(0.05, 0.82, 0.1)

@@ -40,7 +40,7 @@ def create_jzscript(config):
         climate_string = "_amplitude_" + str(config["--amplitude"]) + "_periodi_" + str(config["--period"])
 
     elif config["--env_type"] == "noisy":
-        climate_string = "_nosie_" + str(config["--noise-std"])
+        climate_string = "_noise_" + str(config["--noise_std"])
 
     script_path = scripts_dir + "/climate_" + config["--env_type"] + "_select_" + config["--selection_type"] +\
                   "_genome_" + config["--genome_type"] + climate_string + "_trial_" + str(config["--trial"])   +".sh"

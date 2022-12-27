@@ -199,7 +199,7 @@ class Logger:
         for step in range(len(self.log["Fitness"])):
             trial_log = {'Generation': [step], 'Trial': [self.trial]}
             for key in self.log.keys():
-                if len(self.log[key]):
+                if len(self.log[key]) and (step < len(self.log[key])):
                     trial_log[key] = self.log[key][step]
             if log_df.empty:
                 log_df = pd.DataFrame.from_dict(trial_log)

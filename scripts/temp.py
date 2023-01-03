@@ -13,5 +13,5 @@ for project_idx, project in enumerate(projects):
     for trial_idx, file in enumerate(trials):
         new_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/noisy/" + project_cut[project_idx] + "/trials/" + str(trials_cut[trial_idx])
         print(file, new_dir)
-        shutil.copy(file, new_dir)
+        shutil.move(file, new_dir)
 

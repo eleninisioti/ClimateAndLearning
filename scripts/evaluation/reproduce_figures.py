@@ -242,13 +242,13 @@ def fig9(label):
 if __name__ == "__main__":
     # ------ stable climate function -----
     results_dir = "../projects/paper/stable/fig2"
-    results_dr = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/F"
+    results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/F"
     fig2()
 
-    results_dr = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/NF"
+    results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/NF"
     fig2()
 
-    results_dr = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/N"
+    results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/N"
     fig2()
 
     results_dir = "../projects/paper/stable/fig3"
@@ -288,7 +288,9 @@ if __name__ == "__main__":
     # ---------------------------------------
     # ------ noisy climate function -----
     results_dir = "../projects/paper/noisy/fig9"
-    #fig9(label="selection")
+    results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/noisy"
+
+    fig9(label="selection")
 
     results_dir = "../projects/paper/noisy/fig10"
     include = ["climate", "mean",

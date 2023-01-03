@@ -48,7 +48,7 @@ def create_jzscript(config):
         fh.writelines("#!/bin/bash\n")
         fh.writelines("#SBATCH -J fully\n")
         # fh.writelines("#SBATCH --nodes=1\n")
-        fh.writelines("#SBATCH -t 30:00:00\n")
+        fh.writelines("#SBATCH -t 50:00:00\n")
         fh.writelines("#SBATCH -N 1\n")
         fh.writelines("#SBATCH --ntasks-per-node=15\n")
         scratch_dir = "/scratch/enisioti/climate_log/jz_logs"
@@ -272,9 +272,9 @@ def niche_construction_periodic(mode):
     num_niches = 100
     genome_types = ["niche-construction"]
 
-    selection_types = [ "NF", "N", "F"]
+    selection_types = ["N"]
     climate_mean_init = 0.2
-    amplitude_values = [0.2, 1, 4, 8]
+    amplitude_values = [1, 4, 8]
     period_values = [int(num_gens), int(num_gens / 2), int(num_gens / 8), int(num_gens / 16), int(num_gens / 32)]
 
     for period in period_values:
@@ -410,7 +410,7 @@ if __name__ == "__main__":
         mode = sys.argv[2]
 
         for trial in range(trials):
-            niche_construction_stable(mode)
+            #niche_construction_stable(mode)
             niche_construction_periodic(mode)
             #niche_construction_noisy(mode)
             #niche_construction_noisy_parametric(mode)

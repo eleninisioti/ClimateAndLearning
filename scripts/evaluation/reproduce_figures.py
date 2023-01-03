@@ -242,7 +242,14 @@ def fig9(label):
 if __name__ == "__main__":
     # ------ stable climate function -----
     results_dir = "../projects/paper/stable/fig2"
-    #fig2()
+    results_dr = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/F"
+    fig2()
+
+    results_dr = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/NF"
+    fig2()
+
+    results_dr = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/N"
+    fig2()
 
     results_dir = "../projects/paper/stable/fig3"
     #fig3()
@@ -251,6 +258,16 @@ if __name__ == "__main__":
     #fig4()
     # ---------------------------------------
     # ------ sinusoid climate function -----
+    results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/periodic/F"
+    fig5_6(label="amplitude")
+
+    results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/periodic/NF"
+    fig5_6(label="amplitude")
+
+    results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/periodic/N"
+    fig5_6(label="amplitude")
+
+
     results_dir = "../projects/paper/sin/fig5"
     #fig5_6(label="amplitude")
 
@@ -267,7 +284,7 @@ if __name__ == "__main__":
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]
-    fig_7_8_10(include)
+    #fig_7_8_10(include)
     # ---------------------------------------
     # ------ noisy climate function -----
     results_dir = "../projects/paper/noisy/fig9"
@@ -277,6 +294,6 @@ if __name__ == "__main__":
     include = ["climate", "mean",
                "sigma", "mutate",
                "dispersal", "diversity"]
-    fig_7_8_10(include, cut=True)
+    #fig_7_8_10(include, cut=True)
     # ---------------------------------------
 

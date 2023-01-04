@@ -39,7 +39,7 @@ class Population:
         """
         self.agents = []
         self.selection_type = selection_type
-        self.max_population = 10000
+        self.max_population = 6000
 
         # keep these variables for initializing future agents
         self.genome_type = genome_type
@@ -254,8 +254,8 @@ class Population:
 
         self.not_reproduced = len([el for el in self.agents if not agent.reproduced])
 
-        #self.agents = random.choices(new_agents, k=self.max_population)
-        self.agents = new_agents
+        self.agents = random.choices(new_agents, k=self.max_population)
+        #self.agents = new_agents
         return niche_constructions
 
     def order_agents(self, agents, niche_climate=0):

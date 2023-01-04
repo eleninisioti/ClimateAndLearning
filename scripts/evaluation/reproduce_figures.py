@@ -27,6 +27,36 @@ cm = 1 / 2.54
 figsize = (8.48 * cm, 6 * cm) # these values to fit in latex column
 # -------------------------------------
 
+def fig2_multipleselection(projects):
+    """ Plot Figure 2 """
+    plt.figure(figsize=figsize)
+
+
+
+    for project_label, project in projects.items():
+        variable = "SD"
+        labels = ["num_niches"]
+        results = load_results(results_dir, variable, labels)
+
+        niche=100
+
+        results_niche = results.loc[results['num_niches'] == niche]
+        sns.lineplot(data=results_niche, x="Climate", y="SD", ci=ci, label=project_label)
+
+    plt.yscale('log')
+    plt.xlabel("$e_{0}^0$, Reference Environmental State")
+    plt.ylabel("$\\bar{\sigma}^*$, Plasticity")
+    plt.legend(loc="upper right")
+    plt.ylim([10**(-20), 1000])
+
+    save_dir = results_dir + "/plots"
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    plt.savefig(save_dir + "/fig2.pdf", dpi=300)
+    plt.savefig(save_dir + "/fig2.png", dpi=300)
+
+    plt.clf()
+
 
 def fig2():
     """ Plot Figure 2 """
@@ -241,15 +271,20 @@ def fig9(label):
 
 if __name__ == "__main__":
     # ------ stable climate function -----
+    projects = {"F-selection": "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/F",
+                "N-selection": "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/N",
+                "NF-selection": "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/NF"}
+    fig2_multipleselection(projects)
+
     results_dir = "../projects/paper/stable/fig2"
-    results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/F"
-    fig2()
+    #results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/F"
+    #fig2()
 
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/NF"
-    fig2()
+    #fig2()
 
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/N"
-    fig2()
+    #fig2()
 
     results_dir = "../projects/paper/stable/fig3"
     #fig3()
@@ -259,13 +294,13 @@ if __name__ == "__main__":
     # ---------------------------------------
     # ------ sinusoid climate function -----
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/periodic/F"
-    fig5_6(label="amplitude")
+    #fig5_6(label="amplitude")
 
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/periodic/NF"
-    fig5_6(label="amplitude")
+    #fig5_6(label="amplitude")
 
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/periodic/N"
-    fig5_6(label="amplitude")
+    #fig5_6(label="amplitude")
 
 
     results_dir = "../projects/paper/sin/fig5"
@@ -290,7 +325,7 @@ if __name__ == "__main__":
     results_dir = "../projects/paper/noisy/fig9"
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/noisy"
 
-    fig9(label="selection")
+    #fig9(label="selection")
 
     results_dir = "../projects/paper/noisy/fig10"
     include = ["climate", "mean",

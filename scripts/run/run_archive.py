@@ -272,9 +272,9 @@ def niche_construction_periodic(mode):
     num_niches = 100
     genome_types = ["niche-construction"]
 
-    selection_types = ["N"]
+    selection_types = ["NF"]
     climate_mean_init = 0.2
-    amplitude_values = [1, 4, 8]
+    amplitude_values = [0.2, 1, 4, 8]
     period_values = [int(num_gens), int(num_gens / 2), int(num_gens / 8), int(num_gens / 16), int(num_gens / 32)]
 
     for period in period_values:

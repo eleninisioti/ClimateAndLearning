@@ -49,7 +49,7 @@ def fig2_multipleselection(projects):
     plt.legend(loc="upper right")
     plt.ylim([10**(-20), 1000])
 
-    save_dir = results_dir + "/plots"
+    save_dir = project + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     plt.savefig(save_dir + "/fig2.pdf", dpi=300)

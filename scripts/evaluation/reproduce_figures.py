@@ -36,7 +36,7 @@ def fig2_multipleselection(projects):
     for project_label, project in projects.items():
         variable = "SD"
         labels = ["num_niches"]
-        results = load_results(results_dir, variable, labels)
+        results = load_results(project, variable, labels)
 
         niche=100
 

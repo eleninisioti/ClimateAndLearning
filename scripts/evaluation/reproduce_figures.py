@@ -52,8 +52,8 @@ def fig2_multipleselection(projects):
     save_dir = project + "/plots"
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    plt.savefig(save_dir + "/fig2.pdf", dpi=300)
-    plt.savefig(save_dir + "/fig2.png", dpi=300)
+    plt.savefig(save_dir + "/fig2_multiple.pdf", dpi=300)
+    plt.savefig(save_dir + "/fig2_multiple.png", dpi=300)
 
     plt.clf()
 

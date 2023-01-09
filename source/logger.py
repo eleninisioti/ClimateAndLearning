@@ -133,7 +133,7 @@ class Logger:
 
         print("pop_niches", pop_niches)
 
-        self.log_niches["pop_niches"].append(pop_niches)
+        #self.log_niches["pop_niches"].append(pop_niches)
 
 
         movements = [agent.movement for agent in population.agents]
@@ -142,10 +142,10 @@ class Logger:
         self.log_niches["movements"].append(movements)
 
         histories = [agent.history for agent in population.agents]
-        self.log_niches["histories"].append(histories)
+        #self.log_niches["histories"].append(histories)
 
-        if len(population.agents) and "intrinsic_curves" in population.agents[0].genome.genes.keys():
-            self.log_niches["intrinsic_curves"].append([agent.genome.genes["intrinsic_curves"] for agent in population.agents])
+        #if len(population.agents) and "intrinsic_curves" in population.agents[0].genome.genes.keys():
+        #    self.log_niches["intrinsic_curves"].append([agent.genome.genes["intrinsic_curves"] for agent in population.agents])
 
         self.log_niches["construct"].append(construct_values)
         self.log_niches["constructed"].append({(key, el["constructed"]) for key, el in env.niches.items()})

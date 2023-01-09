@@ -274,7 +274,7 @@ if __name__ == "__main__":
     projects = {"F-selection": "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/F",
                 "N-selection": "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/N",
                 "NF-selection": "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/NF"}
-    fig2_multipleselection(projects)
+    #fig2_multipleselection(projects)
 
     results_dir = "../projects/paper/stable/fig2"
     #results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/stable/F"
@@ -294,13 +294,13 @@ if __name__ == "__main__":
     # ---------------------------------------
     # ------ sinusoid climate function -----
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/periodic/F"
-    #fig5_6(label="amplitude")
+    fig5_6(label="amplitude")
 
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/periodic/NF"
-    #fig5_6(label="amplitude")
+    fig5_6(label="amplitude")
 
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/periodic/N"
-    #fig5_6(label="amplitude")
+    fig5_6(label="amplitude")
 
 
     results_dir = "../projects/paper/sin/fig5"

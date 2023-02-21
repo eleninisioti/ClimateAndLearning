@@ -1,0 +1,22 @@
+!!python/object:argparse.Namespace
+amplitude: 2
+capacity: 1000
+climate_mean_init: 2.0
+decay_construct: 0.5
+env_type: stable
+genome_type: evolv
+history_window: 100
+init_mutate: 0.005
+init_num_agents: 500
+init_sigma: 0.5
+mutate_mutate_rate: 0.0005
+noise_std: 0.2
+num_gens: 1500
+num_niches: 1
+num_trials: 1
+only_climate: 0
+period: 0
+project: temp
+selection_type: capacity-fitness
+time_budget: 104400
+trial: 0

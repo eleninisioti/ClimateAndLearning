@@ -52,6 +52,7 @@ def create_jzscript(config):
         fh.writelines("#SBATCH -N 1\n")
         fh.writelines("#SBATCH --ntasks-per-node=10\n")
         scratch_dir = "/scratch/enisioti/climate_log/jz_logs"
+
         fh.writelines("#SBATCH --output=" + scratch_dir + "/%j.out\n")
         fh.writelines("#SBATCH --error=" + scratch_dir + "/%j.err\n")
         #fh.writelines("module load pytorch-gpu/py3/1.7.1\n")
@@ -237,6 +238,8 @@ def niche_construction_stable(mode):
     num_niches = 100
     selection_types = [ "NF", "F", "N"]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
+    climate_mean_init_values = [0.6]
+
 
     for genome_type in genome_types:
 
@@ -268,14 +271,18 @@ def niche_construction_periodic(mode):
              "--period"]
 
     env_type = "sin"
-    num_gens = 500
+    num_gens = 1000
     num_niches = 100
     genome_types = ["niche-construction-v2"]
 
     selection_types = ["NF", "F", "N"]
     climate_mean_init = 0.2
     amplitude_values = [0.2, 1, 4, 8]
+    amplitude_values = [4]
     period_values = [int(num_gens), int(num_gens / 2), int(num_gens / 8), int(num_gens / 16), int(num_gens / 32)]
+    period_values = [int(num_gens)]
+
+
 
     for period in period_values:
         for amplitude in amplitude_values:
@@ -316,6 +323,7 @@ def niche_construction_noisy(mode):
     genome_types = ["niche-construction-v2"]
     climate_mean_init = 2
     noise_std_values = np.arange(0.05, 0.82, 0.1)
+    noise_std_values = [0.2]
 
     for noise_std in noise_std_values:
 

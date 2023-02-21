@@ -39,7 +39,7 @@ class Genome:
             intrinsic_curves = [mu for _ in range(num_intrinsic_curves)]
             self.genes = {"intrinsic_curves": intrinsic_curves, "r": r, "sigma": sigma}
 
-        elif self.type == "niche-construction":
+        elif self.type == "niche-construction" or self.type == "niche-construction-v2":
             sigma = np.abs(normal(0, init_sigma))
             self.genes = {"mean": mu, "sigma": sigma, "r": r, "c": 0}
         else:
@@ -64,7 +64,7 @@ class Genome:
             self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.genes["r"]))
             self.genes["intrinsic_curves"] = [el + normal(0, self.genes["r"])  for el in self.genes["intrinsic_curves"]]
 
-        elif self.type == "niche-construction":
+        elif self.type == "niche-construction" or self.type == "niche-construction-v2":
             # all genes evolve with the same (evolving) mutation rate
             self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
             self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.genes["r"]))

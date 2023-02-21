@@ -238,6 +238,12 @@ class Population:
 
                             niche_constructions[niche_index] = agent.genome.genes["c"] + partners_a[idx].genome.genes["c"] +\
                             partners_b[idx].genome.genes["c"]
+                    elif agent.genome.type == "niche-construction-v2":
+                        if niche_index is not None:
+
+                            niche_constructions[niche_index] = agent.genome.genes["c"]*(agent.genome.genes["mean"]-env.niches[niche_index]["climate"])\
+                                                               + partners_a[idx].genome.genes["c"]*(agent.genome.genes["mean"]-env.niches[niche_index]["climate"])\
+                                                               + partners_b[idx].genome.genes["c"]*(agent.genome.genes["mean"]-env.niches[niche_index]["climate"])
 
                     else:
                         niche_constructions[niche_index] = env.niches[niche_index]["constructed"]

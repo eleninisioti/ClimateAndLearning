@@ -273,7 +273,7 @@ def niche_construction_periodic(mode):
     env_type = "sin"
     num_gens = 1000
     num_niches = 100
-    genome_types = ["niche-construction-v2","evolv" ]
+    genome_types = ["niche-construction" ]
 
     selection_types = ["NF", "F", "N"]
     climate_mean_init = 0.2

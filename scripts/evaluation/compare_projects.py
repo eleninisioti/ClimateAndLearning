@@ -45,7 +45,7 @@ class Plotter:
         # ----- global configuration of plots -----
         params = {'legend.fontsize': 6,
                   "figure.autolayout": True,
-                  'font.size': 8,
+                  'font.size': 6,
                   'pdf.fonttype':42,
                   'ps.fonttype':42}
         plt.rcParams.update(params)
@@ -119,11 +119,40 @@ class Plotter:
                 log = value[0]
                 config = value[2]
 
+                # add mean niche construction
+                constructed = value[1]
+                mean_climate = log.groupby('Generation')["Climate"].mean().tolist()
+                generations = list(set(log["Generation"].tolist()))
+                generations.sort()
+                #generations =generations[0::10]
 
-                sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="Climate", ci=None, label=label)
+
+                constructed_mean = [0 for el in generations]
+                print(generations)
+                for trial_idx, trial in constructed.items():
+                    if "constructed" in trial.keys():
+                        for gen_idx, gen in enumerate(trial["constructed"][0::10]):
+                            print(gen_idx, len(constructed_mean))
+                            constructed_mean[gen_idx] += np.mean([el[1] for el in gen])
+
+                if "constructed" in trial.keys():
+
+                    constructed_mean = [el/len(constructed) for el in constructed_mean]
 
 
-            self.axs[count].set(ylabel="$e_0$")
+                    climate_and_construct = [sum(x) for x in zip(mean_climate, constructed_mean)]
+                else:
+                    climate_and_construct = mean_climate
+
+                log_climate = pd.DataFrame({'Generation': generations,
+                                            "climate_and_construct": climate_and_construct})
+                #sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="Climate", ci=None, label=label)
+                sns.lineplot(ax=self.axs[count], data=log_climate, x="Generation", y="climate_and_construct", ci=None, label=label)
+
+
+            self.axs[count].ticklabel_format(useOffset=False)
+
+            self.axs[count].set(ylabel="$e_0$, \n climate")
             self.axs[count].set(xlabel=None)
             self.axs[count].get_legend().remove()
 
@@ -142,7 +171,7 @@ class Plotter:
 
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="Mean", ci=self.ci, label=label)
 
-            self.axs[count].set(ylabel="$\\bar{\mu}$ ")
+            self.axs[count].set(ylabel="$E(\mu)$, \npreferred state")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
             loc = plticker.LogLocator(base=10.0, numticks=num_yticks)  # this locator puts ticks at regular intervals
@@ -171,7 +200,7 @@ class Plotter:
             if ("construct" in list(log.keys())):
 
                 self.axs[count].set(xlabel="Time (in generations)")
-                self.axs[count].set(ylabel="$c$,")
+                self.axs[count].set(ylabel="$E(c)$, \n mean construction")
             loc = plticker.LinearLocator(numticks=num_yticks)  # this locator puts ticks at regular intervals
             self.axs[count].yaxis.set_major_locator(loc)
             #self.axs[count].set_yscale('log')
@@ -206,7 +235,7 @@ class Plotter:
 
             if ("construct_sigma" in list(log.keys())):
                 self.axs[count].set(xlabel="Time (in generations)")
-                self.axs[count].set(ylabel="$c_{\sigma}$,")
+                self.axs[count].set(ylabel="$Var(c)$, \n construction variance")
             self.axs[count].set_ylim((0, max_construct_sigma))
             loc = plticker.LinearLocator(numticks=num_yticks)  # this locator puts ticks at regular intervals
             self.axs[count].yaxis.set_major_locator(loc)
@@ -229,7 +258,7 @@ class Plotter:
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="SD", ci=self.ci, label=label)
 
 
-            self.axs[count].set(ylabel="$\\bar{\sigma}$")
+            self.axs[count].set(ylabel="$E(sigma)$,\n plasticity")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
             loc = plticker.LogLocator(base=10, numticks=num_yticks)  # this locator puts ticks at regular intervals
@@ -249,7 +278,7 @@ class Plotter:
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="R", ci=self.ci, label=label)
 
 
-            self.axs[count].set(ylabel="$\\bar{r}$")
+            self.axs[count].set(ylabel="$E(r)$,\nevolvability ")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
             loc = plticker.LogLocator(base=10, numticks=num_yticks)  # this locator puts ticks at regular intervals
@@ -292,7 +321,7 @@ class Plotter:
 
 
             self.axs[count].set(xlabel="Time (in generations)")
-            self.axs[count].set(ylabel="$E$")
+            self.axs[count].set(ylabel="$X$,\n extinctions")
             self.axs[count].get_legend().remove()
 
             count += 1
@@ -311,7 +340,7 @@ class Plotter:
 
 
             self.axs[count].set(xlabel="Time (in generations)")
-            self.axs[count].set(ylabel="$K$, ")
+            self.axs[count].set(ylabel="$K$,\n population size ")
             self.axs[count].set_yscale('log')
             self.axs[count].set_ylim((1, 10000000))
             loc = plticker.LogLocator(base=10, numticks=num_yticks)  # this locator puts ticks at regular intervals
@@ -353,7 +382,7 @@ class Plotter:
 
 
             self.axs[count].set(xlabel="Time (in generations)")
-            self.axs[count].set(ylabel="$V$")
+            self.axs[count].set(ylabel="$V$,\n diversity")
             self.axs[count].get_legend().remove()
 
             count += 1
@@ -371,7 +400,7 @@ class Plotter:
 
 
             self.axs[count].set(xlabel="Time (in generations)")
-            self.axs[count].set(ylabel="$D$")
+            self.axs[count].set(ylabel="$D$,\ndispersal")
             self.axs[count].get_legend().remove()
 
             count += 1
@@ -407,7 +436,7 @@ if __name__ == "__main__":
     if parameter == "selection":
         order = ["_F_G", "_N_G", "_NF_G"]
     else:
-        order = ["evolv", "niche_construct"]
+        order = ["evolv", "niche-construction"]
     for o in order:
         for p in projects:
             if o in p:

@@ -273,14 +273,14 @@ def niche_construction_periodic(mode):
     env_type = "sin"
     num_gens = 1000
     num_niches = 100
-    genome_types = ["niche-construction"]
+    genome_types = ["niche-construction-v2","evolv" ]
 
     selection_types = ["NF", "F", "N"]
     climate_mean_init = 0.2
     amplitude_values = [0.2, 1, 4, 8]
     amplitude_values = [4]
     period_values = [int(num_gens), int(num_gens / 2), int(num_gens / 8), int(num_gens / 16), int(num_gens / 32)]
-    period_values = [int(num_gens)]
+    period_values = [int(num_gens/2)]
 
 
 
@@ -420,6 +420,6 @@ if __name__ == "__main__":
         for trial in range(trials):
             #niche_construction_stable(mode)
             niche_construction_periodic(mode)
-            niche_construction_noisy(mode)
+            #niche_construction_noisy(mode)
             #niche_construction_noisy_parametric(mode)
             #manim_fig8(mode)

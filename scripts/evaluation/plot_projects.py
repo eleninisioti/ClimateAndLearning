@@ -77,7 +77,7 @@ class Plotter:
         count = 0
         first_trial = np.min(self.log['Trial'])
         unique_trials = list(set(self.log['Trial']))
-        step = 10
+        step = 1
         if "dispersal" in self.include:
             self.log = compute_dispersal(self.log, self.log_niches, self.num_niches)
 
@@ -100,8 +100,34 @@ class Plotter:
             log_trial["Climate_avg"] = climate_avg
             x = log_trial["Generation"]
             y = log_trial["Climate_avg"]
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=None)
 
+            # add niche construction
+            key = list(self.log_niches.keys())[0]
+            constructed = self.log_niches[key]
+            generations = list(set(self.log["Generation"].tolist()))
+            generations.sort()
+
+            if "constructed" in list(constructed.keys()):
+                constructed=constructed["constructed"]
+                constructed_mean = []
+                for gen in generations:
+                    constructed_mean.append(np.mean([el[1] for el in constructed[gen]]))
+                y = y
+            total = [sum(x) for x in zip(y, constructed_mean)]
+
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=None, label="intrinsic")
+            sns.lineplot(ax=self.axs[count], x=x, y=total, ci=None, label="total")
+
+            #self.axs[count].ticklabel_format(useOffset=False)
+            #self.axs[count].set_ylim(np.log(min(y+total)), np.log(max(y+total)))
+            print(max(constructed_mean), max(y))
+            if max(constructed_mean) > (max(y)+100):
+                t1 = [float(el) for el in np.geomspace(min(y + total), max(y + total), num=5)]
+                print(t1)
+                #self.axs[count].set_yticklabels([float(el) for el in np.geomspace(min(y+total), max(y+total), num=2)])
+                #self.axs[count].set_yticks(np.geomspace(min(y + total), max(y + total), num=2))
+
+                self.axs[count].set_yscale('symlog')
             self.axs[count].set(ylabel="$e_0$")
             self.axs[count].set(xlabel=None)
 
@@ -500,9 +526,9 @@ def run(project, total):
         try:
             log = pickle.load(open(trial_dir + '/log.pickle', 'rb'))
             log_niches = pickle.load(open(trial_dir + '/log_niches.pickle', 'rb'))
-            for key, val in log_niches.items():
-                if key != "inhabited_niches":
-                    log_niches[key] = []
+            #for key, val in log_niches.items():
+                #if key != "constructed" or key != "inhabited_niches":
+                #    log_niches[key] = []
             #log = log.assign(Trial=trial_idx)
 
             trial_idx = find_index(trial_dir)
@@ -524,7 +550,7 @@ def run(project, total):
     if config["only_climate"]:
         include = ["climate"]
     else:
-        include = ["competition", "climate","mutate", "dispersal", "diversity",
+        include = [ "climate","mutate", "dispersal", "diversity",
                    "num_agents",
                    "extinct",]
 
@@ -532,10 +558,10 @@ def run(project, total):
             include.append("sigma")
             include.append("mean")
 
-        if config["genome_type"] == "niche-construction":
+        if config["genome_type"] == "niche-construction" or config["genome_type"] == "niche-construction-v2" :
             include.append("construct")
             include.append("construct_sigma")
-            include.append( "constructed")
+            #include.append( "constructed")
 
     if not log_df.empty:
         if total:
@@ -578,6 +604,8 @@ if __name__ == "__main__":
     total = int(sys.argv[2])  # if 1 only plot average across trials, if 0 only plot independently for each trial
 
     projects = [os.path.join("../projects/", top_dir, o) for o in os.listdir("../projects/" + top_dir)]
+
     for project in projects:
         if "plots" not in project and ".DS" not in project:
+            print(project)
             run(project, total)

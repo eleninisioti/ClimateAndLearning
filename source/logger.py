@@ -46,7 +46,8 @@ class Logger:
                            "histories": [],
                            "construct": [],
                            "pop_niches": [],
-                           "constructed": []}
+                           "constructed": [],
+                           "var_constructed": []}
 
     def log_gen(self, population, env):
         """ Compute metrics characterizing the generation.
@@ -149,6 +150,7 @@ class Logger:
 
         self.log_niches["construct"].append(construct_values)
         self.log_niches["constructed"].append({(key, el["constructed"]) for key, el in env.niches.items()})
+        self.log_niches["var_constructed"].append({(key, el["var_constructed"]) for key, el in env.niches.items()})
 
 
     def final_log(self):

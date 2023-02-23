@@ -43,7 +43,10 @@ class Env:
 
         self.update_niches(self.niche_constructions)
 
-    def update_niches(self, niche_constructions):
+    def update_niches(self, total_niche_constructions):
+        var_niche_constructions = {key: np.var(el) for key, el in total_niche_constructions.items()}
+        niche_constructions = {key: np.sum(el) for key, el in total_niche_constructions.items()}
+
         southest_lat = -int(self.num_niches / 2)
         northest_lat = int(self.num_niches / 2 + 0.5)
         for lat in range(southest_lat, northest_lat):
@@ -65,7 +68,8 @@ class Env:
             self.niches[lat] = {"climate": lat_climate,
                                 "capacity": niche_capacity,
                                 "lat": lat,
-                                "constructed": niche_constructions[lat]}
+                                "constructed": niche_constructions[lat],
+                                "var_constructed": var_niche_constructions[lat]}
 
     def step(self,  niche_constructions):
         """ Move the environment to the next generation. Updates the climate and capacity of niches based on the reference environmental state.

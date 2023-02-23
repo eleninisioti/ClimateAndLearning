@@ -186,9 +186,11 @@ class Population:
                 partners_a = random.choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
                 partners_b = random.choices(agents_reproduce, weights=weights, k=len(agents_reproduce))
                 for idx, agent in enumerate(agents_reproduce):
-                    agent_genome = Genome(genome_type=self.genome_type, env_mean=self.env_mean,
+                    agent_genome = Genome(genome_type=self.genome_type,
+                                          env_mean=self.env_mean,
                                           init_sigma=self.init_sigma,
-                                          init_mutate=self.init_mutate, mutate_mutate_rate=self.mutate_mutate_rate)
+                                          init_mutate=self.init_mutate,
+                                          mutate_mutate_rate=self.mutate_mutate_rate)
 
                     # first child
                     agent_genome.cross([agent.genome, partners_a[idx].genome])
@@ -235,16 +237,28 @@ class Population:
                     if agent.genome.type == "niche-construction":
                         #print("updating niche with index", niche_index)
                         if niche_index is not None:
+                            new_construction = agent.genome.genes["c"] + partners_a[idx].genome.genes["c"] + \
+                                               partners_b[idx].genome.genes["c"]
 
-                            niche_constructions[niche_index] = agent.genome.genes["c"] + partners_a[idx].genome.genes["c"] +\
-                            partners_b[idx].genome.genes["c"]
+                            if niche_index in niche_constructions.keys():
+
+                                niche_constructions[niche_index].append(new_construction)
+                            else:
+                                niche_constructions[niche_index] = [new_construction]
+
+                            #niche_constructions[niche_index] = agent.genome.genes["c"] + partners_a[idx].genome.genes["c"] +\
+                            #partners_b[idx].genome.genes["c"]
                     elif agent.genome.type == "niche-construction-v2":
                         if niche_index is not None:
-
-                            niche_constructions[niche_index] = agent.genome.genes["c"]*(agent.genome.genes["mean"]-env.niches[niche_index]["climate"])\
+                            new_construction = agent.genome.genes["c"]*(agent.genome.genes["mean"]-env.niches[niche_index]["climate"])\
                                                                + partners_a[idx].genome.genes["c"]*(agent.genome.genes["mean"]-env.niches[niche_index]["climate"])\
                                                                + partners_b[idx].genome.genes["c"]*(agent.genome.genes["mean"]-env.niches[niche_index]["climate"])
 
+                            if niche_index in niche_constructions.keys():
+
+                                niche_constructions[niche_index].append(new_construction)
+                            else:
+                                niche_constructions[niche_index] = [new_construction]
                     else:
                         niche_constructions[niche_index] = env.niches[niche_index]["constructed"]
 

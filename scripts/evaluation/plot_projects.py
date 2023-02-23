@@ -154,6 +154,10 @@ class Plotter:
 
             self.axs[count].set(ylabel="$c$, construct ")
             self.axs[count].set(xlabel=None)
+            self.axs[count].set_ylim(np.log(0.0000001),np.log(100000))
+
+            self.axs[count].set_yscale('symlog')
+
 
             count += 1
         # -----------------------------------
@@ -350,147 +354,22 @@ class Plotter:
         return self.log
 
 
-def plot_intrinsic_old(climate, log, save_dir):
+    def plot_heatmap(self, log, save_dir):
+        constructed = []
+        trial = list(log.keys())[0]
+        log = log[trial]
+        for gen_idx, gen in enumerate(log["constructed"]):
+            constructed.append([el[1] for el in gen])
+        constructed_array = np.array(constructed).transpose()
+        constructed_array = pd.DataFrame(constructed_array)
+        plt.figure(figsize=self.fig_size)
+        sns.heatmap(constructed_array,vmin=0, vmax=10,  cmap='Blues')
+        plt.xlabel("Generations")
+        plt.ylabel("Niche index")
+        #plt.colorbar()
 
-    curves = log["intrinsic_curves"]
-    means = []
-    sigmas = []
-    modes = []
-    if not os.path.exists(save_dir + "/plots/histograms"):
-        os.makedirs(save_dir + "/plots/histograms")
-
-    for gen, gen_curves in enumerate(curves):
-        gen_mean = 0
-        gen_sigma= 0
-        gen_modes = 0
-        print("gneeration", gen, "number of agents", len(gen_curves))
-        for agent, agent_curves in enumerate(gen_curves):
-            n, bins, x = plt.hist(agent_curves)
-            mean_histogram =np.mean(n)
-            gen_modes += len([el for  el in n if el > mean_histogram/2])
-            gen_mean += np.mean(agent_curves)
-            gen_sigma += np.var(agent_curves)
-            if agent%50==0:
-                plt.savefig(save_dir + "/plots/histograms/intrinsic_gen_" + str(gen) + "_agent_"+ str(agent) +".png")
-
-            plt.clf()
-
-        means.append(gen_mean/len(gen_curves))
-        sigmas.append(gen_sigma / len(gen_curves))
-        modes.append(gen_modes/len(gen_curves))
-
-
-    climate = climate[:len(means)]
-
-    fig, axs = plt.subplots(4, sharex=True)
-    axs[0].plot(range(len(climate)), climate)
-    axs[0].set(ylabel="Climate, $e$")
-    axs[1].plot(range(len(climate)), means)
-    axs[1].set(ylabel="Mean of $i$")
-    axs[2].plot(range(len(climate)), sigmas)
-    axs[2].set(ylabel="Var of $i$")
-    axs[3].plot(range(len(climate)), modes)
-    axs[3].set(ylabel="Modes of $i$")
-    axs[3].set(xlabel="Generation, $g$")
-
-    plt.savefig(save_dir + "/plots/intrinsic.pdf")
-    plt.savefig(save_dir + "/plots/intrinsic.png")
-
-
-def plot_intrinsic(climate, log, save_dir):
-
-
-    # ----- plot evolution of tolerance curves ------
-
-
-    curves = log["intrinsic_curves"]
-
-    total_data = []
-    agents_data = {}
-
-    min_climate_axis = int(np.floor(min(climate))) -1
-    max_climate_axis = int(np.ceil(min(climate))) +1
-
-    climate_axis = np.arange(min_climate_axis, max_climate_axis, (max_climate_axis-min_climate_axis)/20)
-    climate_axis = np.asarray([np.round(el, 2) for el in climate_axis])
-
-    for gen, gen_curves in enumerate(curves):
-        print("gen is", gen)
-
-        total_gen_curves = [0]*20
-        for agent, agent_curves in enumerate(gen_curves):
-            if agent%10 == 0:
-                print("agentn is", gen)
-                agent_transform = [0]*20
-
-                for el in agent_curves:
-                    i = (np.abs(climate_axis - el)).argmin()
-                    total_gen_curves[i] += 1
-                    agent_transform[i] += 1
-
-                #total_gen_curves = [el + agent_curves[idx] for idx, el in enumerate(total_gen_curves)]
-
-                if agent in agents_data.keys():
-                    agents_data[agent].append(agent_transform)
-                else:
-                    agents_data[agent] = [agent_transform]
-
-        total_data.append(total_gen_curves)
-
-    sns.heatmap(np.transpose(np.array(total_data)), yticklabels=climate_axis)
-    plt.xlabel("Generation")
-    plt.ylabel("TC mean")
-    plt.savefig(save_dir + "/plots/total_heatmap.pdf")
-    plt.savefig(save_dir + "/plots/total_heatmap.png")
-    plt.clf()
-
-    for agent, agent_data in agents_data.items():
-        agent_array = np.transpose(np.array(agent_data))
-        sns.heatmap(agent_array, yticklabels=climate_axis)
-        plt.xlabel("Generation")
-        plt.ylabel("TC mean")
-        plt.savefig(save_dir + "/plots/heatmap_" + str(agent) + ".pdf")
-        plt.savefig(save_dir + "/plots/heatmap_" + str(agent) + ".png")
+        plt.savefig(save_dir + "/plots/heatmap_trial_" + str(trial))
         plt.clf()
-
-    # -------------------------------
-    # ----- plot evolution of disagreement ------
-    histories = log["histories"]
-    curves = log["intrinsic_curves"]
-    total_stats = []
-    total_p_values = []
-    for gen, gen_curves in enumerate(curves):
-        gen_histories = histories[gen]
-        gen_stats = 0
-        gen_p_values = 0
-
-        for agent, agent_curves in enumerate(gen_curves):
-            agent_histories = gen_histories[agent]
-            if len(agent_histories):
-                statistic, p_value= stats.ks_2samp(agent_histories, agent_curves)
-                #plt.hist(agent_histories)
-                #plt.hist(agent_curves)
-                #plt.show()
-                #plt.clf()
-                gen_stats += statistic
-                gen_p_values += p_value
-        total_stats.append(gen_stats/(len(gen_curves)-1))
-        total_p_values.append(gen_p_values/(len(gen_curves)-1))
-
-    plt.plot(range(len(curves)), total_stats)
-    plt.xlabel("Generation, $g$")
-    plt.ylabel("p-value, $p$")
-    plt.savefig(save_dir + "/plots/stats.pdf")
-    plt.savefig(save_dir + "/plots/stats.png")
-    plt.clf()
-
-    plt.plot(range(len(curves)), total_p_values)
-    plt.savefig(save_dir + "/plots/p_values.pdf")
-    plt.savefig(save_dir + "/plots/p_values.png")
-    plt.clf()
-
-
-
 
 
 
@@ -592,6 +471,8 @@ def run(project, total):
                                           log_niches=log_niches_trial,
                                           include=include)
                         log = plotter.plot_evolution(save_name="trial_" + str(trial))
+
+                    plotter.plot_heatmap(log_niches_trial, project)
 
 
 

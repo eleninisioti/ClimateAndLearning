@@ -182,6 +182,36 @@ class Plotter:
             count += 1
             print("plotted mean")
 
+        # ----- plot average preferred niche -----
+        if ("constructed" in self.include) :
+            for key, value in results.items():
+                label = key
+                log = value[0]
+                log_niches = value[1]
+                config = value[2]
+                print("keys for contstruct", list(log.keys()))
+                if ("constructed" in list(log.keys())):
+                    x = log["Generation"]
+                    y = log["constructed"]
+
+                    sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="constructed", ci=self.ci, label=label)
+
+            if ("constructed" in list(log.keys())):
+
+                self.axs[count].set(xlabel="Time (in generations)")
+                self.axs[count].set(ylabel="$C$, \n constructed")
+            loc = plticker.LinearLocator(numticks=num_yticks)  # this locator puts ticks at regular intervals
+            self.axs[count].yaxis.set_major_locator(loc)
+            #self.axs[count].set_yscale('log')
+            #self.axs[count].set(ylim=(math.pow(10,-10), math.pow(10,5)))
+
+
+
+            self.axs[count].get_legend().remove()
+
+            count +=1
+            print("plotted construct")
+
         # ----------------------------------------
         # ----- plot average preferred niche -----
         if ("construct" in self.include) :
@@ -236,7 +266,7 @@ class Plotter:
             if ("construct_sigma" in list(log.keys())):
                 self.axs[count].set(xlabel="Time (in generations)")
                 self.axs[count].set(ylabel="$Var(c)$, \n construction variance")
-            self.axs[count].set_ylim((0, max_construct_sigma))
+            #self.axs[count].set_ylim((0, max_construct_sigma))
             loc = plticker.LinearLocator(numticks=num_yticks)  # this locator puts ticks at regular intervals
             self.axs[count].yaxis.set_major_locator(loc)
             self.axs[count].get_legend().remove()
@@ -367,7 +397,36 @@ class Plotter:
             self.axs[count].set(ylabel="competition")
             self.axs[count].get_legend().remove()
             count +=1
-        # --------------------------
+        # # --------------------------
+        # if "niche_coordination" in self.include:
+        #     for key, value in results.items():
+        #         label = key
+        #         log = value[0]
+        #         log_niches = value[1]
+        #
+        #         for trial_idx, trial in log_niches.items():
+        #             if "constructed" in trial.keys():
+        #                 for gen_idx, gen in enumerate(trial["constructed"][0::10]):
+        #                     print(gen_idx, len(constructed_mean))
+        #                     for niche_index, niche_constructed in gen.items():
+        #
+        #
+        #
+        #                     constructed_mean[gen_idx] += np.mean([el[1] for el in gen])
+        #
+        #
+        #
+        #         config = value[2]
+        #         x = log["Generation"]
+        #         y = log["diversity"]
+        #
+        #         sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="diversity", ci=self.ci, label=label)
+        #
+        #     self.axs[count].set(xlabel="Time (in generations)")
+        #     self.axs[count].set(ylabel="$V$,\n diversity")
+        #     self.axs[count].get_legend().remove()
+        #
+        #     count += 1
         # ----- plot genomic diversity -----
         if "diversity" in self.include:
             for key, value in results.items():
@@ -477,7 +536,7 @@ if __name__ == "__main__":
     if config["only_climate"]:
         include = ["climate"]
     else:
-        include = ["climate","mutate",  "num_agents", "dispersal"]
+        include = ["climate","mutate",  "num_agents", "dispersal", "diversity"]
 
 
         if config["genome_type"] != "intrinsic":
@@ -489,6 +548,9 @@ if __name__ == "__main__":
             include.append("construct")
             include.append("construct_sigma")
             #include.append( "constructed")
+        include.append("construct")
+        include.append("construct_sigma")
+        include.append("constructed")
 
     print("plotting")
     plotter = Plotter(project=results_dir,

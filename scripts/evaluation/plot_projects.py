@@ -17,6 +17,7 @@ from utils import compute_dispersal, find_index
 import numpy as np
 import pandas as pd
 from scipy import stats
+from matplotlib.colors import LogNorm, Normalize
 
 class Plotter:
 
@@ -116,7 +117,7 @@ class Plotter:
             total = [sum(x) for x in zip(y, constructed_mean)]
 
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=None, label="intrinsic")
-            #sns.lineplot(ax=self.axs[count], x=x, y=total, ci=None, label="total")
+            sns.lineplot(ax=self.axs[count], x=x, y=total, ci=None, label="total")
 
             #self.axs[count].ticklabel_format(useOffset=False)
             #self.axs[count].set_ylim(np.log(min(y+total)), np.log(max(y+total)))
@@ -154,9 +155,9 @@ class Plotter:
 
             self.axs[count].set(ylabel="$c$, construct ")
             self.axs[count].set(xlabel=None)
-            self.axs[count].set_ylim(np.log(0.0000001),np.log(100000))
+            #self.axs[count].set_ylim(np.log(0.0000001),np.log(100000))
 
-            self.axs[count].set_yscale('symlog')
+            #self.axs[count].set_yscale('symlog')
 
 
             count += 1
@@ -181,6 +182,19 @@ class Plotter:
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
 
             self.axs[count].set(ylabel="$C_{total}$,\n World construction ")
+            self.axs[count].set(xlabel=None)
+            #self.axs[count].set_yscale('log')
+
+
+            count += 1
+
+        if "var_constructed" in self.include:
+            x = self.log["Generation"]
+            y = self.log["var_constructed"]
+
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+
+            self.axs[count].set(ylabel="$c_{coord}$,\n Coordination in NC ")
             self.axs[count].set(xlabel=None)
             #self.axs[count].set_yscale('log')
 
@@ -373,7 +387,26 @@ class Plotter:
         plt.ylabel("Niche index")
         #plt.colorbar()
 
-        plt.savefig(save_dir + "/plots/heatmap_trial_" + str(trial))
+        plt.savefig(save_dir + "/plots/meanconstructed_trial_" + str(trial))
+        plt.clf()
+
+        constructed = []
+        for gen_idx, gen in enumerate(log["var_constructed"]):
+            new_constructed = [el[1] for el in gen]
+            if len(new_constructed) > 100:
+                new_constructed = new_constructed[:100]
+            elif len(new_constructed) < 100:
+                new_constructed = new_constructed + [0 for el in range(100 - len(new_constructed) + 1)]
+            constructed.append(new_constructed)
+        constructed_array = np.array(constructed).transpose()
+        constructed_array = pd.DataFrame(constructed_array)
+        plt.figure(figsize=self.fig_size)
+        sns.heatmap(constructed_array, vmin=0, cmap='Reds',norm=LogNorm())
+        plt.xlabel("Generations")
+        plt.ylabel("Niche index")
+        # plt.colorbar()
+
+        plt.savefig(save_dir + "/plots/varconstructed_trial_" + str(trial))
         plt.clf()
 
 
@@ -446,6 +479,7 @@ def run(project, total):
         if config["genome_type"] == "niche-construction" or config["genome_type"] == "niche-construction-v2" :
             include.append("construct")
             include.append("construct_sigma")
+            include.append("var_constructed")
             #include.append( "constructed")
 
     if not log_df.empty:
@@ -470,6 +504,10 @@ def run(project, total):
                 print(trial_dir, list(log_niches_total.keys()))
                 if trial in list(log_niches_total.keys()):
                     log_niches_trial[trial] = log_niches_total[trial]
+                    var_constructed = []
+                    for gen in log_niches_trial[trial]["var_constructed"]:
+                        var_constructed.append(np.mean([el[1] for el in gen]))
+                    log_trial["var_constructed"] = var_constructed
                     if not log_trial.empty:
                         plotter = Plotter(project=project,
                                           num_niches=config["num_niches"],

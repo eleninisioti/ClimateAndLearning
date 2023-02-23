@@ -212,6 +212,31 @@ class Plotter:
             count +=1
             print("plotted construct")
 
+        if ("var_constructed" in self.include):
+            for key, value in results.items():
+                label = key
+                log = value[0]
+                log_niches = value[1]
+                config = value[2]
+                if ("var_constructed" in list(log.keys())):
+                    x = log["Generation"]
+                    y = log["var_constructed"]
+
+                    sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="var_constructed", ci=self.ci, label=label)
+
+            if ("var_constructed" in list(log.keys())):
+                self.axs[count].set(xlabel="Time (in generations)")
+                self.axs[count].set(ylabel="$c_{coord}$,\n Coordination in NC ")
+            loc = plticker.LinearLocator(numticks=num_yticks)  # this locator puts ticks at regular intervals
+            self.axs[count].yaxis.set_major_locator(loc)
+            # self.axs[count].set_yscale('log')
+            # self.axs[count].set(ylim=(math.pow(10,-10), math.pow(10,5)))
+
+            self.axs[count].get_legend().remove()
+
+            count += 1
+            print("plotted construct")
+
         # ----------------------------------------
         # ----- plot average preferred niche -----
         if ("construct" in self.include) :
@@ -507,12 +532,26 @@ if __name__ == "__main__":
             trial_dirs = list(next(os.walk(p + "/trials"))[1])
             log_niches_total = {}
             log_df = pd.DataFrame()
+            skip_lines = 1
+            with open(p + "/config.yml") as f:
+                for i in range(skip_lines):
+                    _ = f.readline()
+                config = yaml.safe_load(f)
             for trial_idx, trial_dir in enumerate(trial_dirs):
                 try:
                     log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
                     log_niches = pickle.load(open(p + "/trials/" + trial_dir + '/log_niches.pickle', 'rb'))
                     trial = trial_dir.find("trial_")
                     #trial = int(trial_dir[(trial + 6):])
+
+                    if "var_constructed" in log_niches.keys():
+
+                        var_constructed = []
+                        for gen in log_niches["var_constructed"]:
+                            var_constructed.append(np.mean([el[1] for el in gen]))
+                    else:
+                        var_constructed = [0 for el in range(config["num_gens"])]
+                    log["var_constructed"] = var_constructed
 
                     if log_df.empty:
                         log_df = log
@@ -521,7 +560,7 @@ if __name__ == "__main__":
                     log_niches_total[trial_idx] = log_niches
 
                 except (IOError,EOFError) as e  :
-                    print("No log file for project. ", trial_dir)
+                    print("No log file for project. ", p)
 
             skip_lines = 1
             with open(p + "/config.yml") as f:
@@ -551,6 +590,8 @@ if __name__ == "__main__":
         include.append("construct")
         include.append("construct_sigma")
         include.append("constructed")
+        include.append("var_constructed")
+
 
     print("plotting")
     plotter = Plotter(project=results_dir,

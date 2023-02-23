@@ -69,7 +69,9 @@ class Genome:
             # all genes evolve with the same (evolving) mutation rate
             self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
             self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.genes["r"]))
-            self.genes["c"] = np.min([self.genes["c"] + normal(0, 0.0001), self.max_c])
+            #self.genes["c"] = np.min([self.genes["c"] + normal(0, 0.0001), self.max_c])
+            self.genes["c"] = np.min([self.genes["c"] + normal(0, 0.0003), self.max_c])
+
             self.genes["sigma"] = np.abs(self.genes["sigma"] + normal(0, self.genes["r"]))
 
 

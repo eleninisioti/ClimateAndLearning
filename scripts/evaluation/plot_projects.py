@@ -364,7 +364,6 @@ class Plotter:
                 new_constructed = new_constructed[:100]
             elif len(new_constructed) < 100:
                 new_constructed = new_constructed + [0 for el in range(100-len(new_constructed)+1)]
-            print(len(new_constructed))
             constructed.append(new_constructed)
         constructed_array = np.array(constructed).transpose()
         constructed_array = pd.DataFrame(constructed_array)

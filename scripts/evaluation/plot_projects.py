@@ -116,18 +116,18 @@ class Plotter:
             total = [sum(x) for x in zip(y, constructed_mean)]
 
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=None, label="intrinsic")
-            sns.lineplot(ax=self.axs[count], x=x, y=total, ci=None, label="total")
+            #sns.lineplot(ax=self.axs[count], x=x, y=total, ci=None, label="total")
 
             #self.axs[count].ticklabel_format(useOffset=False)
             #self.axs[count].set_ylim(np.log(min(y+total)), np.log(max(y+total)))
-            print(max(constructed_mean), max(y))
-            if max(constructed_mean) > (max(y)+100):
-                t1 = [float(el) for el in np.geomspace(min(y + total), max(y + total), num=5)]
-                print(t1)
-                #self.axs[count].set_yticklabels([float(el) for el in np.geomspace(min(y+total), max(y+total), num=2)])
-                #self.axs[count].set_yticks(np.geomspace(min(y + total), max(y + total), num=2))
-
-                self.axs[count].set_yscale('symlog')
+            #print(max(constructed_mean), max(y))
+            #if max(constructed_mean) > (max(y)+100):
+            #    t1 = [float(el) for el in np.geomspace(min(y + total), max(y + total), num=5)]
+            #     print(t1)
+            #     #self.axs[count].set_yticklabels([float(el) for el in np.geomspace(min(y+total), max(y+total), num=2)])
+            #     #self.axs[count].set_yticks(np.geomspace(min(y + total), max(y + total), num=2))
+            #
+            #     self.axs[count].set_yscale('symlog')
             self.axs[count].set(ylabel="$e_0$")
             self.axs[count].set(xlabel=None)
 
@@ -359,11 +359,17 @@ class Plotter:
         trial = list(log.keys())[0]
         log = log[trial]
         for gen_idx, gen in enumerate(log["constructed"]):
-            constructed.append([el[1] for el in gen])
+            new_constructed= [el[1] for el in gen]
+            if len(new_constructed)>100:
+                new_constructed = new_constructed[:100]
+            elif len(new_constructed) < 100:
+                new_constructed = new_constructed + [0 for el in range(100-len(new_constructed)+1)]
+            print(len(new_constructed))
+            constructed.append(new_constructed)
         constructed_array = np.array(constructed).transpose()
         constructed_array = pd.DataFrame(constructed_array)
         plt.figure(figsize=self.fig_size)
-        sns.heatmap(constructed_array,vmin=0, vmax=10,  cmap='Blues')
+        sns.heatmap(constructed_array,vmin=0,  cmap='Blues')
         plt.xlabel("Generations")
         plt.ylabel("Niche index")
         #plt.colorbar()
@@ -398,31 +404,32 @@ def run(project, total):
         for i in range(skip_lines):
             _ = f.readline()
         config = yaml.safe_load(f)
+    if "niche" in config["genome_type"]:
 
-    for trial_idx, trial_dir in enumerate(trial_dirs):
-        print(trial_dir)
+        for trial_idx, trial_dir in enumerate(trial_dirs):
+            print(trial_dir)
 
-        try:
-            log = pickle.load(open(trial_dir + '/log.pickle', 'rb'))
-            log_niches = pickle.load(open(trial_dir + '/log_niches.pickle', 'rb'))
-            #for key, val in log_niches.items():
-                #if key != "constructed" or key != "inhabited_niches":
-                #    log_niches[key] = []
-            #log = log.assign(Trial=trial_idx)
+            try:
+                log = pickle.load(open(trial_dir + '/log.pickle', 'rb'))
+                log_niches = pickle.load(open(trial_dir + '/log_niches.pickle', 'rb'))
+                #for key, val in log_niches.items():
+                    #if key != "constructed" or key != "inhabited_niches":
+                    #    log_niches[key] = []
+                #log = log.assign(Trial=trial_idx)
 
-            trial_idx = find_index(trial_dir)
-            if log_df.empty:
-                log_df = log
-            else:
-                log_df = log_df.append(log)
-            log_niches_total[trial_idx] = log_niches
+                trial_idx = find_index(trial_dir)
+                if log_df.empty:
+                    log_df = log
+                else:
+                    log_df = log_df.append(log)
+                log_niches_total[trial_idx] = log_niches
 
-            # plot intrinsic motivaation
-            if config["genome_type"] == "intrinsic":
-                plot_intrinsic(log["Climate"].tolist(), log_niches, trial_dir)
+                # plot intrinsic motivaation
+                if config["genome_type"] == "intrinsic":
+                    plot_intrinsic(log["Climate"].tolist(), log_niches, trial_dir)
 
-        except (IOError, EOFError) as e:
-            print("No log file for trial: ", trial_dir)
+            except (IOError, EOFError) as e:
+                print("No log file for trial: ", trial_dir)
 
 
     # choose which evaluation metrics to plot

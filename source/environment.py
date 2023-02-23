@@ -56,6 +56,7 @@ class Env:
                 #lat_climate = min([lat_climate, self.max_climate + np.random.uniform(0,1)])
             else:
                 niche_constructions[lat] = 0
+                var_niche_constructions[lat] = 0
             niche_constructions[lat] = niche_constructions[lat]*self.decay_construct
 
 

@@ -234,10 +234,10 @@ def niche_construction_stable(mode):
              "--climate_mean_init"]
 
     env_type = "stable"
-    num_gens = 1000
+    num_gens = 5000
     genome_types = ["niche-construction"]
     num_niches = 100
-    selection_types = [ "NF"]
+    selection_types = [ "NF", "F", "N"]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
     climate_mean_init_values = [0.6]
 

@@ -378,16 +378,30 @@ class Plotter:
                 new_constructed = new_constructed[:100]
             elif len(new_constructed) < 100:
                 new_constructed = new_constructed + [0 for el in range(100-len(new_constructed)+1)]
+            print(new_constructed.index(max(new_constructed)))
+            print(max(new_constructed))
+            if max(new_constructed) > 0.01:
+                print('here', gen_idx)
+
             constructed.append(new_constructed)
         constructed_array = np.array(constructed).transpose()
         constructed_array = pd.DataFrame(constructed_array)
         plt.figure(figsize=self.fig_size)
-        sns.heatmap(constructed_array,vmin=0,  cmap='Blues')
+        sns.heatmap(constructed_array, vmin=0, cmap='Blues')
         plt.xlabel("Generations")
         plt.ylabel("Niche index")
         #plt.colorbar()
 
-        plt.savefig(save_dir + "/plots/meanconstructed_trial_" + str(trial))
+        plt.savefig(save_dir + "/plots/mean_positive_trial_" + str(trial))
+        plt.clf()
+
+
+        sns.heatmap(constructed_array, vmax=0, cmap='Blues')
+        plt.xlabel("Generations")
+        plt.ylabel("Niche index")
+        #plt.colorbar()
+
+        plt.savefig(save_dir + "/plots/mean_negative_trial_" + str(trial))
         plt.clf()
 
         constructed = []

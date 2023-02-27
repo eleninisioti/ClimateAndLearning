@@ -43,7 +43,7 @@ def create_jzscript(config):
     elif config["--env_type"] == "noisy":
         climate_string = "_noise_" + str(config["--noise_std"])
 
-    script_path = scripts_dir + "/climate_" + config["--env_type"] + "_N_" + str(config["--num_niches"]) + "_select_"  + config["--selection_type"] +\
+    script_path = scripts_dir + "/climate_" + config["--env_type"]  +  "_stopNC_" + str(config["--stop_NC_every"])+ "_N_" + str(config["--num_niches"]) + "_select_"  + config["--selection_type"] +\
                   "_genome_" + config["--genome_type"] + climate_string + "_trial_" + str(config["--trial"])   +".sh"
     with open(script_path, "w") as fh:
         fh.writelines("#!/bin/bash\n")

@@ -320,7 +320,7 @@ def niche_construction_noisy(mode):
     num_gens = 500
     genome_type = "evolv"
     num_niches = 100
-    selection_types = ["NF", "F"]
+    selection_types = ["NF"]
     genome_types = ["niche-construction"]
     climate_mean_init = 2
     noise_std_values = np.arange(0.05, 0.82, 0.1)
@@ -418,7 +418,7 @@ if __name__ == "__main__":
         trials = int(sys.argv[1])  # number of independent trials
         mode = sys.argv[2]
 
-        for trial in range(trials):
+        for trial in range(5, trials):
             #niche_construction_stable(mode)
             #niche_construction_periodic(mode)
             niche_construction_noisy(mode)

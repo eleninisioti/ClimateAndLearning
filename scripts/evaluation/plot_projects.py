@@ -415,7 +415,7 @@ class Plotter:
         constructed_array = np.array(constructed).transpose()
         constructed_array = pd.DataFrame(constructed_array)
         plt.figure(figsize=self.fig_size)
-        sns.heatmap(constructed_array, vmin=0, cmap='Reds',norm=LogNorm())
+        sns.heatmap(constructed_array, vmin=0, cmap='Reds')
         plt.xlabel("Generations")
         plt.ylabel("Niche index")
         # plt.colorbar()

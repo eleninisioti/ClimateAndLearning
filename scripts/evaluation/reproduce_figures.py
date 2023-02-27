@@ -294,13 +294,13 @@ if __name__ == "__main__":
     # ---------------------------------------
     # ------ sinusoid climate function -----
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/4_1_2023/periodic/F"
-    fig5_6(label="amplitude")
+    #fig5_6(label="amplitude")
 
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/4_1_2023/periodic/NF"
-    fig5_6(label="amplitude")
+    #fig5_6(label="amplitude")
 
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/4_1_2023/periodic/N"
-    fig5_6(label="amplitude")
+    #fig5_6(label="amplitude")
 
 
     results_dir = "../projects/paper/sin/fig5"
@@ -324,8 +324,8 @@ if __name__ == "__main__":
     # ------ noisy climate function -----
     results_dir = "../projects/paper/noisy/fig9"
     results_dir = "/scratch/enisioti/climate_log/projects/niche_construction/30_12_2022/noisy"
-
-    #fig9(label="selection")
+    results_dir = "../projects/report/26_2_2023/noisy/F"
+    fig9(label="selection")
 
     results_dir = "../projects/paper/noisy/fig10"
     include = ["climate", "mean",

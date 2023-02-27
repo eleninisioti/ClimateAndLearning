@@ -60,7 +60,7 @@ def load_results(results_dir, variable, labels):
                 num_agents = list(log["num_agents"])
                 if len(num_agents):
                     num_agents = num_agents[-1]
-                    if num_agents > 50:
+                    if num_agents > 1:
                         trial_variable = 1
                     else:
                         trial_variable = 0

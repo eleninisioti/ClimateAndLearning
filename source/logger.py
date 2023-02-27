@@ -152,7 +152,7 @@ class Logger:
         self.log_niches["constructed"].append({(key, el["constructed"]) for key, el in env.niches.items()})
         self.log_niches["var_constructed"].append({(key, el["var_constructed"]) for key, el in env.niches.items()})
 
-
+    
     def final_log(self):
         """ Prepare log for final saving.
         """

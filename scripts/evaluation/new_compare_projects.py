@@ -582,6 +582,7 @@ def run(top_dir):
             save_dir = "../projects/" + top_dir + "/plots"
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
+            print(save_dir + "/evolution_" + save_name + ".png")
             plt.savefig(save_dir + "/evolution_" + save_name + ".pdf", dpi=300)
             plt.savefig(save_dir + "/evolution_" + save_name + ".png", dpi=300)
 

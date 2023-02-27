@@ -379,9 +379,9 @@ class Plotter:
                 new_constructed = new_constructed[:100]
             elif len(new_constructed) < 100:
                 new_constructed = new_constructed + [0 for el in range(100-len(new_constructed)+1)]
-            print(new_constructed.index(max(new_constructed)))
-            print(max(new_constructed))
-            if max(new_constructed) > 0.01:
+            print(new_constructed.index(min(new_constructed)))
+            print(min(new_constructed))
+            if min(new_constructed) < (-1):
                 print('here', gen_idx)
 
             constructed.append(new_constructed)

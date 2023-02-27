@@ -231,7 +231,8 @@ def niche_construction_stable(mode):
              "--selection_type",
              "--genome_type",
              "--num_niches",
-             "--climate_mean_init"]
+             "--climate_mean_init",
+             "--stop_NC_every"]
 
     env_type = "stable"
     num_gens = 2000
@@ -240,6 +241,7 @@ def niche_construction_stable(mode):
     selection_types = [ "NF", "F"]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
     climate_mean_init_values = [0.6]
+    stop_NC_every = 0
 
     for num_niches in num_niches_values:
 
@@ -250,7 +252,7 @@ def niche_construction_stable(mode):
 
                     project = top_dir + "S_" + S + "_G_" + genome_type + "_N_" + \
                               str(num_niches) + "_climate_" + str(climate_mean_init)
-                    values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init]
+                    values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init, stop_NC_every]
                     config = dict(zip(flags, values))
                     if mode == "local":
                         exec_command(config)

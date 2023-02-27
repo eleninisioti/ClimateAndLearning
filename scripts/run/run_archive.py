@@ -418,7 +418,7 @@ if __name__ == "__main__":
         trials = int(sys.argv[1])  # number of independent trials
         mode = sys.argv[2]
 
-        for trial in range(5, trials):
+        for trial in range(5, trials +5):
             #niche_construction_stable(mode)
             #niche_construction_periodic(mode)
             niche_construction_noisy(mode)

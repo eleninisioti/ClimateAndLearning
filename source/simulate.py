@@ -178,12 +178,12 @@ def init_parser():
     parser.add_argument('--stop_NC_every',
                         help='Stop niche construction every.',
                         type=int,
-                        default=500)
+                        default=0)
 
     parser.add_argument('--stop_NC_for',
                         help='Stop niche construction every.',
                         type=int,
-                        default=200)
+                        default=0)
 
     args = parser.parse_args()
     return args

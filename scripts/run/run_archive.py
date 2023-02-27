@@ -235,8 +235,8 @@ def niche_construction_stable(mode):
 
     env_type = "stable"
     num_gens = 2000
-    genome_types = ["niche-construction"]
-    num_niches_values = [1, 20, 50]
+    genome_types = ["niche-construction", "evolv"]
+    num_niches_values = [1, 20, 50, 100]
     selection_types = [ "NF", "F"]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
     climate_mean_init_values = [0.6]
@@ -251,6 +251,48 @@ def niche_construction_stable(mode):
                     project = top_dir + "S_" + S + "_G_" + genome_type + "_N_" + \
                               str(num_niches) + "_climate_" + str(climate_mean_init)
                     values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init]
+                    config = dict(zip(flags, values))
+                    if mode == "local":
+                        exec_command(config)
+                    elif mode == "server":
+                        create_jzscript(config)
+
+
+def niche_construction_stable_control(mode):
+    top_dir = setup_dir(project="niche_construction", mode=mode) + "/stable_control/"
+
+    flags = ["--project",
+             "--env_type",
+             "--num_gens",
+             "--trial",
+             "--selection_type",
+             "--genome_type",
+             "--num_niches",
+             "--climate_mean_init",
+             "--stop_NC_every",
+             "--stop_NC_for"]
+
+    env_type = "stable"
+    num_gens = 2000
+    genome_types = ["niche-construction"]
+    num_niches_values = [1, 20, 50]
+    selection_types = [ "NF", "F"]
+    climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
+    climate_mean_init_values = [0.6]
+    stop_NC_every = 500
+    stop_NC_for = 200
+
+    for num_niches in num_niches_values:
+
+        for genome_type in genome_types:
+
+            for climate_mean_init in climate_mean_init_values:
+                for S in selection_types:
+
+                    project = top_dir + "S_" + S + "_G_" + genome_type + "_N_" + \
+                              str(num_niches) + "_climate_" + str(climate_mean_init)
+                    values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init,
+                              stop_NC_every, stop_NC_for]
                     config = dict(zip(flags, values))
                     if mode == "local":
                         exec_command(config)
@@ -420,6 +462,7 @@ if __name__ == "__main__":
         mode = sys.argv[2]
 
         for trial in range(trials):
+            niche_construction_stable_control(mode)
             niche_construction_stable(mode)
             #niche_construction_periodic(mode)
             #niche_construction_noisy(mode)

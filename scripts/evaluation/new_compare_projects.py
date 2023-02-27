@@ -18,6 +18,9 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 from matplotlib.colors import LogNorm, Normalize
+from types import SimpleNamespace
+from scripts.evaluation.utils import find_label
+
 
 class Plotter:
 
@@ -62,7 +65,7 @@ class Plotter:
 
 
 
-    def plot_evolution(self, save_name):
+    def plot_evolution(self, label):
         """ Plot the evolution of climate and population dynamics.
 
         Parameters
@@ -108,17 +111,19 @@ class Plotter:
             generations = list(set(self.log["Generation"].tolist()))
             generations.sort()
 
-            if "constructed" in list(constructed.keys()):
-                constructed=constructed["constructed"]
-                constructed_mean = []
-                for gen in generations:
-                    constructed_mean.append(np.mean([el[1] for el in constructed[gen]]))
-                y = y
+            if "construction" in label:
 
-                total = [sum(x) for x in zip(y, constructed_mean)]
+                if "constructed" in list(constructed.keys()):
+                    constructed=constructed["constructed"]
+                    constructed_mean = []
+                    for gen in generations:
+                        constructed_mean.append(np.mean([el[1] for el in constructed[gen]]))
+                    y = y
 
-                sns.lineplot(ax=self.axs[count], x=x, y=total, ci=None, label="total")
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=None, label="intrinsic")
+                    total = [sum(x) for x in zip(y, constructed_mean)]
+
+                    sns.lineplot(ax=self.axs[count], x=x, y=total, ci=None, label="total", color="green")
+                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=None, label="intrinsic", color="red")
 
             #self.axs[count].ticklabel_format(useOffset=False)
             #self.axs[count].set_ylim(np.log(min(y+total)), np.log(max(y+total)))
@@ -140,7 +145,7 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["Mean"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(ylabel="$\\bar{\mu}$ ")
             self.axs[count].set(xlabel=None)
@@ -152,10 +157,12 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["construct"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
-            self.axs[count].set(ylabel="$c$, construct ")
+            self.axs[count].set(ylabel="$c$,\n construct ")
             self.axs[count].set(xlabel=None)
+            self.axs[count].get_legend().remove()
+
             #self.axs[count].set_ylim(np.log(0.0000001),np.log(100000))
 
             #self.axs[count].set_yscale('symlog')
@@ -168,10 +175,12 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["construct_sigma"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(ylabel="$c_{\sigma}$, variance  \n of construct ")
             self.axs[count].set(xlabel=None)
+            self.axs[count].get_legend().remove()
+
 
             count += 1
         # -----------------------------------
@@ -180,10 +189,12 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["constructed"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(ylabel="$C_{total}$,\n World construction ")
             self.axs[count].set(xlabel=None)
+            self.axs[count].get_legend().remove()
+
             #self.axs[count].set_yscale('log')
 
 
@@ -193,10 +204,12 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["var_constructed"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
-            self.axs[count].set(ylabel="$c_{coord}$,\n Coordination in NC ")
+            self.axs[count].set(ylabel="$c_{coord}$,\n NC-Coordination")
             self.axs[count].set(xlabel=None)
+            self.axs[count].get_legend().remove()
+
             #self.axs[count].set_yscale('log')
 
 
@@ -208,11 +221,13 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["SD"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(ylabel="$\\bar{\sigma}$")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
+            self.axs[count].get_legend().remove()
+
 
             count += 1
         # ------------------------------------
@@ -221,11 +236,13 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["R"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(ylabel="$\\bar{r}$")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
+            self.axs[count].get_legend().remove()
+
             count += 1
         # --------------------------------
         # ----- plot average fitness -----
@@ -234,7 +251,7 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["Fitness"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$\\bar{f}$")
@@ -246,10 +263,12 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["extinctions"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$E$")
+            self.axs[count].get_legend().remove()
+
             count += 1
         # ----------------------------------
         # ----- plot number of agents  -----
@@ -257,10 +276,12 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["num_agents"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$N$, number of agents")
+            self.axs[count].get_legend().remove()
+
             count += 1
         # --------------------------
         # ----- plot genomic diversity -----
@@ -268,10 +289,12 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["diversity"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$V$")
+            self.axs[count].get_legend().remove()
+
             count += 1
 
         # ------------------------------------------
@@ -280,10 +303,12 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["diversity_mean"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$V_{\mu}$")
+            self.axs[count].get_legend().remove()
+
             count += 1
         # ------------------------------------------
         # ----- plot genomic diversity of plasticity -----
@@ -291,10 +316,12 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["diversity_sigma"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$V_{\sigma}$")
+            self.axs[count].get_legend().remove()
+
             count += 1
         # ------------------------------------------
         # ----- plot genomic diversity of evolvability  -----
@@ -302,7 +329,7 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["diversity_mutate"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$V_{r}$")
@@ -313,7 +340,7 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["fixation_index"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$F_{st}$, fixation_index")
@@ -325,7 +352,7 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["competition"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$C$, competition")
@@ -336,7 +363,7 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["not_reproduced"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$\\bar{R}$, Not reproduced")
@@ -347,10 +374,12 @@ class Plotter:
             x = self.log["Generation"]
             y = self.log["Dispersal"]
 
-            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
+            sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$D$")
+            self.axs[count].get_legend().remove()
+
             count += 1
 
         # all sub-plots share the same horizontal axis
@@ -359,13 +388,7 @@ class Plotter:
         self.axs[count - 1].set(xlabel="$G$, Generation")
 
         # -------------------------------------------------------------
-        save_dir = self.project + "/plots"
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
-        plt.savefig(save_dir + "/evolution_" + save_name + ".pdf", dpi=300)
-        plt.savefig(save_dir + "/evolution_" + save_name + ".png", dpi=300)
 
-        plt.clf()
         return self.log
 
 
@@ -426,7 +449,7 @@ class Plotter:
 
 
 
-def run(project, total):
+def run(top_dir):
     """ Produce plots for a single project.
 
     Parameters
@@ -439,44 +462,64 @@ def run(project, total):
 
     """
     # ----- collect data from each trial -----
-    log_df = pd.DataFrame()
-    log_niches_total = {}
+    parameter = "genome_type"
+    projects = [os.path.join("../projects/", top_dir, o) for o in os.listdir("../projects/" + top_dir)]
+    projects = [el for el in projects if "plots" not in el]
+    log_dfs = {}
+    logs_niches_total = {}
+    labels = []
+    for project in projects:
+        log_df = pd.DataFrame()
+        log_niches_total = {}
 
-    trial_dirs = [os.path.join(project + "/trials", o) for o in os.listdir(project + "/trials")]
-    trial_dirs = [el for el in trial_dirs if ".DS" not in el]
-    # ---------------------------------
-    # load  project configuration
-    skip_lines = 1
-    with open(project + "/config.yml") as f:
-        for i in range(skip_lines):
-            _ = f.readline()
-        config = yaml.safe_load(f)
-    #if "" in config["genome_type"]:
+        trial_dirs = [os.path.join(project + "/trials", o) for o in os.listdir(project + "/trials")]
+        trial_dirs = [el for el in trial_dirs if ".DS" not in el]
+        # ---------------------------------
+        # load  project configuration
+        skip_lines = 1
+        with open(project + "/config.yml") as f:
+            for i in range(skip_lines):
+                _ = f.readline()
+            config = yaml.safe_load(f)
+        #if "" in config["genome_type"]:
 
-    for trial_idx, trial_dir in enumerate(trial_dirs):
-        print(trial_dir)
+        for trial_idx, trial_dir in enumerate(trial_dirs):
+            print(trial_dir)
 
-        try:
-            log = pickle.load(open(trial_dir + '/log.pickle', 'rb'))
-            log_niches = pickle.load(open(trial_dir + '/log_niches.pickle', 'rb'))
-            #for key, val in log_niches.items():
-                #if key != "constructed" or key != "inhabited_niches":
-                #    log_niches[key] = []
-            #log = log.assign(Trial=trial_idx)
+            try:
+                log = pickle.load(open(trial_dir + '/log.pickle', 'rb'))
 
-            trial_idx = find_index(trial_dir)
-            if log_df.empty:
-                log_df = log
-            else:
-                log_df = log_df.append(log)
-            log_niches_total[trial_idx] = log_niches
 
-            # plot intrinsic motivaation
-            if config["genome_type"] == "intrinsic":
-                plot_intrinsic(log["Climate"].tolist(), log_niches, trial_dir)
+                num_gens = min([2000, config["num_gens"]])
+                log = log.loc[log["Generation"] < num_gens]
 
-        except (IOError, EOFError) as e:
-            print("No log file for trial: ", trial_dir)
+                if "construct" not in log:
+                    log["construct"] = [0 for el in range(num_gens)]
+
+                if "construct_sigma" not in log:
+                    log["construct_sigma"] = [0 for el in range(num_gens)]
+
+                log_niches = pickle.load(open(trial_dir + '/log_niches.pickle', 'rb'))
+                #for key, val in log_niches.items():
+                    #if key != "constructed" or key != "inhabited_niches":
+                    #    log_niches[key] = []
+                #log = log.assign(Trial=trial_idx)
+
+                trial_idx = find_index(trial_dir)
+                if log_df.empty:
+                    log_df = log
+                else:
+                    log_df = log_df.append(log)
+                log_niches_total[trial_idx] = log_niches
+
+
+
+            except (IOError, EOFError) as e:
+                print("No log file for trial: ", trial_dir)
+        label = find_label(SimpleNamespace(**config), parameter)
+        labels.append(label)
+        log_dfs[label] = log_df
+        logs_niches_total[label] = log_niches_total
 
 
     # choose which evaluation metrics to plot
@@ -496,48 +539,58 @@ def run(project, total):
             include.append("construct_sigma")
             include.append("var_constructed")
             #include.append( "constructed")
+    include = [ "climate","mutate", "dispersal",
+                   "num_agents",
+                   "extinct","sigma", "mean", "construct", "var_constructed"]
 
     if not log_df.empty:
-        if total:
-            plotter = Plotter(project=project,
-                              num_niches=config["num_niches"],
-                              log=log_df,
-                              log_niches=log_niches_total,
-                              include=include)
 
-            log = plotter.plot_evolution(save_name="_total")
 
         for trial_dir in trial_dirs:
-            trial = find_index(trial_dir)
-            log_trial = log_df.loc[(log_df['Trial'] == trial)]
-            if total:
-                # save new log data produced by plotter (includes dispersal)
-                pickle.dump(log_trial, open(trial_dir + '/log_updated.pickle', 'wb'))
-            else:
+            plotter = Plotter(project=project,
+                              num_niches=config["num_niches"],
+                              log=[],
+                              log_niches=[],
+                              include=include)
+            for label in labels:
+                print(label)
+                log_df = log_dfs[label]
+                log_niches_total = logs_niches_total[label]
+                trial = find_index(trial_dir)
+                log_trial = log_df.loc[(log_df['Trial'] == trial)]
+
                 # plot only for this trial and don't save
                 log_niches_trial = {}
-                print(trial_dir, list(log_niches_total.keys()))
                 if trial in list(log_niches_total.keys()):
                     log_niches_trial[trial] = log_niches_total[trial]
                     var_constructed = []
+                    num_gens = max(list(set(log_trial["Generation"].tolist()))) + 1
+                    num_gens = min([2000, num_gens])
                     if "var_constructed" in log_niches_trial[trial].keys():
-                        for gen in log_niches_trial[trial]["var_constructed"]:
+                        for gen in log_niches_trial[trial]["var_constructed"][:num_gens]:
                             var_constructed.append(np.mean([el[1] for el in gen]))
                     else:
-                        num_gens = min([2000, config["num_gens"]])
+
                         var_constructed = [0 for el in range(num_gens)]
 
                     log_trial["var_constructed"] = var_constructed
                     if not log_trial.empty:
-                        plotter = Plotter(project=project,
-                                          num_niches=config["num_niches"],
-                                          log=log_trial,
-                                          log_niches=log_niches_trial,
-                                          include=include)
-                        log = plotter.plot_evolution(save_name="trial_" + str(trial))
+                        plotter.log = log_trial
+                        plotter.log_niches = log_niches_trial
+                        log = plotter.plot_evolution(label)
+            save_name = "trial_" + str(trial)
+            save_dir = "../projects/" + top_dir + "/plots"
+            if not os.path.exists(save_dir):
+                os.makedirs(save_dir)
+            plt.savefig(save_dir + "/evolution_" + save_name + ".pdf", dpi=300)
+            plt.savefig(save_dir + "/evolution_" + save_name + ".png", dpi=300)
 
-                    if "construct" in config["genome_type"]:
-                        plotter.plot_heatmap(log_niches_trial, project)
+            plt.clf()
+
+
+                    #if "construct" in config["genome_type"]:
+                    #    plotter.plot_heatmap(log_niches_trial, project)
+    #label = find_label(SimpleNamespace(**config), parameter)
 
 
 
@@ -549,9 +602,6 @@ if __name__ == "__main__":
     # "../projects")
     total = int(sys.argv[2])  # if 1 only plot average across trials, if 0 only plot independently for each trial
 
-    projects = [os.path.join("../projects/", top_dir, o) for o in os.listdir("../projects/" + top_dir)]
 
-    for project in projects:
-        if "plots" not in project and ".DS" not in project:
-            print(project)
-            run(project, total)
+
+    run(top_dir)

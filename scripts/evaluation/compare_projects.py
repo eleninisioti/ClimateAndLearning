@@ -131,6 +131,7 @@ class Plotter:
                 print(generations)
                 for trial_idx, trial in constructed.items():
                     if "constructed" in trial.keys():
+                        trial["constructed"] = [trial["constructed"][el] for el in range(len(trial["constructed"])) if el < max(generations)]
                         for gen_idx, gen in enumerate(trial["constructed"][0::10]):
                             print(gen_idx, len(constructed_mean))
                             constructed_mean[gen_idx] += np.mean([el[1] for el in gen])
@@ -526,78 +527,92 @@ if __name__ == "__main__":
             if o in p:
                 ordered_projects.append(p)
     projects = ordered_projects
+    trials = 5
+    for trial_idx in range(trials):
+        log_niches_total = {}
+        log_df = pd.DataFrame()
 
-    for p in projects:
-        if "plots" not in p and ".DS" not in p:
-            trial_dirs = list(next(os.walk(p + "/trials"))[1])
-            log_niches_total = {}
-            log_df = pd.DataFrame()
-            skip_lines = 1
+        for p in projects:
+            if "plots" not in p and ".DS" not in p:
+                trial_dirs = list(next(os.walk(p + "/trials"))[1])
+                trial_dir = trial_dirs[trial_idx]
+
+                skip_lines = 1
+
             with open(p + "/config.yml") as f:
                 for i in range(skip_lines):
                     _ = f.readline()
                 config = yaml.safe_load(f)
-            for trial_idx, trial_dir in enumerate(trial_dirs):
                 try:
                     log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
+
+                    # pick up to 2000 generations
+                    num_gens = min([2000,config["num_gens"]])
+                    if "construct" not in log:
+                        log["construct"] = [0 for el in range(num_gens)]
+
+
+                    if "construct_sigma" not in log:
+                        log["construct_sigma"] = [0 for el in range(num_gens)]
+
+                    log = log.loc[log["Generation"] < 2000]
                     log_niches = pickle.load(open(p + "/trials/" + trial_dir + '/log_niches.pickle', 'rb'))
-                    trial = trial_dir.find("trial_")
+                    trial = int(trial_dir[trial_dir.find("trial_")+6:])
                     #trial = int(trial_dir[(trial + 6):])
 
                     if "var_constructed" in log_niches.keys():
 
                         var_constructed = []
-                        for gen in log_niches["var_constructed"]:
+                        for gen in log_niches["var_constructed"][:num_gens]:
                             var_constructed.append(np.mean([el[1] for el in gen]))
                     else:
-                        var_constructed = [0 for el in range(config["num_gens"])]
+                        var_constructed = [0 for el in range(num_gens)]
                     log["var_constructed"] = var_constructed
 
                     if log_df.empty:
                         log_df = log
                     else:
                         log_df = log_df.append(log, ignore_index=True)
-                    log_niches_total[trial_idx] = log_niches
+                    log_niches_total[trial] = log_niches
 
                 except (IOError,EOFError) as e  :
-                    print("No log file for project. ", p)
+                    print("No log file for project. ", p, trial_dir)
 
             skip_lines = 1
             with open(p + "/config.yml") as f:
                 for i in range(skip_lines):
                     _ = f.readline()
                 config = yaml.safe_load(f)
-                #config = SimpleNamespace(**config)
+                # config = SimpleNamespace(**config)
 
             label = find_label(SimpleNamespace(**config), parameter)
-            results[label] = [log_df, log_niches_total, config]
+            results[label] = [log_df.loc[log_df["Trial"]==trial], log_niches_total, config]
 
-    if config["only_climate"]:
-        include = ["climate"]
-    else:
-        include = ["climate","mutate",  "num_agents", "dispersal", "diversity"]
+        if config["only_climate"]:
+            include = ["climate"]
+        else:
+            include = ["climate", "mutate", "num_agents", "dispersal", "diversity"]
 
+            if config["genome_type"] != "intrinsic":
+                include.append("sigma")
+                include.append("mean")
 
-        if config["genome_type"] != "intrinsic":
-            include.append("sigma")
-            include.append("mean")
-
-
-        if config["genome_type"] == "niche-construction" and parameter !="genome":
+            if config["genome_type"] == "niche-construction" and parameter != "genome":
+                include.append("construct")
+                include.append("construct_sigma")
+                # include.append( "constructed")
             include.append("construct")
             include.append("construct_sigma")
-            #include.append( "constructed")
-        include.append("construct")
-        include.append("construct_sigma")
-        include.append("constructed")
-        include.append("var_constructed")
+            #include.append("constructed")
+            #include.append("var_constructed")
+
+        print("plotting")
+        plotter = Plotter(project=results_dir,
+                          num_niches=config["num_niches"],
+                          log={},
+                          log_niches={},
+                          include=include)
+        plotter.compare_evolution(results, save_name="compare_select_trial_" + str(trial))
 
 
-    print("plotting")
-    plotter = Plotter(project=results_dir,
-                      num_niches=config["num_niches"],
-                      log={},
-                      log_niches={},
-                      include=include)
-    plotter.compare_evolution(results, save_name="compare_select")
     #plotter.compare_intrinsic(results, results_dir)

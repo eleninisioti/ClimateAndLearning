@@ -247,15 +247,15 @@ def niche_construction_stable(mode):
         for climate_mean_init in climate_mean_init_values:
             for S in selection_types:
 
-                if not (genome_type=="evolv" and S=="F"):
-                    project = top_dir + "S_" + S + "_G_" + genome_type + "_N_" + \
-                              str(num_niches) + "_climate_" + str(climate_mean_init)
-                    values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init]
-                    config = dict(zip(flags, values))
-                    if mode == "local":
-                        exec_command(config)
-                    elif mode == "server":
-                        create_jzscript(config)
+                project = top_dir + "S_" + S + "_G_" + genome_type + "_N_" + \
+                          str(num_niches) + "_climate_" + str(climate_mean_init)
+                values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init]
+                config = dict(zip(flags, values))
+                if mode == "local":
+                    exec_command(config)
+                elif mode == "server":
+                    create_jzscript(config)
+
 
 def niche_construction_periodic(mode):
     top_dir = setup_dir(project="niche_construction", mode=mode) + "/periodic/"

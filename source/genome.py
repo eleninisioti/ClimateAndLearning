@@ -47,7 +47,7 @@ class Genome:
             sigma = np.abs(normal(0, init_sigma))
             self.genes = {"mean": mu, "sigma": sigma, "r": r}
 
-    def mutate(self):
+    def mutate(self, stopped_NC):
         """ Applies mutations to the genome.
         """
         if self.type == "no-evolv":
@@ -70,7 +70,9 @@ class Genome:
             self.genes["mean"] = self.genes["mean"] + normal(0, self.genes["r"])
             self.genes["r"] = np.abs(self.genes["r"] + normal(0, self.genes["r"]))
             #self.genes["c"] = np.min([self.genes["c"] + normal(0, 0.0001), self.max_c])
-            self.genes["c"] = np.min([self.genes["c"] + normal(0, 0.0003), self.max_c])
+            if not stopped_NC:
+
+                self.genes["c"] = np.min([self.genes["c"] + normal(0, 0.0003), self.max_c])
 
             self.genes["sigma"] = np.abs(self.genes["sigma"] + normal(0, self.genes["r"]))
 

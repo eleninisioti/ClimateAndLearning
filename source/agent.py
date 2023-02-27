@@ -23,8 +23,8 @@ class Agent:
         self.history_window = history_window
 
 
-    def mutate(self):
-        self.genome.mutate()
+    def mutate(self, stopped_NC):
+        self.genome.mutate(stopped_NC)
 
     def set_history(self, history):
         self.history = history[-self.history_window:]

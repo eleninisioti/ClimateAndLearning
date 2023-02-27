@@ -96,13 +96,6 @@ class Logger:
         self.log["sigma_constructed"].append(np.std([el["constructed"] for key, el in env.niches.items()]))
 
 
-        print("capacity ", self.log["capacity"][-1])
-        print("sigma", self.log["running_SD"][-1])
-        print("constructed ", self.log["constructed"][-1])
-        print("construct ", self.log["construct"][-1])
-        print("extinctions", self.log["extinctions"][-1])
-        print("number of agents", self.log["num_agents"][-1])
-
 
         # compute population diversity
         self.log["diversity_mean"].append(np.std(mean_values))
@@ -152,7 +145,7 @@ class Logger:
         self.log_niches["constructed"].append({(key, el["constructed"]) for key, el in env.niches.items()})
         self.log_niches["var_constructed"].append({(key, el["var_constructed"]) for key, el in env.niches.items()})
 
-    
+
     def final_log(self):
         """ Prepare log for final saving.
         """

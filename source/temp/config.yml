@@ -18,5 +18,7 @@ only_climate: 0
 period: 0
 project: temp
 selection_type: capacity-fitness
+stop_NC_every: 500
+stop_NC_for: 200
 time_budget: 104400
 trial: 0

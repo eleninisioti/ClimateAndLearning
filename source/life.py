@@ -59,6 +59,7 @@ class Life:
         niche_constructions = self.env.niche_constructions
 
         stopped_NC = False
+        stop_NC_counter = 0
         # ----- run generations ------
         for gen in range(self.config.num_gens):
             start_time_gen = time.time()
@@ -68,23 +69,24 @@ class Life:
 
             if not self.config.only_climate:
 
-                if self.config["stop_NC_every"]:
-                    if gen%self.config["stop_NC_every"] ==0:
+                if self.config.stop_NC_every:
+                    if gen%self.config.stop_NC_every ==0 and not stop_NC_counter and gen:
                         print("stopping NC at ", str(gen))
                         stop_NC_counter = 0
                         stopped_NC = True
-                        keep_NC = [agent.genome.genes["c"] for agent in self.population.agents]
+                        #keep_NC = [agent.genome.genes["c"] for agent in self.population.agents]
                         for agent_idx, agent in enumerate(self.population.agents):
-                            agent.genomes.genes["c"] = 0
+                            agent.genome.genes["c"] = 0
                             self.population.agents[agent_idx] = agent
 
                 if stopped_NC:
                     stop_NC_counter += 1
-                    if stop_NC_counter == self.config["stop_NC_for"]:
+                    if stop_NC_counter == self.config.stop_NC_for:
                         print("continuing NC at ", str(gen))
-                        for agent_idx, agent in enumerate(self.population.agents):
-                            agent.genomes.genes["c"] = keep_NC[agent_idx]
-                            self.population.agents[agent_idx] = agent
+                        # for agent_idx, agent in enumerate(self.population.agents):
+                        #     agent.genome.genes["c"] = keep_NC[agent_idx]
+                        #     self.population.agents[agent_idx] = agent
+                        stopped_NC = False
 
                 # compute fitness of population
                 self.population.survive(self.env)
@@ -103,7 +105,8 @@ class Life:
                     break
 
                 # reproduce population
-                niche_constructions = self.population.reproduce(self.env)
+                niche_constructions = self.population.reproduce(self.env, stopped_NC)
+                print("constructions", [np.sum(val) for key, val in niche_constructions.items()])
 
                 if gen % 1 == 0:
                     # print progress

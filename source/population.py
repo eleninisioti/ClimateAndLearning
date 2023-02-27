@@ -99,7 +99,7 @@ class Population:
                     if agent_b in self.agents:
                         self.agents.remove(agent_b)
                         # mutate agent_b
-                        agent_a.mutate()
+                        agent_a.mutate(stopped_NC)
                         self.agents.append(agent_a)
 
                 elif agent_b_dominant:
@@ -107,11 +107,11 @@ class Population:
                     if agent_a in self.agents:
                         self.agents.remove(agent_a)
                         # mutate agent_b
-                        agent_b.mutate()
+                        agent_b.mutate(stopped_NC)
                         self.agents.append(agent_b)
 
 
-    def reproduce(self, env):
+    def reproduce(self, env, stopped_NC):
         """ Population reproduction at the end of a generation.
 
         Parameters
@@ -195,7 +195,7 @@ class Population:
                     # first child
                     agent_genome.cross([agent.genome, partners_a[idx].genome])
                     new_agent = Agent(genome=agent_genome, history_window=agent.history_window)
-                    new_agent.mutate()
+                    new_agent.mutate(stopped_NC)
 
                     if "lat" in niche_data:
                         new_agent.movement = niche_data["lat"]
@@ -213,7 +213,7 @@ class Population:
                     # second child
                     agent_genome.cross([agent.genome, partners_b[idx].genome])
                     new_agent = Agent(genome=agent_genome, history_window=agent.history_window)
-                    new_agent.mutate()
+                    new_agent.mutate(stopped_NC)
                     if "lat" in niche_data:
                         new_agent.movement = niche_data["lat"]
                         #new_agent.movement = agent.realized_niche

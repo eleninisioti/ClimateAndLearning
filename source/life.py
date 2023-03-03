@@ -70,7 +70,7 @@ class Life:
             if not self.config.only_climate:
 
                 if self.config.stop_NC_every:
-                    if gen%self.config.stop_NC_every ==0 and not stop_NC_counter and gen:
+                    if gen%self.config.stop_NC_every ==0 and (not stopped_NC) and gen:
                         print("stopping NC at ", str(gen))
                         stop_NC_counter = 0
                         stopped_NC = True

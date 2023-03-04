@@ -111,7 +111,6 @@ class Plotter:
             new_value = new_value.reset_index()
             #new_value = value[0].loc[((value[0]["Trial"]) % step)==0]
             results[key][0] = new_value
-            print("processed", key)
         # ----- plot climate curve -----
         if "climate" in self.include:
             for key, value in results.items():
@@ -121,34 +120,50 @@ class Plotter:
 
                 # add mean niche construction
                 constructed = value[1]
-                mean_climate = log.groupby('Generation')["Climate"].mean().tolist()
-                generations = list(set(log["Generation"].tolist()))
-                generations.sort()
-                #generations =generations[0::10]
+                total_constructed = []
+                total_generations = []
+                total_climate = []
 
-
-                constructed_mean = [0 for el in generations]
-                print(generations)
                 for trial_idx, trial in constructed.items():
+                    climate_trial = log.loc[log["Trial"]==trial_idx]
+                    #mean_climate = log.groupby('Generation')["Climate"].mean().tolist()
+                    generations = list(set(log["Generation"].tolist()))
+                    generations.sort()
+                    #total_generations.extend(generations)
+
+                    #generations =generations[0::10]
+
+
                     if "constructed" in trial.keys():
                         trial["constructed"] = [trial["constructed"][el] for el in range(len(trial["constructed"])) if el < max(generations)]
                         for gen_idx, gen in enumerate(trial["constructed"][0::10]):
-                            print(gen_idx, len(constructed_mean))
-                            constructed_mean[gen_idx] += np.mean([el[1] for el in gen])
+                            gen_idx = gen_idx*10
+                            print(max(climate_trial["Generation"]), gen_idx)
+                            if gen_idx <= max(climate_trial["Generation"]):
+                                current_climate = climate_trial.loc[climate_trial["Generation"]==gen_idx]
+                                current_climate_list = current_climate["Climate"].tolist()
+                                total_constructed.append( np.mean([el[1] for el in gen]) )
+                                total_climate.append(current_climate_list[0])
+                                total_generations.append(gen_idx)
 
                 if "constructed" in trial.keys():
 
-                    constructed_mean = [el/len(constructed) for el in constructed_mean]
+                    #constructed_mean = [el/len(constructed) for el in constructed_mean]
 
 
-                    climate_and_construct = [sum(x) for x in zip(mean_climate, constructed_mean)]
+                    climate_and_construct = [sum(x) for x in zip(total_climate, total_constructed)]
                 else:
-                    climate_and_construct = mean_climate
+                    climate_and_construct = total_climate
+                print(len(total_generations))
+                print(len(climate_and_construct))
+                print(len(total_climate))
+                print(len(total_constructed ))
 
-                log_climate = pd.DataFrame({'Generation': generations,
+
+                log_climate = pd.DataFrame({'Generation': total_generations,
                                             "climate_and_construct": climate_and_construct})
                 #sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="Climate", ci=None, label=label)
-                sns.lineplot(ax=self.axs[count], data=log_climate, x="Generation", y="climate_and_construct", ci=None, label=label)
+                sns.lineplot(ax=self.axs[count], data=log_climate, x="Generation", y="climate_and_construct", ci=self.ci, label=label)
 
 
             self.axs[count].ticklabel_format(useOffset=False)
@@ -172,7 +187,7 @@ class Plotter:
 
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="Mean", ci=self.ci, label=label)
 
-            self.axs[count].set(ylabel="$E(\mu)$, \npreferred state")
+            self.axs[count].set(ylabel="$\mathbb{E}(\mu)$, \npreferred state")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
             loc = plticker.LogLocator(base=10.0, numticks=num_yticks)  # this locator puts ticks at regular intervals
@@ -190,7 +205,6 @@ class Plotter:
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                print("keys for contstruct", list(log.keys()))
                 if ("constructed" in list(log.keys())):
                     x = log["Generation"]
                     y = log["constructed"]
@@ -246,7 +260,6 @@ class Plotter:
                 log = value[0]
                 log_niches = value[1]
                 config = value[2]
-                print("keys for contstruct", list(log.keys()))
                 if ("construct" in list(log.keys())):
                     x = log["Generation"]
                     y = log["construct"]
@@ -314,7 +327,7 @@ class Plotter:
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="SD", ci=self.ci, label=label)
 
 
-            self.axs[count].set(ylabel="$E(sigma)$,\n plasticity")
+            self.axs[count].set(ylabel="$\mathbb{E}(sigma)$,\n plasticity")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
             loc = plticker.LogLocator(base=10, numticks=num_yticks)  # this locator puts ticks at regular intervals
@@ -334,7 +347,7 @@ class Plotter:
                 sns.lineplot(ax=self.axs[count], data=log, x="Generation", y="R", ci=self.ci, label=label)
 
 
-            self.axs[count].set(ylabel="$E(r)$,\nevolvability ")
+            self.axs[count].set(ylabel="$\mathbb{E}(r)$,\nevolvability")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
             loc = plticker.LogLocator(base=10, numticks=num_yticks)  # this locator puts ticks at regular intervals
@@ -397,10 +410,10 @@ class Plotter:
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$K$,\n population size ")
-            self.axs[count].set_yscale('log')
-            self.axs[count].set_ylim((1, 10000000))
-            loc = plticker.LogLocator(base=10, numticks=num_yticks)  # this locator puts ticks at regular intervals
-            self.axs[count].yaxis.set_major_locator(loc)
+            #self.axs[count].set_yscale('log')
+            #self.axs[count].set_ylim((1, 10000000))
+            #loc = plticker.LogLocator(base=10, numticks=num_yticks)  # this locator puts ticks at regular intervals
+            #self.axs[count].yaxis.set_major_locator(loc)
 
             self.axs[count].get_legend().remove()
 
@@ -468,6 +481,8 @@ class Plotter:
 
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$V$,\n diversity")
+            self.axs[count].set_yscale('log')
+
             self.axs[count].get_legend().remove()
 
             count += 1
@@ -487,7 +502,7 @@ class Plotter:
             self.axs[count].set(xlabel="Time (in generations)")
             self.axs[count].set(ylabel="$D$,\ndispersal")
             self.axs[count].get_legend().remove()
-
+            self.axs[count].set_ylim((50, 100))
             count += 1
 
 
@@ -527,56 +542,28 @@ if __name__ == "__main__":
             if o in p:
                 ordered_projects.append(p)
     projects = ordered_projects
-    trials = 5
-    for trial_idx in range(trials):
-        log_niches_total = {}
-        log_df = pd.DataFrame()
-
-        for p in projects:
-            if "plots" not in p and ".DS" not in p:
-                trial_dirs = list(next(os.walk(p + "/trials"))[1])
-                trial_dir = trial_dirs[trial_idx]
-
-                skip_lines = 1
-
-            with open(p + "/config.yml") as f:
-                for i in range(skip_lines):
-                    _ = f.readline()
-                config = yaml.safe_load(f)
+    #projects = [projects[0]]
+    print(projects)
+    for p in projects:
+        if "plots" not in p and ".DS" not in p:
+            trial_dirs = list(next(os.walk(p + "/trials"))[1])
+            log_niches_total = {}
+            log_df = pd.DataFrame()
+            for trial_idx, trial_dir in enumerate(trial_dirs):
                 try:
                     log = pickle.load(open(p + "/trials/" + trial_dir + '/log.pickle', 'rb'))
-
-                    # pick up to 2000 generations
-                    num_gens = min([2000,config["num_gens"]])
-                    if "construct" not in log:
-                        log["construct"] = [0 for el in range(num_gens)]
-
-
-                    if "construct_sigma" not in log:
-                        log["construct_sigma"] = [0 for el in range(num_gens)]
-
-                    log = log.loc[log["Generation"] < 2000]
                     log_niches = pickle.load(open(p + "/trials/" + trial_dir + '/log_niches.pickle', 'rb'))
-                    trial = int(trial_dir[trial_dir.find("trial_")+6:])
-                    #trial = int(trial_dir[(trial + 6):])
-
-                    if "var_constructed" in log_niches.keys():
-
-                        var_constructed = []
-                        for gen in log_niches["var_constructed"][:num_gens]:
-                            var_constructed.append(np.mean([el[1] for el in gen]))
-                    else:
-                        var_constructed = [0 for el in range(num_gens)]
-                    log["var_constructed"] = var_constructed
+                    trial = trial_dir.find("trial_")
+                    # trial = int(trial_dir[(trial + 6):])
 
                     if log_df.empty:
                         log_df = log
                     else:
                         log_df = log_df.append(log, ignore_index=True)
-                    log_niches_total[trial] = log_niches
+                    log_niches_total[trial_idx] = log_niches
 
-                except (IOError,EOFError) as e  :
-                    print("No log file for project. ", p, trial_dir)
+                except (IOError, EOFError) as e:
+                    print("No log file for project. ", trial_dir)
 
             skip_lines = 1
             with open(p + "/config.yml") as f:
@@ -586,33 +573,33 @@ if __name__ == "__main__":
                 # config = SimpleNamespace(**config)
 
             label = find_label(SimpleNamespace(**config), parameter)
-            results[label] = [log_df.loc[log_df["Trial"]==trial], log_niches_total, config]
+            results[label] = [log_df, log_niches_total, config]
 
-        if config["only_climate"]:
-            include = ["climate"]
-        else:
-            include = ["climate", "mutate", "num_agents", "dispersal", "diversity"]
+    if config["only_climate"]:
+        include = ["climate"]
+    else:
+        include = ["climate", "mutate", "num_agents", "dispersal"]
 
-            if config["genome_type"] != "intrinsic":
-                include.append("sigma")
-                include.append("mean")
+        if config["genome_type"] != "intrinsic":
+            include.append("sigma")
+            include.append("mean")
 
-            if config["genome_type"] == "niche-construction" and parameter != "genome":
-                include.append("construct")
-                include.append("construct_sigma")
-                # include.append( "constructed")
+        if config["genome_type"] == "niche-construction" and parameter != "genome":
             include.append("construct")
             include.append("construct_sigma")
-            #include.append("constructed")
-            #include.append("var_constructed")
+            # include.append( "constructed")
 
-        print("plotting")
-        plotter = Plotter(project=results_dir,
-                          num_niches=config["num_niches"],
-                          log={},
-                          log_niches={},
-                          include=include)
-        plotter.compare_evolution(results, save_name="compare_select_trial_" + str(trial))
+    include = ["climate", "mutate", "num_agents", "dispersal", "diversity", "mean", "sigma"]
+
+    print("plotting")
+    plotter = Plotter(project=results_dir,
+                      num_niches=config["num_niches"],
+                      log={},
+                      log_niches={},
+                      include=include)
+    plotter.compare_evolution(results, save_name="compare_select")
 
 
     #plotter.compare_intrinsic(results, results_dir)
+
+

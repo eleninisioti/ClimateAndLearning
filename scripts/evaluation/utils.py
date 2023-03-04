@@ -126,11 +126,11 @@ def find_label(config, parameter="selection"):
             label += "F-selection"
     elif parameter == "genome":
         if config.genome_type == "evolv":
-            label += "$R_{evolve}$"
+            label += "$R$"
         elif config.genome_type == "no-evolv":
             label += "$R_{no-evolve}$"
         elif config.genome_type == "niche-construction":
-            label += "$R_{c}$"
+            label += "$R_{NC}$"
         elif config.genome_type == "niche-construction-v2":
             label += "$R_{c2}$"
 

@@ -278,7 +278,7 @@ def niche_construction_stable_control(mode):
     num_gens = 2000
     genome_types = ["niche-construction"]
     num_niches_values = [100]
-    selection_types = ["F"]
+    selection_types = ["NF"]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
     climate_mean_init_values = [0.6]
     stop_NC_every = 500

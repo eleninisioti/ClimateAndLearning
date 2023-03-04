@@ -44,7 +44,7 @@ class Plotter:
         # ----- global configuration of plots -----
         params = {'legend.fontsize': 6,
                   "figure.autolayout": True,
-                  'font.size': 8,
+                  'font.size': 6,
                   'pdf.fonttype':42,
                   'ps.fonttype':42}
         plt.rcParams.update(params)
@@ -110,10 +110,10 @@ class Plotter:
             constructed = self.log_niches[key]
             generations = list(set(self.log["Generation"].tolist()))
             generations.sort()
+            print("label", label)
+            if True:
 
-            if "construction" in label:
-
-                if "constructed" in list(constructed.keys()):
+                if True:
                     constructed=constructed["constructed"]
                     constructed_mean = []
                     for gen in generations:
@@ -147,8 +147,10 @@ class Plotter:
 
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
-            self.axs[count].set(ylabel="$\\bar{\mu}$ ")
+            self.axs[count].set(ylabel="$\mathbb{E}(\mu)$, \npreferred state")
             self.axs[count].set(xlabel=None)
+            self.axs[count].get_legend().remove()
+
 
             count += 1
         # ----------------------------------------
@@ -159,7 +161,7 @@ class Plotter:
 
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
-            self.axs[count].set(ylabel="$c$,\n construct ")
+            self.axs[count].set(ylabel="$E(c)$, \n mean construction")
             self.axs[count].set(xlabel=None)
             self.axs[count].get_legend().remove()
 
@@ -223,7 +225,7 @@ class Plotter:
 
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
-            self.axs[count].set(ylabel="$\\bar{\sigma}$")
+            self.axs[count].set(ylabel="$\mathbb{E}(sigma)$,\n plasticity")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
             self.axs[count].get_legend().remove()
@@ -238,7 +240,7 @@ class Plotter:
 
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
-            self.axs[count].set(ylabel="$\\bar{r}$")
+            self.axs[count].set(ylabel="$\mathbb{E}(r)$,\nevolvability")
             self.axs[count].set(xlabel=None)
             self.axs[count].set_yscale('log')
             self.axs[count].get_legend().remove()
@@ -266,7 +268,7 @@ class Plotter:
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
-            self.axs[count].set(ylabel="$E$")
+            self.axs[count].set(ylabel="$E$,\n extinctions")
             self.axs[count].get_legend().remove()
 
             count += 1
@@ -279,7 +281,7 @@ class Plotter:
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
-            self.axs[count].set(ylabel="$N$, number of agents")
+            self.axs[count].set(ylabel="$K$,\n population size ")
             self.axs[count].get_legend().remove()
 
             count += 1
@@ -292,7 +294,7 @@ class Plotter:
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
-            self.axs[count].set(ylabel="$V$")
+            self.axs[count].set(ylabel="$V$,\n diversity")
             self.axs[count].get_legend().remove()
 
             count += 1
@@ -377,7 +379,7 @@ class Plotter:
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci, label=label)
 
             self.axs[count].set(xlabel="Time (in generations)")
-            self.axs[count].set(ylabel="$D$")
+            self.axs[count].set(ylabel="$D$,\n Dispersal")
             self.axs[count].get_legend().remove()
 
             count += 1
@@ -462,7 +464,7 @@ def run(top_dir):
 
     """
     # ----- collect data from each trial -----
-    parameter = "genome_type"
+    parameter = "selection_type"
     projects = [os.path.join("../projects/", top_dir, o) for o in os.listdir("../projects/" + top_dir)]
     projects = [el for el in projects if "plots" not in el]
     log_dfs = {}
@@ -539,9 +541,9 @@ def run(top_dir):
             include.append("construct_sigma")
             include.append("var_constructed")
             #include.append( "constructed")
-    include = [ "climate","mutate", "dispersal",
+    include = [ "mutate","climate",
                    "num_agents",
-                   "extinct","sigma", "mean", "construct", "var_constructed"]
+                   "extinct","sigma", "mean", "construct"]
 
     if not log_df.empty:
 

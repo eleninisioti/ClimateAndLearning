@@ -41,7 +41,7 @@ class Plotter:
         # ----- global configuration of plots -----
         params = {'legend.fontsize': 6,
                   "figure.autolayout": True,
-                  'font.size': 8,
+                  'font.size': 6,
                   'pdf.fonttype':42,
                   'ps.fonttype':42}
         plt.rcParams.update(params)
@@ -142,7 +142,7 @@ class Plotter:
 
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
 
-            self.axs[count].set(ylabel="$\\bar{\mu}$ ")
+            self.axs[count].set(ylabel="$\mathbb{E}(\mu)$, \npreferred state")
             self.axs[count].set(xlabel=None)
 
             count += 1
@@ -154,7 +154,7 @@ class Plotter:
 
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
 
-            self.axs[count].set(ylabel="$c$, construct ")
+            self.axs[count].set(ylabel="$E(c)$, \n mean NC")
             self.axs[count].set(xlabel=None)
             #self.axs[count].set_ylim(np.log(0.0000001),np.log(100000))
 
@@ -170,7 +170,7 @@ class Plotter:
 
             sns.lineplot(ax=self.axs[count], x=x, y=y, ci=self.ci)
 
-            self.axs[count].set(ylabel="$c_{\sigma}$, variance  \n of construct ")
+            self.axs[count].set(ylabel="$Var(c)$, \n NC variance")
             self.axs[count].set(xlabel=None)
 
             count += 1
@@ -374,7 +374,14 @@ class Plotter:
         trial = list(log.keys())[0]
         log = log[trial]
         for gen_idx, gen in enumerate(log["constructed"]):
-            new_constructed= [el[1] for el in gen]
+            niches_indexes = []
+            new_constructed = []
+            for key, el in gen:
+                niches_indexes.append(key)
+                new_constructed.append(el)
+            new_constructed = [x for _, x in sorted(zip(niches_indexes, new_constructed))]
+
+            #new_constructed= [el[1] for el in gen]
             if len(new_constructed)>100:
                 new_constructed = new_constructed[:100]
             elif len(new_constructed) < 100:
@@ -391,6 +398,8 @@ class Plotter:
         sns.heatmap(constructed_array, vmin=0, cmap='Blues')
         plt.xlabel("Generations")
         plt.ylabel("Niche index")
+        plt.yticks(range(len(niches_indexes))[::20], sorted(niches_indexes)[::20])
+
         #plt.colorbar()
 
         plt.savefig(save_dir + "/plots/mean_positive_trial_" + str(trial))
@@ -400,6 +409,8 @@ class Plotter:
         sns.heatmap(constructed_array, vmax=0, cmap='Blues')
         plt.xlabel("Generations")
         plt.ylabel("Niche index")
+        plt.yticks(range(len(niches_indexes))[::20], sorted(niches_indexes)[::20])
+
         #plt.colorbar()
 
         plt.savefig(save_dir + "/plots/mean_negative_trial_" + str(trial))
@@ -407,7 +418,12 @@ class Plotter:
 
         constructed = []
         for gen_idx, gen in enumerate(log["var_constructed"]):
-            new_constructed = [el[1] for el in gen]
+            niches_indexes = []
+            new_constructed = []
+            for key, el in gen:
+                niches_indexes.append(key)
+                new_constructed.append(el)
+            new_constructed = [x for _, x in sorted(zip(niches_indexes, new_constructed))]
             if len(new_constructed) > 100:
                 new_constructed = new_constructed[:100]
             elif len(new_constructed) < 100:
@@ -419,6 +435,8 @@ class Plotter:
         sns.heatmap(constructed_array, vmin=0, cmap='Reds')
         plt.xlabel("Generations")
         plt.ylabel("Niche index")
+        plt.yticks(range(len(niches_indexes))[::20], sorted(niches_indexes)[::20])
+
         # plt.colorbar()
 
         plt.savefig(save_dir + "/plots/varconstructed_trial_" + str(trial))
@@ -496,6 +514,10 @@ def run(project, total):
             include.append("construct_sigma")
             include.append("var_constructed")
             #include.append( "constructed")
+
+    include = ["mean", "construct", "construct_sigma"]
+    include = ["mean", "construct", "construct_sigma", "sigma", "mutate", "dispersal", "num_agents"]
+
 
     if not log_df.empty:
         if total:

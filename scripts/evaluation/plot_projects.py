@@ -384,15 +384,14 @@ class Plotter:
             #new_constructed= [el[1] for el in gen]
             if len(new_constructed)>100:
                 new_constructed = new_constructed[:100]
-            elif len(new_constructed) < 100:
-                new_constructed = new_constructed + [0 for el in range(100-len(new_constructed)+1)]
-            print(new_constructed.index(min(new_constructed)))
-            print(min(new_constructed))
-            if min(new_constructed) < (-1):
-                print('here', gen_idx)
+            #elif len(new_constructed) < 100:
+            #    new_constructed = new_constructed + [0 for el in range(100-len(new_constructed)+1)]
+
 
             constructed.append(new_constructed)
         constructed_array = np.array(constructed).transpose()
+        #constructed_array = constructed_array[0,:]
+
         constructed_array = pd.DataFrame(constructed_array)
         plt.figure(figsize=self.fig_size)
         sns.heatmap(constructed_array, vmin=0, cmap='Blues')
@@ -430,13 +429,17 @@ class Plotter:
                 new_constructed = new_constructed + [0 for el in range(100 - len(new_constructed) + 1)]
             constructed.append(new_constructed)
         constructed_array = np.array(constructed).transpose()
+        #constructed_array = constructed_array[0,:]
+
         constructed_array = pd.DataFrame(constructed_array)
         plt.figure(figsize=self.fig_size)
-        sns.heatmap(constructed_array, vmin=0, cmap='Reds')
+        #sns.heatmap(constructed_array, vmin=0, cmap='Reds', norm=LogNorm())
+        sns.heatmap(constructed_array, vmin=0, cmap='Reds', norm=LogNorm())
         plt.xlabel("Generations")
         plt.ylabel("Niche index")
         plt.yticks(range(len(niches_indexes))[::20], sorted(niches_indexes)[::20])
-
+        for index,row in constructed_array.iterrows():
+            print(row,max(row))
         # plt.colorbar()
 
         plt.savefig(save_dir + "/plots/varconstructed_trial_" + str(trial))

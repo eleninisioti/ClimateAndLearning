@@ -43,7 +43,7 @@ def create_jzscript(config):
     elif config["--env_type"] == "noisy":
         climate_string = "_noise_" + str(config["--noise_std"])
 
-    script_path = scripts_dir + "/climate_" + config["--env_type"]  +  "_stopNC_" + str(config["--stop_NC_every"])+ "_N_" + str(config["--num_niches"]) + "_select_"  + config["--selection_type"] +\
+    script_path = scripts_dir + "/climate_" + config["--env_type"]  +  "_stopNC_" + str(config["--stop_NC_every"])+  "_stopNCfor_" + str(config["--stop_NC_for"])+ "_N_" + str(config["--num_niches"]) + "_select_"  + config["--selection_type"] +\
                   "_genome_" + config["--genome_type"] + climate_string + "_trial_" + str(config["--trial"])   +".sh"
     with open(script_path, "w") as fh:
         fh.writelines("#!/bin/bash\n")
@@ -275,31 +275,33 @@ def niche_construction_stable_control(mode):
              "--stop_NC_for"]
 
     env_type = "stable"
-    num_gens = 2000
+    num_gens = 4000
     genome_types = ["niche-construction"]
     num_niches_values = [100]
-    selection_types = ["NF"]
+    selection_types = ["NF", "F"]
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
     climate_mean_init_values = [0.6]
     stop_NC_every = 500
-    stop_NC_for = 700
+    stop_NC_for_values = [200, 700]
 
-    for num_niches in num_niches_values:
+    for stop_NC_for in stop_NC_for_values:
 
-        for genome_type in genome_types:
+        for num_niches in num_niches_values:
 
-            for climate_mean_init in climate_mean_init_values:
-                for S in selection_types:
+            for genome_type in genome_types:
 
-                    project = top_dir + "S_" + S + "_G_" + genome_type + "_N_" + \
-                              str(num_niches) + "_climate_" + str(climate_mean_init)
-                    values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init,
-                              stop_NC_every, stop_NC_for]
-                    config = dict(zip(flags, values))
-                    if mode == "local":
-                        exec_command(config)
-                    elif mode == "server":
-                        create_jzscript(config)
+                for climate_mean_init in climate_mean_init_values:
+                    for S in selection_types:
+
+                        project = top_dir + "S_" + S + "_G_" + genome_type + "_N_" + \
+                                  str(num_niches) + "_climate_" + str(climate_mean_init)
+                        values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init,
+                                  stop_NC_every, stop_NC_for]
+                        config = dict(zip(flags, values))
+                        if mode == "local":
+                            exec_command(config)
+                        elif mode == "server":
+                            create_jzscript(config)
 
 
 def niche_construction_periodic(mode):

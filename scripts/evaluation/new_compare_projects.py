@@ -111,7 +111,7 @@ class Plotter:
             generations = list(set(self.log["Generation"].tolist()))
             generations.sort()
             print("label", label)
-            if True:
+            if "constructed" in log_trial.keys():
 
                 if True:
                     constructed=constructed["constructed"]
@@ -122,8 +122,8 @@ class Plotter:
 
                     total = [sum(x) for x in zip(y, constructed_mean)]
 
-                    sns.lineplot(ax=self.axs[count], x=x, y=total, ci=None, label="total", color="green")
-                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=None, label="intrinsic", color="red")
+                    #sns.lineplot(ax=self.axs[count], x=x, y=total, ci=None, label="total", color="green")
+                sns.lineplot(ax=self.axs[count], x=x, y=y, ci=None, label=label)
 
             #self.axs[count].ticklabel_format(useOffset=False)
             #self.axs[count].set_ylim(np.log(min(y+total)), np.log(max(y+total)))
@@ -543,7 +543,7 @@ def run(top_dir):
             #include.append( "constructed")
     include = [ "mutate","climate",
                    "num_agents",
-                   "extinct","sigma", "mean", "construct"]
+                   "dispersal","diversity","sigma", "mean", "construct"]
 
     if not log_df.empty:
 

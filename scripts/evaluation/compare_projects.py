@@ -486,6 +486,44 @@ class Plotter:
             self.axs[count].get_legend().remove()
 
             count += 1
+        if "diversity_mean" in self.include:
+            for key, value in results.items():
+                label = key
+                log = value[0]
+                log_niches = value[1]
+                config = value[2]
+                x = log["Generation"]
+                y = log["diversity_mean"]
+
+                sns.lineplot(ax=self.axs[count],data=log, x="Generation", y="diversity_mean", ci=self.ci, label=label)
+
+
+            self.axs[count].set(xlabel="Time (in generations)")
+            self.axs[count].set(ylabel="$V_{\mu}$,\n diversity in mean")
+            self.axs[count].set_yscale('log')
+
+            self.axs[count].get_legend().remove()
+
+            count += 1
+        if "diversity_sigma" in self.include:
+            for key, value in results.items():
+                label = key
+                log = value[0]
+                log_niches = value[1]
+                config = value[2]
+                x = log["Generation"]
+                y = log["diversity_sigma"]
+
+                sns.lineplot(ax=self.axs[count],data=log, x="Generation", y="diversity_sigma", ci=self.ci, label=label)
+
+
+            self.axs[count].set(xlabel="Time (in generations)")
+            self.axs[count].set(ylabel="$V_{\sigma}$,\n diversity in $\sigma$")
+            self.axs[count].set_yscale('log')
+
+            self.axs[count].get_legend().remove()
+
+            count += 1
         # ----- plot dispersal  -----
         if "dispersal" in self.include:
             for key, value in results.items():
@@ -589,7 +627,8 @@ if __name__ == "__main__":
             include.append("construct_sigma")
             # include.append( "constructed")
 
-    include = ["climate", "mutate", "num_agents", "dispersal", "diversity", "mean", "sigma"]
+    include = ["climate", "mutate", "num_agents", "dispersal", "diversity",
+               "diversity_mean", "diversity_sigma", "mean", "sigma"]
 
     print("plotting")
     plotter = Plotter(project=results_dir,

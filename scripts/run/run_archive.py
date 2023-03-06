@@ -232,7 +232,9 @@ def niche_construction_stable(mode):
              "--genome_type",
              "--num_niches",
              "--climate_mean_init",
-             "--stop_NC_every"]
+             "--stop_NC_every",
+             "--stop_NC_for"
+             ]
 
     env_type = "stable"
     num_gens = 2000
@@ -242,6 +244,7 @@ def niche_construction_stable(mode):
     climate_mean_init_values = [0.2, 0.4, 0.6, 0.8, 1, 2, 4, 8]
     climate_mean_init_values = [0.6]
     stop_NC_every = 0
+    stop_NC_for = 0
 
     for num_niches in num_niches_values:
 
@@ -252,7 +255,8 @@ def niche_construction_stable(mode):
 
                     project = top_dir + "S_" + S + "_G_" + genome_type + "_N_" + \
                               str(num_niches) + "_climate_" + str(climate_mean_init)
-                    values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init, stop_NC_every]
+                    values = [project, env_type, num_gens, trial, S, genome_type, num_niches, climate_mean_init,
+                              stop_NC_every, stop_NC_for]
                     config = dict(zip(flags, values))
                     if mode == "local":
                         exec_command(config)
@@ -316,7 +320,10 @@ def niche_construction_periodic(mode):
              "--num_niches",
              "--climate_mean_init",
              "--amplitude",
-             "--period"]
+             "--period",
+             "--stop_NC_every",
+             "--stop_NC_for"
+             ]
 
     env_type = "sin"
     num_gens = 2000
@@ -329,6 +336,8 @@ def niche_construction_periodic(mode):
     amplitude_values = [8]
     period_values = [int(num_gens), int(num_gens / 2), int(num_gens / 8), int(num_gens / 16), int(num_gens / 32)]
     period_values = [int(num_gens/2)]
+    stop_NC_for = 0
+    stop_NC_every = 0
 
 
 
@@ -343,7 +352,7 @@ def niche_construction_periodic(mode):
                                   "_climate_" + str(climate_mean_init) + "_T_" + str(period) + "_A_" + str(
                             amplitude)
                         values = [project, env_type, num_gens, trial, selection, genome_type, num_niches,
-                                  climate_mean_init, amplitude, period]
+                                  climate_mean_init, amplitude, period, stop_NC_every, stop_NC_for]
                         config = dict(zip(flags, values))
                         if mode == "local":
                             exec_command(config)

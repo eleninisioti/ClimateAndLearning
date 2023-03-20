@@ -35,5 +35,5 @@ will run a simulation with an environment with a climate function whose state is
 
 You can also take a look at scripts/run/reproduce_gecco.py to see which flags were used for the simulations presented in the paper.
 
-Running all simulations requires some days. You can instead download the data produced by running scripts/run/reproduce_gecco.py from [this google folder](https://drive.google.com/file/d/1rwyEx7n7mqJuy5LHkbpn0w3sxBYE5J6t/view?usp=sharing) and unzip them under the projects directory. 
+Running all simulations requires some days. You can instead download the data produced by running scripts/run/reproduce_gecco.py from [this google folder](https://share.internxt.com/d/sh/file/ba212fae02ac981b88fa/45fae4ceb720fd0ff85d63b8de8b1f38931c2fcddf53038819ada2b696666b70) and unzip them under the projects directory. 
 
